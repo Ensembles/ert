@@ -331,7 +331,7 @@ const char * config_item_get(const config_item_type * item) {
 
 
 static const stringlist_type * config_item_iget_stringlist_ref(const config_item_type * item, int occurence) {
-  config_item_node_type * node = config_item_iget_node(item , 0);  
+  config_item_node_type * node = config_item_iget_node(item , occurence);  
   return node->stringlist;
 }
 
@@ -1082,6 +1082,17 @@ const char * config_get(const config_type * config , const char * kw) {
 }
 
 
+/**
+   This function will return NULL is the item has not been set, 
+   however it must be installed with config_add_item().
+*/
+const char * config_safe_get(const config_type * config , const char *kw) {
+  config_item_type * item = config_get_item(config , kw);
+  if (config_item_is_set(item))
+    return config_item_get(item);
+  else
+    return NULL;
+}
 
 /** 
     As the config_get function, but the argc_minmax requiremnt has been removed.

@@ -54,6 +54,7 @@ config_item_type * config_item_alloc(const char * , bool , bool);
 config_item_type * config_get_item(const config_type *, const char *);
 void               config_add_alias(config_type * , const char * , const char * );
 void               config_install_message(config_type * , const char * , const char * );
+const char       * config_safe_get(const config_type * , const char *);
 /*
 const char       * config_iget_arg(const config_item_type * , int);
 int                config_item_get_argc(const config_item_type *);
