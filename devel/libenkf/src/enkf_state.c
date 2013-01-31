@@ -359,7 +359,6 @@ void enkf_state_update_eclbase( enkf_state_type * enkf_state ) {
       enkf_state_add_subst_kw( enkf_state , "CASE" , eclbase , NULL);      /* No CASE_TABLE loaded - using the eclbase as default. */
     else
       enkf_state_add_subst_kw( enkf_state , "CASE" , casename , NULL);
-    
   }
 }
 
@@ -498,7 +497,7 @@ enkf_state_type * enkf_state_alloc(int iens,
      done in a cascade like fashion). The user defined keywords are
      added first, so that these can refer to the built in keywords.
   */
-  
+
   enkf_state_add_subst_kw(enkf_state , "RUNPATH"       , "---" , "The absolute path of the current forward model instance. ");
   enkf_state_add_subst_kw(enkf_state , "IENS"          , "---" , "The realisation number for this realization.");
   enkf_state_add_subst_kw(enkf_state , "IENS4"         , "---" , "The realization number for this realization - formated with %04d.");
@@ -518,21 +517,14 @@ enkf_state_type * enkf_state_alloc(int iens,
     enkf_state_add_subst_kw(enkf_state , "CASE" , casename , "The casename for this realization - as loaded from the CASE_TABLE file.");
   else
     enkf_state_add_subst_kw(enkf_state , "CASE" , "---" , "The casename for this realization - similar to ECLBASE.");
-  
+
   enkf_state->my_config = member_config_alloc( iens , casename , pre_clear_runpath , keep_runpath , ecl_config , ensemble_config , fs);
   enkf_state_set_static_subst_kw( enkf_state );
-
   enkf_state_add_nodes( enkf_state , ensemble_config );
-
+  
   return enkf_state;
 }
 
-
-
-enkf_state_type * enkf_state_copyc(const enkf_state_type * src) {
-  util_abort("%s: not implemented \n",__func__);
-  return NULL;
-}
 
 
 
@@ -589,12 +581,17 @@ void enkf_state_update_node( enkf_state_type * enkf_state , const char * node_ke
 }
 
 
+const char * enkf_state_get_eclbase( const enkf_state_type * enkf_state ) {
+  return member_config_get_eclbase( enkf_state->my_config );
+}
+
+
 static ecl_sum_type * enkf_state_load_ecl_sum(const enkf_state_type * enkf_state , stringlist_type * messages , bool * loadOK) {
   member_config_type * my_config         = enkf_state->my_config;
   const run_info_type * run_info         = enkf_state->run_info;
   const ecl_config_type * ecl_config     = enkf_state->shared_info->ecl_config;
   const bool fmt_file                    = ecl_config_get_formatted(ecl_config);
-  const char * eclbase                   = member_config_get_eclbase( my_config );
+  const char * eclbase                   = enkf_state_get_eclbase( enkf_state );
   
 
   stringlist_type * data_files           = stringlist_alloc_new();
@@ -739,7 +736,7 @@ static bool enkf_state_internalize_dynamic_eclipse_results(enkf_state_type * enk
       }
       {
         time_map_type * time_map = enkf_fs_get_time_map( fs );
-        time_map_summary_update( time_map , summary );
+        time_map_summary_update_strict( time_map , summary );
       }
       ecl_sum_free( summary ); 
       return true;

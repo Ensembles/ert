@@ -56,6 +56,7 @@ extern "C" {
 #include <ert/enkf/enkf_plot_data.h>
 #include <ert/enkf/ert_report_list.h>
 #include <ert/enkf/ranking_table.h>
+#include <ert/enkf/qc_module.h>
 
   /*****************************************************************/
   
@@ -75,7 +76,7 @@ extern "C" {
   const char                  * enkf_main_get_rft_config_file( const enkf_main_type * enkf_main );
   bool                          enkf_main_get_pre_clear_runpath( const enkf_main_type * enkf_main );
   void                          enkf_main_set_pre_clear_runpath( enkf_main_type * enkf_main , bool pre_clear_runpath);
-  void                          enkf_main_set_refcase( enkf_main_type * enkf_main , const char * refcase_path);
+  bool                          enkf_main_set_refcase( enkf_main_type * enkf_main , const char * refcase_path);
   
   ert_report_list_type        * enkf_main_get_report_list( const enkf_main_type * enkf_main );
   ert_templates_type          * enkf_main_get_templates( enkf_main_type * enkf_main );
@@ -98,6 +99,7 @@ extern "C" {
   void                          enkf_main_add_well(enkf_main_type * , const char * , int , const char ** );
   void                          enkf_main_analysis(enkf_main_type * );
   void                          enkf_main_free(enkf_main_type * );
+  void                          enkf_main_exit(enkf_main_type * enkf_main);
   void                          enkf_main_init_eclipse(enkf_main_type * , int , int );
   void                          enkf_main_init_run( enkf_main_type * enkf_main, run_mode_type run_mode);
   void                          enkf_main_load_ecl_init_mt(enkf_main_type * enkf_main , int );
@@ -215,7 +217,10 @@ extern "C" {
   void                        enkf_main_update_node( enkf_main_type * enkf_main , const char * key );
   void                        enkf_main_fprintf_config( const enkf_main_type * enkf_main );
   int_vector_type           * enkf_main_update_alloc_step_list( const enkf_main_type * enkf_main , int load_start , int step2 , int stride);
-  
+
+  const qc_module_type * enkf_main_get_qc_module( const enkf_main_type * enkf_main );
+  bool                   enkf_main_has_QC_workflow( const enkf_main_type * enkf_main );
+
   void enkf_main_get_PC( const enkf_main_type * enkf_main , 
                          const matrix_type * S, 
                          const matrix_type * dObs,
@@ -229,6 +234,11 @@ extern "C" {
   
   void                   enkf_main_set_verbose( enkf_main_type * enkf_main , bool verbose);
   bool                   enkf_main_get_verbose( const enkf_main_type * enkf_main );
+
+  ert_workflow_list_type * enkf_main_get_workflow_list( enkf_main_type * enkf_main );
+  
+  enkf_main_type      * enkf_main_alloc_empty( );
+
 
 UTIL_SAFE_CAST_HEADER(enkf_main);
 
