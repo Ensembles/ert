@@ -334,8 +334,20 @@ double util_kahan_sum(const double *data, size_t N) {
 }
 
 
-
-
+bool util_double_approx_equal( double d1 , double d2) {
+  if (d1 == d2)
+    return true;
+  else {
+    double epsilon = 1e-6;
+    double diff = fabs(d1 - d2);
+    double sum  = fabs(d1) + fabs(d2);
+    
+    if ((diff / sum) < epsilon)
+      return true;
+    else
+      return false;
+  }
+}
 
 
 char * util_alloc_substring_copy(const char *src , int offset , int N) {
@@ -1987,6 +1999,11 @@ double util_scanf_double(const char * prompt , int prompt_len) {
   getchar(); /* eating a \r left in the stdin input buffer. */
   return double_value;
 }
+
+
+
+
+
 
 
 /** 
