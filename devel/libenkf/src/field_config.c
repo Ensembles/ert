@@ -944,7 +944,7 @@ void field_config_assert_binary( const field_config_type * config1 , const field
 bool field_config_parse_user_key__( const char * index_key , int *i , int *j , int *k) {
   int      length;
   {
-    int_vector_type * indices = string_util_alloc_active_list( index_key );
+    int_vector_type * indices = string_util_alloc_value_list( index_key );
     length = int_vector_size( indices );
 
     if (length == 3) {
