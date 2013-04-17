@@ -31,28 +31,26 @@ class ErtTemplate(CClass):
         if self.owner:
             cfunc.free( self )
 
+    @property
+    def get_template_file(self):
+        return cfunc.get_template_file(self)
 
-    def has_key(self , key):
-        return cfunc.has_key( self ,key )
+    @property
+    def get_target_file(self):
+        return cfunc.get_target_file(self)
 
-
-
+    @property
+    def get_args_as_string(self):
+        return cfunc.get_args_as_string(self)   
 ##################################################################
 
 cwrapper = CWrapper( libenkf.lib )
-cwrapper.registerType( "ert_template" , AnalysisConfig )
+cwrapper.registerType( "ert_template" , ErtTemplate )
 
-# 3. Installing the c-functions used to manipulate ecl_kw instances.
-#    These functions are used when implementing the EclKW class, not
-#    used outside this scope.
 cfunc = CWrapperNameSpace("ert_template")
-
-
+##################################################################
+##################################################################
 cfunc.free                   = cwrapper.prototype("void ert_template_free( ert_template )")
-cfunc.alloc_list             = cwrapper.prototype("c_void_p ert_templates_alloc_list(long)"),
-cfunc.get_template           = cwrapper.prototype("c_void_p ert_templates_get_template(long, char*)"),
-cfunc.get_template_file      = cwrapper.prototype("char* ert_template_get_template_file(long)"),
-cfunc.get_target_file        = cwrapper.prototype("char* ert_template_get_target_file(long)"),
-cfunc.get_args_as_string     = cwrapper.prototype("char* ert_template_get_args_as_string(long)"),
-cfunc.clear                  = cwrapper.prototype("void ert_templates_clear(long)"),
-cfunc.add_template           = cwrapper.prototype("void ert_templates_add_template(long, char*, char*, char*, char*)"),]
+cfunc.get_template_file      = cwrapper.prototype("char* ert_template_get_template_file(ert_template)")
+cfunc.get_target_file        = cwrapper.prototype("char* ert_template_get_target_file(ert_template)")
+cfunc.get_args_as_string     = cwrapper.prototype("char* ert_template_get_args_as_string(ert_template)")

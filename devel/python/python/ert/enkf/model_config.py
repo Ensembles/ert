@@ -15,48 +15,87 @@
 #  for more details. 
 
 import  ctypes
-from    ert.cwrap.cwrap       import *
-from    ert.cwrap.cclass      import CClass
-from    ert.util.tvector      import * 
-from    enkf_enum             import *
-import  libenkf
+from    ert.cwrap.cwrap            import *
+from    ert.cwrap.cclass           import CClass
+from    ert.util.tvector           import * 
+from    enkf_enum                  import *
+from    ert.job_queue.forward_model import ForwardModel
+from    libenkf import *
+from    ert.sched.libsched import *
+from    ert.sched.history import HistoryType
+from    ert.sched.sched_file import *
+from    ert.ecl.ecl_sum import *
 class ModelConfig(CClass):
     
-    def __init__(self , c_ptr = None):
-        self.owner = False
-        self.c_ptr = c_ptr
+    def __init__(self , c_ptr , parent = None):
+        if parent:
+            self.init_cref( c_ptr , parent)
+        else:
+            self.init_cobj( c_ptr , cfunc.free )
+
+    @property
+    def get_enkf_sched_file(self):
+        return cfunc.get_enkf_sched_file( self )
+
+    def set_enkf_sched_file(self, file):
+        cfunc.get_enkf_sched_file( self , file)
+
+    @property
+    def get_history_source(self):
+        return HistoryType(c_ptr = cfunc.get_history_source( self ) , parent = self)
+
+    def set_history_source(self, count):
+        if self.parent:
+            if count == 0:
+                schedfile = self.parent.get_schedule_prediction_file
+                cfunc.select_schedule_history(self, schedfile)
+            if count == 1:
+                refcase = self.parent.ecl_config.get_refcase
+                cfunc.select_refcase_history(self,refcase,True)
+            if count == 2: 
+                refcase = self.parent.ecl_config.get_refcase
+                cfunc.select_refcase_history(self,refcase,False)                 
         
-        
-    def __del__(self):
-        if self.owner:
-            cfunc.free( self )
 
+    @property
+    def get_max_internal_submit(self):
+        return cfunc.get_max_internal_submit( self )
 
-    def has_key(self , key):
-        return cfunc.has_key( self ,key )
+    def set_max_internal_submit(self, max):
+        cfunc.get_max_internal_submit( self , max)
 
+    @property     
+    def get_forward_model(self):
+        ford_model = ForwardModel( c_ptr = cfunc.get_forward_model( self ))
+        return ford_model
 
+    @property
+    def get_case_table_file(self):
+        return cfunc.get_case_table_file(self)
 
+    @property
+    def get_runpath_as_char(self):
+        return cfunc.get_runpath_as_char(self)
 ##################################################################
 
 cwrapper = CWrapper( libenkf.lib )
 cwrapper.registerType( "model_config" , ModelConfig )
 
-# 3. Installing the c-functions used to manipulate ecl_kw instances.
-#    These functions are used when implementing the EclKW class, not
-#    used outside this scope.
 cfunc = CWrapperNameSpace("model_config")
 
+##################################################################
+##################################################################
 
-cfunc.free                = cwrapper.prototype("void model_config_free( model_config )")
-cfunc.get_enkf_sched_file = cwrapper.prototype("char* model_config_get_enkf_sched_file( model_config )")
-cfunc.set_enkf_sched_file = cwrapper.prototype("void model_config_set_enkf_sched_file( model_config, char*)")
-cfunc.get_history_source  = cwrapper.prototype("int model_config_get_history_source(model_config)")
-cfunc.set_history_source  = cwrapper.prototype("void model_config_set_history_source(model_config, int)")
-cfunc.get_forward_model   = cwrapper.prototype("c_void_p model_config_get_forward_model(model_config)")
-cfunc.get_max_resample    = cwrapper.prototype("int model_config_get_max_resample(model_config)")
-cfunc.set_max_resample    = cwrapper.prototype("void model_config_set_max_resample(model_config, int)")
-cfunc.get_case_table_file = cwrapper.prototype("char* model_config_get_case_table_file(model_config)")
-cfunc.get_runpath_as_char = cwrapper.prototype("char* model_config_get_runpath_as_char(model_config)")
-cfunc.set_runpath_fmt     = cwrapper.prototype("void model_config_set_runpath_fmt(model_config, char*)")
+cfunc.free                    = cwrapper.prototype("void model_config_free( model_config )")
+cfunc.get_enkf_sched_file     = cwrapper.prototype("char* model_config_get_enkf_sched_file( model_config )")
+cfunc.set_enkf_sched_file     = cwrapper.prototype("void model_config_set_enkf_sched_file( model_config, char*)")
+cfunc.get_history_source      = cwrapper.prototype("c_void_p model_config_get_history_source(model_config)")
+cfunc.select_schedule_history = cwrapper.prototype("void model_config_select_schedule_history(model_config, sched_file)")
+cfunc.select_refcase_history = cwrapper.prototype("void model_config_select_refcase_history(model_config, ecl_sum, bool)")
+cfunc.get_forward_model       = cwrapper.prototype("c_void_p model_config_get_forward_model(model_config)")
+cfunc.get_max_internal_submit = cwrapper.prototype("int model_config_get_max_internal_submit(model_config)")
+cfunc.set_max_internal_submit = cwrapper.prototype("void model_config_set_max_internal_submit(model_config, int)")
+cfunc.get_case_table_file     = cwrapper.prototype("char* model_config_get_case_table_file(model_config)")
+cfunc.get_runpath_as_char     = cwrapper.prototype("char* model_config_get_runpath_as_char(model_config)")
+cfunc.select_runpath          = cwrapper.safe_prototype("void model_config_select_runpath(model_config, char*)")
                                  

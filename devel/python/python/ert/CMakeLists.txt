@@ -10,4 +10,5 @@ add_subdirectory( rms )
 add_subdirectory( sched )
 add_subdirectory( util )
 add_subdirectory( well )
-
+add_subdirectory( ert )
+add_subdirectory( plot )
