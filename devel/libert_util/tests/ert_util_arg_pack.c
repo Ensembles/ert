@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2013  Statoil ASA, Norway. 
     
-   The file 'config_config.c' is part of ERT - Ensemble based Reservoir Tool. 
+   The file 'ert_util_arg_pack.c' is part of ERT - Ensemble based Reservoir Tool. 
     
    ERT is free software: you can redistribute it and/or modify 
    it under the terms of the GNU General Public License as published by 
@@ -17,20 +17,30 @@
 */
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <execinfo.h>
 #include <unistd.h>
 
 #include <ert/util/test_util.h>
-#include <ert/util/util.h>
-
-#include <ert/config/config.h>
-#include <ert/config/config_schema_item.h>
+#include <ert/util/arg_pack.h>
 
 
-int main(int argc , char ** argv) {
-  config_type * config = config_alloc();
-  config_add_schema_item( config , "KEYWORD" , false );
-  config_free( config );
+
+/*
+  This test must be compiled with -Werror; an important part of the test
+  is that we should get no warnings related to the const pointers.
+*/
+
+int main( int argc , char ** argv) {
+  const char * ptr1 = "Pointer1";
+  const char * ptr2 = "Pointer2";
+
+  arg_pack_type * arg_pack = arg_pack_alloc();
+  arg_pack_append_const_ptr( arg_pack , ptr1 );
+  arg_pack_append_const_ptr( arg_pack , ptr2 );
+
+
+  test_assert_ptr_equal( ptr1 , arg_pack_iget_const_ptr( arg_pack , 0 ));
+  test_assert_ptr_equal( ptr2 , arg_pack_iget_const_ptr( arg_pack , 1 ));
+
   exit(0);
 }
-
