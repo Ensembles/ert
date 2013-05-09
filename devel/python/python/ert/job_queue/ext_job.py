@@ -18,8 +18,9 @@ import  ctypes
 from    ert.cwrap.cwrap       import *
 from    ert.cwrap.cclass      import CClass
 from    ert.util.tvector      import * 
-from    ert.enkf.enkf_enum             import *
-import  ert.enkf.libenkf
+from    ert.enkf.enkf_enum    import *
+import  libjob_queue
+
 class ExtJob(CClass):
     
     def __init__(self , c_ptr = None):
@@ -42,7 +43,7 @@ class ExtJob(CClass):
     def get_help_text(self):
         return cfunc.get_help_text(self)##################################################################
 
-cwrapper = CWrapper( libenkf.lib )
+cwrapper = CWrapper( libjob_queue.lib )
 cwrapper.registerType( "ext_job" , ExtJob )
 
 cfunc = CWrapperNameSpace("ext_job")

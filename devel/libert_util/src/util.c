@@ -73,7 +73,7 @@
 #include <sys/wait.h>
 #endif
 
-#ifdef HAVE_USLEEP
+#ifdef HAVE__USLEEP
 #include <unistd.h>
 #endif
 
@@ -700,7 +700,7 @@ char * util_realloc_stdin_line(char * p) {
 */
 
 void util_usleep( unsigned long micro_seconds ) {
-#ifdef HAVE_USLEEP
+#ifdef HAVE__USLEEP
   usleep( micro_seconds );
 #else 
   #ifdef ERT_WINDOWS
@@ -2102,11 +2102,16 @@ int util_count_content_file_lines(FILE * stream) {
       col = 0;
       c = fgetc(stream);
       if (! feof(stream) ) {
-        if (!EOL_CHAR(c))
+        if (!EOL_CHAR(c)){
           fseek(stream , -1 , SEEK_CUR);
+	}
+      }else if (c == EOF){
+	lines++;
       }
-    } else if (c == EOF)
+      
+    } else if (c == EOF){
       lines++;
+    }
     else {
       if (c != ' ')
         col++;

@@ -18,8 +18,6 @@ import  ctypes
 from    ert.cwrap.cwrap       import *
 from    ert.cwrap.cclass      import CClass
 from    ert.util.tvector      import * 
-from    ert.enkf.enkf_enum             import *
-from    ert.enkf.libenkf import *
 import  libjob_queue
 class ForwardModel(CClass):
     
