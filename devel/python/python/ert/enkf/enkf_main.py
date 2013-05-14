@@ -82,12 +82,12 @@ class EnKFMain(CClass):
 
     @property     
     def logh(self):
-        mog = Log( c_ptr = cfunc.get_logh( self ))
+        mog = Log( c_ptr = cfunc.get_logh( self ), parent = self)
         return mog
     
     @property     
     def local_config(self):
-        loc_config = LocalConfig( c_ptr = cfunc.get_local_config( self ))
+        loc_config = LocalConfig( c_ptr = cfunc.get_local_config( self ), parent = self)
         return loc_config
     
     @property     
@@ -97,12 +97,12 @@ class EnKFMain(CClass):
     
     @property     
     def ecl_config(self):
-        ecl_conf = EclConfig( c_ptr = cfunc.get_ecl_config( self ))
+        ecl_conf = EclConfig( c_ptr = cfunc.get_ecl_config( self ) , parent = self)
         return ecl_conf
      
     @property     
     def plot_config(self):
-        plot_conf = PlotConfig( c_ptr = cfunc.get_plot_config( self ))
+        plot_conf = PlotConfig( c_ptr = cfunc.get_plot_config( self ), parent = self)
         return plot_conf
      
     def set_eclbase(self, eclbase):
@@ -138,7 +138,7 @@ class EnKFMain(CClass):
         
     @property
     def get_obs(self):
-        ob = EnkfObs( c_ptr = cfunc.get_obs( self ))
+        ob = EnkfObs( c_ptr = cfunc.get_obs( self ), parent = self)
         return ob
     
     def load_obs(self, obs_config_file):
@@ -167,7 +167,7 @@ class EnKFMain(CClass):
 
     @property
     def get_templates(self):
-        temp = ErtTemplates( c_ptr = cfunc.get_templates( self ))
+        temp = ErtTemplates( c_ptr = cfunc.get_templates( self ), parent = self)
         return temp
         
     @property
@@ -177,11 +177,10 @@ class EnKFMain(CClass):
        
     def initialize_from_scratch(self, parameter_list, iens1, iens2, force_init = True):
         cfunc.initialize_from_scratch(self, parameter_list, iens1, iens2, force_init)
-       
+
     @property
     def get_fs(self):
-        enkf_fsout = EnkfFs(c_ptr = cfunc.get_fs(self))
-        return enkf_fsout
+        return EnkfFs(c_ptr = cfunc.get_fs(self), parent = self)
 
     @property
     def get_history_length(self):
@@ -196,12 +195,12 @@ class EnKFMain(CClass):
 
 
     def iget_state(self, ens_memb):
-        i_enkf_state = EnKFState( c_ptr = cfunc.iget_state( self ,ens_memb))
+        i_enkf_state = EnKFState( c_ptr = cfunc.iget_state( self ,ens_memb), parent = self)
         return i_enkf_state
     
     def get_observations(self, user_key, obs_count, obs_x, obs_y, obs_std):
         cfunc.get_observations(self, user_key, obs_count, obs_x, obs_y, obs_std)
-        
+
     def get_observation_count(self, user_key):
         return cfunc.get_observation_count(self, user_key)
  
@@ -219,6 +218,29 @@ class EnKFMain(CClass):
             cfunc.run_exp(self, boolPtr, False, init_step_parameter, simFrom, state)
         if mode == 5:
             cfunc.run_smoother(self, "AUTOSMOOTHER", True)
+
+    @property
+    def alloc_caselist(self):
+        return StringList(c_ptr = cfunc.alloc_caselist(self), parent = self)
+
+    @property
+    def get_current_fs(self):
+        return cfunc.get_current_fs(self)
+
+    def user_select_fs(self, input_case):
+        cfunc.user_select_fs(self, input_case)
+
+    @property
+    def get_alt_fs(self, fs, read_only, create):
+        return EnkfFS(cfunc.get_alt_fs(self, fs, read_only, create), parent = self)
+
+    @staticmethod
+    def create_new_config(config_file, storage_path, case_name, dbase_type, num_realizations):
+        cfunc.create_new_config(config_file, storage_path, case_name, dbase_type, num_realizations)
+
+    def fprintf_config(self):
+        cfunc.fprintf_config(self)
+    
 ##################################################################
 
 cwrapper = CWrapper( libenkf.lib )
@@ -265,7 +287,7 @@ cfunc.initialize_from_existing__   = cwrapper.prototype("void enkf_main_initiali
 cfunc.copy_ensemble                = cwrapper.prototype("void enkf_main_copy_ensemble(enkf_main, char*, int, int, char*, int, int, bool_vector, char*, stringlist)")
 cfunc.get_observations             = cwrapper.prototype("void enkf_main_get_observations(enkf_main, char*, int, long*, double*, double*)") 
 cfunc.get_observation_count        = cwrapper.prototype("int enkf_main_get_observation_count(enkf_main, char*)")
-cfunc.mount_extra_fs               = cwrapper.safe_prototype("c_void_p enkf_main_mount_extra_fs(enkf_main, char*)")
+cfunc.get_alt_fs                   = cwrapper.prototype("c_void_p enkf_main_get_alt_fs(enkf_main , char* , bool , bool)")
 cfunc.is_initialized               = cwrapper.prototype("bool enkf_main_is_initialized(enkf_main)")
 cfunc.iget_state                   = cwrapper.prototype("c_void_p enkf_main_iget_state(enkf_main, int)")
 cfunc.user_select_fs               = cwrapper.prototype("void enkf_main_user_select_fs(enkf_main , char*)") 
@@ -273,3 +295,7 @@ cfunc.get_logh                     = cwrapper.prototype("void enkf_main_get_logh
 cfunc.run_exp                      = cwrapper.prototype("void enkf_main_run_exp( enkf_main, bool_vector, bool, int, int, int)")
 cfunc.run_assimilation             = cwrapper.prototype("void enkf_main_run_assimilation( enkf_main, bool_vector, int, int, int)")
 cfunc.run_smoother                 = cwrapper.prototype("void enkf_main_run_smoother(enkf_main, char*, bool)")
+cfunc.get_current_fs               = cwrapper.prototype("char* enkf_main_get_current_fs(enkf_main)")
+cfunc.alloc_caselist               = cwrapper.prototype("c_void_p enkf_main_alloc_caselist(enkf_main)")
+cfunc.fprintf_config               = cwrapper.prototype("void enkf_main_fprintf_config(enkf_main)")
+cfunc.create_new_config            = cwrapper.prototype("void enkf_main_create_new_config(char* , char*, char* , char* , int)")

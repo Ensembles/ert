@@ -17,13 +17,12 @@
 import  ctypes
 from    ert.cwrap.cwrap        import *
 from    ert.cwrap.cclass       import CClass
-from    ert.ert.erttypes       import time_t
+from    ert.util.ctime         import ctime
 from    ert.util.tvector       import * 
 from    enkf_enum              import *
 import  libenkf
 from    ert.enkf.libenkf       import *
-
-#from ert.job_queue.ext_joblist import ExtJoblist
+from    ert.ert.erttypes import time_t
 
 class TimeMap(CClass):
     
@@ -51,4 +50,4 @@ cfunc = CWrapperNameSpace("time_map")
 
 cfunc.free                  = cwrapper.prototype("void time_map_free( time_map )")           
 cfunc.iget_sim_days         = cwrapper.prototype("double time_map_iget_sim_days(time_map, int)")
-cfunc.iget                  = cwrapper.prototype("time_t time_map_iget(time_map, int)")
+cfunc.iget                  = cwrapper.prototype("int time_map_iget(time_map, int)")

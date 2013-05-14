@@ -22,7 +22,6 @@ from ert_gui.widgets.checkbox import CheckBox
 from ert_gui.widgets.spinnerwidgets import IntegerSpinner, DoubleSpinner, DoubleSpinner
 import ert_gui.widgets.tablewidgets
 from ert_gui.widgets.pathchooser import PathChooser
-from ert_gui.widgets.combochoice import ComboChoice
 from PyQt4 import QtGui
 import ert.enkf
 
@@ -50,7 +49,7 @@ def createAnalysisPage(configPanel, parent):
     def get_local_config_files(ert):
         local_config = ert.main.local_config
         config_files_pointer = ert.main.local_config.get_config_files
-        return ert.getStringList(config_files_pointer)
+        return config_files_pointer
 
     r.initialize = get_local_config_files
     r.getter = get_local_config_files
@@ -81,20 +80,6 @@ def createAnalysisPage(configPanel, parent):
     r.initialize = lambda ert : ert.main.analysis_config.get_merge_observations 
     r.getter = lambda ert : ert.main.analysis_config.get_merge_observations
     r.setter = lambda ert, value : ert.main.analysis_config.set_merge_observations( value)
-
-
-    #enkf_mode_type = {"ENKF_STANDARD" : 10, "ENKF_SQRT" : 20}
-    #enkf_mode_type_inverted = {10 : "ENKF_STANDARD" , 20 : "ENKF_SQRT"}
-    #r = configPanel.addRow(ComboChoice(parent, enkf_mode_type.keys(), "Mode", "config/analysis/enkf_mode"))
-    #r.getter = lambda ert : enkf_mode_type_inverted[ert.enkf.analysis_config_get_enkf_mode(ert.analysis_config)]
-    #r.setter = lambda ert, value : ert.enkf.analysis_config_set_enkf_mode(ert.analysis_config, enkf_mode_type[str(value)])
-
-
-    #r = configPanel.addRow(DoubleSpinner(parent, "Truncation", "config/analysis/enkf_truncation", 0, 1, 2))
-    #r.getter = lambda ert : ert.enkf.analysis_config_get_truncation(ert.analysis_config)
-    #r.setter = lambda ert, value : ert.enkf.analysis_config_set_truncation(ert.analysis_config, value)
-
-
 
     configPanel.endGroup()
     configPanel.endPage()

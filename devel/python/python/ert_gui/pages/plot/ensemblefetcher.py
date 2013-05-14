@@ -25,8 +25,8 @@ from PyQt4.QtCore import SIGNAL
 from ert.ert.erttypes import time_t, time_vector
 import numpy
 from ert.util.node_id import *
-from ert.ert.c_enums import c_state_enum
-
+from ert.util.tvector import DoubleVector
+import datetime
 class EnsembleFetcher(PlotDataFetcherHandler):
     """A data fetcher for ensemble parameters."""
 
@@ -46,21 +46,20 @@ class EnsembleFetcher(PlotDataFetcherHandler):
         self.connect(self.keyword_configuration, SIGNAL('configurationChanged()'), emitter)
         self.connect(self.data_configuration, SIGNAL('configurationChanged()'), emitter)
 
-
-
+        
+        
     def isHandlerFor(self, ert, key):
         return ert.main.ensemble_config.has_key( key)
 
 
     def fetch(self, ert, key, parameter, data, comparison_fs):
         data.x_data_type = "time"
-
         fs = ert.main.get_fs
         config_node = ert.main.ensemble_config.get_node(key)
         node = config_node.alloc_node
         comp_node = config_node.alloc_node
         num_realizations = ert.main.ens_size
-
+        var_type_set = False
         user_data = parameter.getUserData()
 
         if user_data is None:
@@ -72,19 +71,25 @@ class EnsembleFetcher(PlotDataFetcherHandler):
 
         if parameter.getType() == FieldModel.TYPE:
             field_position = user_data['field_position']
-            field_config = config_node.get_ref
-            if ert.enkf.field_config_ijk_active(field_config, field_position[0] - 1, field_position[1] - 1, field_position[2] - 1):
+            field_config = config_node.field_model
+            if field_config.ijk_active(field_position[0] - 1, field_position[1] - 1, field_position[2] - 1):
                 key_index = "%i,%i,%i" % (field_position[0], field_position[1], field_position[2])
                 data.setKeyIndexIsIndex(True)
             else:
                 return False
+            var_type = enums.enkf_var_type.PARAMETER
+            var_type_set = True
         elif parameter.getType() == DataModel.TYPE:
             data_index = user_data['data_index']
             key_index = "KEY:%d" % data_index
             data.setKeyIndexIsIndex(True)
+            var_type = enums.enkf_var_type.PARAMETER
+            var_type_set = True
 
+        if var_type_set == False:
+            var_type = enums.enkf_var_type.DYNAMIC_RESULT
+        
         data.setKeyIndex(key_index)
-
         state_list = [user_data['state']]
         if state_list[0] == enums.ert_state_enum.BOTH:
             state_list = [enums.ert_state_enum.FORECAST, enums.ert_state_enum.ANALYZED]
@@ -103,32 +108,37 @@ class EnsembleFetcher(PlotDataFetcherHandler):
 
             stop_time = ert.main.get_history_length
 
-            for step in range(0, stop_time + 1):
-                for state in state_list:
-                    if fs.has_node(key, step, member, state.value()):
+            for state in state_list:
+                if not node.vector_storage:
+                    if fs.has_vector(key, var_type.value(), member, state.value()):
                         time_map = fs.get_time_map
-                        sim_time = time_map.iget(step)
-                        fs.fread_node(key, step, member, state.value())
-                        valid = ertwrapper.c_double()
-                        state_enum = c_state_enum(state.value())
-                        node_id = NodeId(step, state_enum, member)
-                        value = node.user_get(fs, key_index, node_id, ertwrapper.byref(valid))
-                        if valid.value == 1:
-                            data.checkMaxMin(sim_time)
-                            data.checkMaxMinY(value)
-                            x_time.append(sim_time)
-                            y.append(value)
-                        #else:
-                        #    print "Not valid: ", key, member, step, key_index
+                        fs.fread_vector(key, var_type.value(), member, state.value())
+                        victor = DoubleVector()
+                        value = node.user_get_vector(fs, key, member, state.value(), victor)
+                        if value == 1:
+                            for step in range(1, stop_time):
+                                sim_time1 = time_map.iget(step-1)
+                                jaja = time_t(sim_time1)
+                                sim_time = jaja.datetime().toordinal()
+                                print "Her", sim_time, step, victor[step-1]
+                                data.checkMaxMin(sim_time)
+                                data.checkMaxMinY(victor[step])
+                                x_time.append(sim_time)
+                                y.append(victor[step])
+                                print len(victor), "Not valid: ", key, member, step, victor[step], sim_time
 
+                    
+                        else:
+                            print "Not valid: ", key, member, step
+                        
                     if not comparison_fs is None:
                         if comparison_fs.has_node(key, step, member, state.value()):
                             time_map = comparison_fs.get_time_map
                             sim_time = time_map.iget(step)
-                            comparison_fs.fread_node(comp_node, step, member, state.value())
+                            print "Is this invoked 2"#sim_time
+                            comparison_fs.fread_node(comp_node, var_type.value(), step, member, state.value())
                             valid = ertwrapper.c_double()
-                            node_id = NodeId(step, state.value(), member)
-                            value = comp_node.user_get(comparison_fs, key_index, node_id, ertwrapper.byref(valid))
+                            value = comp_node.user_get(comparison_fs, key, step, member, state.value(), ertwrapper.byref(valid))
                             if valid.value == 1:
                                 #data.checkMaxMin(sim_time)
                                 #data.checkMaxMinY(value)
@@ -137,7 +147,45 @@ class EnsembleFetcher(PlotDataFetcherHandler):
                             #else:
                             #    print "Not valid: ", key, member, step, key_index
 
-            data.x_data[member] = numpy.array([t.datetime() for t in x_time])
+                else:
+                    for step in range(1, stop_time + 1):
+                        if not fs.has_node(key, var_type.value(), step, member, state.value()):
+                            time_map = fs.get_time_map
+                            sim_time1 = time_map.iget(step)
+                            jaja = time_t(sim_time1)
+                            sim_time = jaja.datetime().toordinal()
+                            #sim_time = time_map.iget(step)
+                            #print "Is this invoked 1", key, var_type.value(), step, member, state.value()
+                            #fs.fread_node(key, var_type.value(), step, member, state.value())
+                            valid = ertwrapper.c_double()
+                            value = node.user_get(fs, key, step, member, state.value(), ertwrapper.byref(valid))
+                            if value == 1:
+                                print sim_time, valid.value
+                                data.checkMaxMin(sim_time1)
+                                data.checkMaxMinY(valid.value)
+                                x_time.append(sim_time)
+                                y.append(valid.value)
+                        #else:
+                        #    print "Not valid: ", key, member, step, key_index
+                        
+                        if not comparison_fs is None:
+                            if comparison_fs.has_node(key, step, member, state.value()):
+                                time_map = comparison_fs.get_time_map
+                                sim_time = time_map.iget(step)
+                                print "Is this invoked 2"#sim_time
+                                comparison_fs.fread_node(comp_node, step, member, state.value())
+                                valid = ertwrapper.c_double()
+                                value = comp_node.user_get(comparison_fs, key_index, step, member, state.value(), ertwrapper.byref(valid))
+                                if valid.value == 1:
+                                    #data.checkMaxMin(sim_time)
+                                    #data.checkMaxMinY(value)
+                                    x_comp_time.append(sim_time)
+                                    y_comp.append(value)
+                            #else:
+                            #    print "Not valid: ", key, member, step, key_index
+                            
+                            
+                            data.x_data[member] = numpy.array([t.datetime() for t in x_time])
             data.y_data[member] = numpy.array(y)
 
             if not comparison_fs is None:
@@ -161,22 +209,25 @@ class EnsembleFetcher(PlotDataFetcherHandler):
             user_key = key
 
         obs_count = ert.main.get_observation_count(user_key)
+        print obs_count
         if obs_count > 0:
             obs_x = (time_t * obs_count)()
             obs_y = (ertwrapper.c_double * obs_count)()
             obs_std = (ertwrapper.c_double * obs_count)()
             ert.main.get_observations(user_key, obs_count, obs_x, obs_y, obs_std)
 
+            print "Hit?"
+            
             data.obs_x = numpy.array([t.datetime() for t in obs_x])
             data.obs_y = numpy.array(obs_y)
             data.obs_std_y = numpy.array(obs_std)
             data.obs_std_x = None
 
-            data.checkMaxMin(max(obs_x))
-            data.checkMaxMin(min(obs_x))
+            #data.checkMaxMin(max(obs_x))
+            #data.checkMaxMin(min(obs_x))
 
-            data.checkMaxMinY(max(obs_y))
-            data.checkMaxMinY(min(obs_y))
+            #data.checkMaxMinY(max(obs_y))
+            #data.checkMaxMinY(min(obs_y))
 
 
     def _getRefCase(self, ert, key, data):
@@ -194,7 +245,7 @@ class EnsembleFetcher(PlotDataFetcherHandler):
             for x in x_data:
                 if not first:
                     data.refcase_x.append(x)
-                    data.checkMaxMin(x)
+                    #data.checkMaxMin(x)
                 else:
                     first = False #skip first element because of eclipse behavior
 

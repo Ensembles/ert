@@ -19,29 +19,32 @@ from    ert.cwrap.cwrap       import *
 from    ert.cwrap.cclass      import CClass
 from    ert.util.tvector      import * 
 import  libjob_queue
+from    ert.util.stringlist import StringList
+from    ert.job_queue.ext_job import ExtJob
+
 class ForwardModel(CClass):
     
-    def __init__(self , c_ptr = None):
-        self.owner = False
-        self.c_ptr = c_ptr
-        
-        
-    def __del__(self):
-        if self.owner:
-            cfunc.free( self )
-
+    def __init__(self , c_ptr , parent = None):
+        if parent:
+            self.init_cref( c_ptr , parent)
+        else:
+            self.init_cobj( c_ptr , cfunc.free )
+            
     @property
     def alloc_joblist(self):
-        return cfunc.alloc_joblist(self)
+        s = StringList(initial = None, c_ptr = cfunc.alloc_joblist(self))
+        return s
 
     def iget_job(self, index):
-        job = ert.job_queue.ext_job.ExtJob( cfunc.iget_job( self, index ))
+        job = ExtJob( cfunc.iget_job( self, index ), parent = self)
         return job
 
     def add_job(self, name):
-        job = ert.job_queue.ext_job.ExtJob( cfunc.iget_job( self, name ))
+        job = ExtJob( cfunc.add_job( self, name ), parent = self)
         return job
 
+    def clear(self):
+        cfunc.clear(self)
 ##################################################################
 
 cwrapper = CWrapper( libjob_queue.lib )

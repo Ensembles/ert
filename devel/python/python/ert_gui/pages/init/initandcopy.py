@@ -21,6 +21,7 @@ from ert_gui.widgets.util import resourceIcon, ListCheckPanel, ValidatedTimestep
 from ert.ert.enums import ert_state_enum
 from   ert.util.stringlist import StringList
 from ctypes import *
+from ert.util.tvector import BoolVector
 
 class ParametersAndMembers(HelpedWidget):
 
@@ -122,9 +123,9 @@ class ParametersAndMembers(HelpedWidget):
         source_case = str(self.sourceCase.currentText())
         source_report_step = self.sourceReportStep.getSelectedValue()
         source_state = ert_state_enum.resolveName(str(self.sourceType.currentText())).value()
-        member_mask = ert.createBoolVector(self.membersList.count(), selected_members)
+        member_mask = BoolVector.active_mask(str(selected_members).strip('[]'))
         ranking_key = None
-        node_list = ert.createStringList(selected_parameters)
+        node_list = StringList(selected_parameters)
 
         ert.main.initialize_from_existing__(          source_case,
                                                       source_report_step,
@@ -133,8 +134,7 @@ class ParametersAndMembers(HelpedWidget):
                                                       ranking_key,
                                                       node_list)
 
-        ert.freeStringList(node_list)
-        ert.freeBoolVector(member_mask)
+        node_list.__del__
 
     def copyEnsemble(self, selected_parameters, selected_members):
         ert = self.getModel()
@@ -150,9 +150,9 @@ class ParametersAndMembers(HelpedWidget):
         target_report_step = self.targetReportStep.getSelectedValue()
         target_state = ert_state_enum.resolveName(str(self.targetType.currentText())).value()
 
-        member_mask = ert.createBoolVector(self.membersList.count(), selected_members)
+        member_mask = BoolVector.active_mask(str(selected_members).strip('[]'))
         ranking_key = None
-        node_list = ert.createStringList(selected_parameters)
+        node_list = StringList(selected_parameters)
 
         ert.main.copy_ensemble(          source_case,
                                          source_report_step,
@@ -164,8 +164,7 @@ class ParametersAndMembers(HelpedWidget):
                                          ranking_key,
                                          node_list)
 
-        ert.freeStringList(node_list)
-        ert.freeBoolVector(member_mask)
+        node_list.__del__
 
     def initializeOrCopy(self):
         selected_parameters = getItemsFromList(self.parametersList)
@@ -228,24 +227,16 @@ class ParametersAndMembers(HelpedWidget):
         #enums from enkf_types.h
         PARAMETER = 1
         DYNAMIC_STATE = 2
-        keylist = ert.main.ensemble_config.alloc_keylist_from_var_type( PARAMETER )
+        parameters = ert.main.ensemble_config.alloc_keylist_from_var_type( PARAMETER )
         
-        parameters = ert.getStringList(keylist)
-        ert.freeStringList(keylist)
-
-        keylist = ert.main.ensemble_config.alloc_keylist_from_var_type( DYNAMIC_STATE )
-        dynamicParameters = ert.getStringList(keylist)
-        ert.freeStringList(keylist)
+        dynamicParameters = ert.main.ensemble_config.alloc_keylist_from_var_type( DYNAMIC_STATE )
 
         members = ert.main.ens_size
 
         fs = ert.main.get_fs
-        currentCase = "default" #ert.enkf.enkf_fs_get_read_dir(fs)
+        currentCase = ert.main.get_current_fs
 
-        #caseList = ert.enkf.enkf_fs_alloc_dirlist(fs)
-        #list = ert.getStringList(caseList)
-        #ert.freeStringList(caseList)
-        list = ["default"]
+        list = ert.main.alloc_caselist
         historyLength = ert.main.get_history_length
 
         return {"parameters" : parameters,

@@ -122,7 +122,7 @@ import ert_gui.widgets.help
 ert_gui.widgets.help.help_prefix = os.getenv("ERT_SHARE_PATH")+ "/gui/help/"
 ert_gui.widgets.util.img_prefix  = os.getenv("ERT_SHARE_PATH")+ "/gui/img/"
 
-
+from ert.enkf.enkf_main import EnKFMain
 
 from ert_gui.newconfig import NewConfigurationDialog
 
@@ -140,7 +140,7 @@ import matplotlib
 print "PyQt4 version: ", QtCore.qVersion()
 print "matplotlib version: ", matplotlib.__version__
 
-splash = QtGui.QSplashScreen(resourceImage("splash") , QtCore.Qt.WindowStaysOnTopHint)
+splash = QtGui.QSplashScreen(resourceImage("newsplash") , QtCore.Qt.WindowStaysOnTopHint)
 splash.show()
 splash.showMessage("Starting up...", color=QtCore.Qt.white)
 app.processEvents()
@@ -179,7 +179,7 @@ if not os.path.exists(enkf_config):
         dbase_type       = new_configuration_dialog.getDBaseType()
         num_realizations = new_configuration_dialog.getNumberOfRealizations()
         storage_path     = new_configuration_dialog.getStoragePath()
-        ert.main.create_new_config( storage_path , firste_case_name, dbase_type, num_realizations)
+        EnKFMain.create_new_config(enkf_config, storage_path , firste_case_name, dbase_type, num_realizations)
         strict = False
 
 ert.bootstrap(enkf_config, site_config = site_config, strict = strict)

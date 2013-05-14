@@ -20,16 +20,15 @@ from    ert.cwrap.cclass      import CClass
 from    ert.util.tvector      import * 
 from    enkf_enum             import *
 import  libenkf
+from ert.util.ctime import ctime
+#from ert.util.ctime import time_t
 class EnKFState(CClass):
     
-    def __init__(self , c_ptr = None):
-        self.owner = False
-        self.c_ptr = c_ptr
-        
-        
-    def __del__(self):
-        if self.owner:
-            cfunc.free( self )
+    def __init__(self , c_ptr , parent = None):
+        if parent:
+            self.init_cref( c_ptr , parent)
+        else:
+            self.init_cobj( c_ptr , cfunc.free )
 
     def kill_simulation(self):
         cfunc.kill_simulation(self)
@@ -61,5 +60,5 @@ cfunc.free                = cwrapper.prototype("void enkf_state_free( enkf_state
 cfunc.kill_simulation     = cwrapper.prototype("void enkf_state_kill_simulation(enkf_state)")
 cfunc.resubmit_simulation = cwrapper.prototype("void enkf_state_resubmit_simulation(enkf_state, int)")
 cfunc.get_run_status      = cwrapper.prototype("int enkf_state_get_run_status(enkf_state)")
-cfunc.get_start_time      = cwrapper.prototype("time_t enkf_state_get_start_time(enkf_state)")
-cfunc.get_submit_time     = cwrapper.prototype("time_t enkf_state_get_submit_time(enkf_state)")
+cfunc.get_start_time      = cwrapper.prototype("int enkf_state_get_start_time(enkf_state)")
+cfunc.get_submit_time     = cwrapper.prototype("int enkf_state_get_submit_time(enkf_state)")

@@ -38,6 +38,10 @@ class EnkfConfigNode(CClass):
         return cfunc.get_impl_type( self )
 
     @property
+    def get_var_type( self ):
+        return cfunc.get_var_type( self )
+
+    @property
     def get_ref(self):
         return cfunc.get_ref( self)
 
@@ -61,7 +65,6 @@ class EnkfConfigNode(CClass):
     def keyword_model(self):
         return GenKwConfig(c_ptr = cfunc.get_ref( self), parent = self)
 
-
     @property
     def get_enkf_infile(self):
         return cfunc.get_enkf_infile( self)
@@ -83,11 +86,10 @@ cfunc = CWrapperNameSpace("enkf_config_node")
 ##################################################################
 ##################################################################
 cfunc.free                = cwrapper.prototype("void enkf_config_node_free( enkf_config_node )")
-cfunc.iget_sim_days       = cwrapper.safe_prototype("double enkf_config_node_iget_sim_days(enkf_config_node, int, int)")
-cfunc.iget_sim_time       = cwrapper.safe_prototype("time_t enkf_config_node_iget_sim_time(enkf_config_node, int, int)")
 cfunc.get_ref             = cwrapper.prototype("c_void_p enkf_config_node_get_ref(enkf_config_node)")
 cfunc.get_impl_type       = cwrapper.prototype("c_void_p enkf_config_node_get_impl_type(enkf_config_node)")
 cfunc.get_enkf_outfile    = cwrapper.prototype("char* enkf_config_node_get_enkf_outfile(enkf_config_node)")
 cfunc.get_min_std_file    = cwrapper.prototype("char* enkf_config_node_get_min_std_file(enkf_config_node)")
 cfunc.get_enkf_infile     = cwrapper.prototype("char* enkf_config_node_get_enkf_infile(enkf_config_node)")
 cfunc.get_init_file_fmt   = cwrapper.prototype("char* enkf_config_node_get_init_file_fmt(enkf_config_node)")
+cfunc.get_var_type        = cwrapper.prototype("c_void_p enkf_config_node_get_var_type(enkf_config_node)")
