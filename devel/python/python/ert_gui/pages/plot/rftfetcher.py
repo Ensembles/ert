@@ -18,7 +18,6 @@
 from fetcher import PlotDataFetcherHandler
 import ert.ert.ertwrapper as ertwrapper
 import ert.ert.enums as enums
-import plotdata
 from ert.ert.enums import ert_state_enum, obs_impl_type
 import numpy
 
@@ -33,7 +32,6 @@ class RFTFetcher(PlotDataFetcherHandler):
     def isHandlerFor(self, ert, key):
         enkf_obs = ert.main.get_obs
         key_list = enkf_obs.alloc_typed_keylist(obs_impl_type.GEN_OBS.value())
-        print "hallo", key_list
         return key in key_list
 
     def fetch(self, ert, key, parameter, data, comparison_fs):
@@ -58,14 +56,11 @@ class RFTFetcher(PlotDataFetcherHandler):
         state_kw = obs_vector.get_state_kw
 
         ens_size = ert.main.get_ensemble_size
-        print "SKJERA?"
+
         config_node = ert.main.ensemble_config.get_node(state_kw)
         field_config = config_node.get_ref
         block_obs = obs_vector.iget_node(report_step)
 
-        i = block_obs.get_i
-        j = block_obs.get_j
-        k = block_obs.get_k
         obs_size = block_obs.get_size
         grid = field_config.get_grid
 
@@ -80,7 +75,7 @@ class RFTFetcher(PlotDataFetcherHandler):
         value = (ertwrapper.c_double)()
         std = (ertwrapper.c_double)()
         for index in range(obs_size):
-            grid.get_xyz3(i[index], j[index], k[index], xpos, ypos , zpos)
+            grid.get_xyz3(block_obs.iget_i(index),block_obs.iget_j(index),block_obs.iget_k(index), xpos, ypos , zpos)
             y_obs.append(zpos.value)
             block_obs.iget(index, value, std)
             x_obs.append(value.value)
@@ -144,7 +139,7 @@ class RFTFetcher(PlotDataFetcherHandler):
 
                 field = ert.enkf.enkf_node_value_ptr(comp_node)
                 for index in range(obs_size):
-                    value = field.ijk_get_double(i[index] , j[index] , k[index])
+                    value = field.ijk_get_double(block_obs.iget_i(index),block_obs.iget_j(index),block_obs.iget_k(index))
                     x_data.append(value)
                     y_data.append(y_obs[index])
                     data.checkMaxMin(value)
