@@ -282,6 +282,7 @@ const void * queue_driver_get_option(queue_driver_type * driver, const char * op
 
 /*****************************************************************/
 
+
 queue_driver_type * queue_driver_alloc_LSF(const char * queue_name, const char * resource_request, const char * remote_lsf_server) {
 #ifdef USE_LSF
   queue_driver_type * driver = queue_driver_alloc(LSF_DRIVER);
@@ -292,7 +293,7 @@ queue_driver_type * queue_driver_alloc_LSF(const char * queue_name, const char *
 
   return driver;
 #else
-      util_abort("%s: not compiled with support for LFS queue driver.\n");
+  util_abort("%s: not compiled with support for LSF queue driver.\n");
   return NULL;
 #endif
 }
