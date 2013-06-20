@@ -145,7 +145,7 @@ queue_driver_type * queue_driver_alloc(job_driver_type type) {
       driver->data = lsf_driver_alloc();
       break;
 #else
-      util_abort("%s: not compiled with support for driver type:%d \n", type);
+      util_abort("%s: not compiled with support for driver type:%d \n",  __func__, type);
 #endif
     case LOCAL_DRIVER:
       driver->submit = local_driver_submit_job;
@@ -179,7 +179,7 @@ queue_driver_type * queue_driver_alloc(job_driver_type type) {
       driver->data = torque_driver_alloc();
       break;
     default:
-      util_abort("%s: unrecognized driver type:%d \n", type);
+      util_abort("%s: unrecognized driver type:%d \n",  __func__, type);
   }
   return driver;
 }
@@ -293,7 +293,7 @@ queue_driver_type * queue_driver_alloc_LSF(const char * queue_name, const char *
 
   return driver;
 #else
-  util_abort("%s: not compiled with support for LSF queue driver.\n");
+  util_abort("%s: not compiled with support for LSF queue driver.\n",  __func__);
   return NULL;
 #endif
 }
