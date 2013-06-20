@@ -22,7 +22,9 @@
 #include <ert/util/util.h>
 
 #include <ert/job_queue/queue_driver.h>
+#ifdef USE_LSF
 #include <ert/job_queue/lsf_driver.h>
+#endif
 #include <ert/job_queue/local_driver.h>
 #include <ert/job_queue/rsh_driver.h>
 #include <ert/job_queue/torque_driver.h>
@@ -130,6 +132,7 @@ queue_driver_type * queue_driver_alloc(job_driver_type type) {
   driver->driver_type = type;
   switch (type) {
     case LSF_DRIVER:
+#ifdef USE_LSF
       driver->submit = lsf_driver_submit_job;
       driver->get_status = lsf_driver_get_job_status;
       driver->kill_job = lsf_driver_kill_job;
@@ -141,6 +144,9 @@ queue_driver_type * queue_driver_alloc(job_driver_type type) {
       driver->name = util_alloc_string_copy("LSF");
       driver->data = lsf_driver_alloc();
       break;
+#else
+      util_abort("%s: not compiled with support for driver type:%d \n",  __func__, type);
+#endif
     case LOCAL_DRIVER:
       driver->submit = local_driver_submit_job;
       driver->get_status = local_driver_get_job_status;
@@ -173,7 +179,7 @@ queue_driver_type * queue_driver_alloc(job_driver_type type) {
       driver->data = torque_driver_alloc();
       break;
     default:
-      util_abort("%s: unrecognized driver type:%d \n", type);
+      util_abort("%s: unrecognized driver type:%d \n",  __func__, type);
   }
   return driver;
 }
@@ -278,6 +284,7 @@ const void * queue_driver_get_option(queue_driver_type * driver, const char * op
 
 
 queue_driver_type * queue_driver_alloc_LSF(const char * queue_name, const char * resource_request, const char * remote_lsf_server) {
+#ifdef USE_LSF
   queue_driver_type * driver = queue_driver_alloc(LSF_DRIVER);
 
   queue_driver_set_option(driver, LSF_QUEUE, queue_name);
@@ -285,6 +292,10 @@ queue_driver_type * queue_driver_alloc_LSF(const char * queue_name, const char *
   queue_driver_set_option(driver, LSF_SERVER, remote_lsf_server);
 
   return driver;
+#else
+  util_abort("%s: not compiled with support for LSF queue driver.\n",  __func__);
+  return NULL;
+#endif
 }
 
 queue_driver_type * queue_driver_alloc_TORQUE() {
