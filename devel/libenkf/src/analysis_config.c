@@ -615,5 +615,7 @@ void analysis_config_fprintf_config( analysis_config_type * config , FILE * stre
   fprintf(stream , "\n\n");
 }
 
-
+void analysis_config_iter_config_fprintf_config( analysis_config_type * config , FILE * stream){
+  analysis_iter_config_fprintf_config( config->iter_config , stream );
+}
 

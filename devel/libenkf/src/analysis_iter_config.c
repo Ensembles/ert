@@ -23,6 +23,7 @@
 
 #include <ert/util/util.h>
 #include <ert/util/stringlist.h>
+#include <ert/util/path_fmt.h>
 
 #include <ert/config/config.h>
 
@@ -135,4 +136,26 @@ void analysis_iter_config_init(analysis_iter_config_type * iter_config , const c
     analysis_iter_config_set_num_iterations( iter_config , config_get_value_as_int( config , ITER_COUNT_KEY ));
 }
 
+void analysis_iter_config_fprintf_config( analysis_iter_config_type * iter_config , FILE * stream) {
+  fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
+  fprintf( stream , CONFIG_COMMENT_FORMAT , "Here comes configuration information related to iterated smoother");
+  
+  
+  if (iter_config->runpath_fmt != DEFAULT_ANALYSIS_ITER_RUNPATH) {
+    fprintf( stream , CONFIG_KEY_FORMAT        , ITER_RUNPATH_KEY);
+    fprintf( stream , CONFIG_ENDVALUE_FORMAT   , iter_config->runpath_fmt );
+  }
 
+  if (iter_config->case_fmt != DEFAULT_ANALYSIS_ITER_CASE) {
+    fprintf( stream , CONFIG_KEY_FORMAT        , ITER_CASE_KEY);
+    fprintf( stream , CONFIG_ENDVALUE_FORMAT   , iter_config->case_fmt );
+  }
+
+  if (iter_config->num_iterations != DEFAULT_ANALYSIS_NUM_ITERATIONS) {
+    fprintf( stream , CONFIG_KEY_FORMAT   , ITER_COUNT_KEY );
+    fprintf( stream , CONFIG_INT_FORMAT , iter_config->num_iterations );
+    fprintf( stream , "\n");
+  }
+
+  fprintf(stream , "\n\n");
+}

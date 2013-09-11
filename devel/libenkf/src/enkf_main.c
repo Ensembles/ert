@@ -3617,6 +3617,7 @@ void enkf_main_fprintf_config( const enkf_main_type * enkf_main ) {
     enkf_main_log_fprintf_config( enkf_main , stream );
     site_config_fprintf_config( enkf_main->site_config , stream );    
     rng_config_fprintf_config( enkf_main->rng_config , stream );
+    analysis_config_iter_config_fprintf_config( enkf_main->analysis_config , stream );
     fclose( stream );
   }
 }
