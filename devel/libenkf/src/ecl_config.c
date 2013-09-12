@@ -711,11 +711,6 @@ void ecl_config_add_config_items( config_type * config ) {
     GEN_KW is added in ensemble_config.c
   */
 
-  item = config_add_schema_item( config , IGNORE_SCHEDULE_KEY , false  );
-  config_schema_item_set_argc_minmax(item , 1 , 1 );
-  config_schema_item_iset_type( item , 0 , CONFIG_BOOL);
-
-  
   item = config_add_schema_item(config , ECLBASE_KEY , false  );
   config_schema_item_set_argc_minmax(item , 1 , 1);
 
@@ -768,7 +763,7 @@ void ecl_config_add_config_items( config_type * config ) {
 
 void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stream ) {
   fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
-  fprintf( stream , CONFIG_COMMENT_FORMAT , "Here comes configuration information related to the ECLIPSE model.");
+  fprintf( stream , CONFIG_COMMENT_FORMAT , "Configuration information related to the ECLIPSE model.");
 
   fprintf( stream , CONFIG_KEY_FORMAT      , DATA_FILE_KEY );
   fprintf( stream , CONFIG_ENDVALUE_FORMAT , ecl_config->data_file );
@@ -796,12 +791,12 @@ void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stre
     }
   }
 
-  /*
+  
     if (ecl_config->refcase != NULL) {
     fprintf( stream , CONFIG_KEY_FORMAT      , REFCASE_KEY );
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , ecl_config_get_refcase_name( ecl_config ));
     }
-  */
+  
 
   if (ecl_config->grid != NULL) {
     fprintf( stream , CONFIG_KEY_FORMAT      , GRID_KEY );
@@ -834,7 +829,10 @@ void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stre
     hash_iter_free( iter );
   }
 
-  
+  if (config->merge_observations != DEFAULT_MERGE_OBSERVATIONS) {
+    fprintf( stream , CONFIG_KEY_FORMAT        , ENKF_MERGE_OBSERVATIONS_KEY);
+    fprintf( stream , CONFIG_ENDVALUE_FORMAT   , CONFIG_BOOL_STRING( config->merge_observations ));
+  }
   
   fprintf(stream , "\n\n");
 }

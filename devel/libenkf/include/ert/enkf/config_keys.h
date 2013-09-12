@@ -24,6 +24,20 @@ extern "C" {
 #endif
 
 /* These keys are used as options in KEY:VALUE statements */
+
+/* Config options related to the ECLIPSE model ecl_config.c*/
+#define  SCHEDULE_FILE_KEY                 "SCHEDULE_FILE"
+#define  ECLBASE_KEY                       "ECLBASE"
+#define  DATA_FILE_KEY                     "DATA_FILE"
+#define  STATIC_KW_KEY                     "ADD_STATIC_KW"
+#define  ADD_FIXED_LENGTH_SCHEDULE_KW_KEY  "ADD_FIXED_LENGTH_SCHEDULE_KW"
+#define  REFCASE_KEY                       "REFCASE"
+#define  REFCASE_LIST_KEY                  "REFCASE_LIST"
+#define  PLOT_REFCASE_LIST_KEY             "PLOT_REFCASE_LIST"
+#define  GRID_KEY                          "GRID"
+#define  INIT_SECTION_KEY                  "INIT_SECTION"
+#define  END_DATE_KEY                      "END_DATE"
+
 #define  FORWARD_INIT_KEY                  "FORWARD_INIT"
 #define  MIN_STD_KEY                       "MIN_STD"
 #define  INIT_FILES_KEY                    "INIT_FILES"
@@ -46,20 +60,20 @@ extern "C" {
 #define  DEFINE_KEY                        "DEFINE"  
 #define  BASE_SURFACE_KEY                  "BASE_SURFACE"
 
-#define  ADD_FIXED_LENGTH_SCHEDULE_KW_KEY  "ADD_FIXED_LENGTH_SCHEDULE_KW"
+
 #define  ANALYSIS_COPY_KEY                 "ANALYSIS_COPY"
 #define  ANALYSIS_LOAD_KEY                 "ANALYSIS_LOAD"
 #define  ANALYSIS_SET_VAR_KEY              "ANALYSIS_SET_VAR"
 #define  ANALYSIS_SELECT_KEY               "ANALYSIS_SELECT"
 #define  CASE_TABLE_KEY                    "CASE_TABLE"
 #define  CONTAINER_KEY                     "CONTAINER"
-#define  DATA_FILE_KEY                     "DATA_FILE"
+
 #define  DATA_KW_KEY                       "DATA_KW"  
 #define  DBASE_TYPE_KEY                    "DBASE_TYPE"
 #define  DBASE_TYPE_KEY                    "DBASE_TYPE"
 #define  DELETE_RUNPATH_KEY                "DELETE_RUNPATH"  
-#define  ECLBASE_KEY                       "ECLBASE"
-#define  END_DATE_KEY                      "END_DATE"
+
+
 #define  ENKF_BOOTSTRAP_KEY                "ENKF_BOOTSTRAP"
 #define  ENKF_PEN_PRESS_KEY                "ENKF_PEN_PRESS"
 #define  ENKF_ALPHA_KEY                    "ENKF_ALPHA"
@@ -86,13 +100,13 @@ extern "C" {
 #define  GEN_KW_KEY                        "GEN_KW"
 #define  GEN_KW_TAG_FORMAT_KEY             "GEN_KW_TAG_FORMAT"
 #define  GEN_PARAM_KEY                     "GEN_PARAM"    
-#define  GRID_KEY                          "GRID"
+
 #define  HISTORY_SOURCE_KEY                "HISTORY_SOURCE"
 #define  HOSY_TYPE_KEY                     "HOST_TYPE"
-#define  IGNORE_SCHEDULE_KEY               "IGNORE_SCHEDULE"        
+
 #define  IMAGE_TYPE_KEY                    "IMAGE_TYPE"
 #define  IMAGE_VIEWER_KEY                  "IMAGE_VIEWER"      
-#define  INIT_SECTION_KEY                  "INIT_SECTION"
+
 #define  INSTALL_JOB_KEY                   "INSTALL_JOB"
 #define  JOB_SCRIPT_KEY                    "JOB_SCRIPT"
 #define  JOBNAME_KEY                       "JOBNAME"
@@ -121,15 +135,15 @@ extern "C" {
 #define  PLOT_HEIGHT_KEY                   "PLOT_HEIGHT"       
 #define  PLOT_PATH_KEY                     "PLOT_PATH"         
 #define  PLOT_REFCASE_KEY                  "PLOT_REFCASE"
-#define  PLOT_REFCASE_LIST_KEY             "PLOT_REFCASE_LIST"
+
 #define  PLOT_WIDTH_KEY                    "PLOT_WIDTH"        
 #define  PRE_CLEAR_RUNPATH_KEY             "PRE_CLEAR_RUNPATH"
 #define  QUEUE_SYSTEM_KEY                  "QUEUE_SYSTEM"
 #define  QUEUE_OPTION_KEY                  "QUEUE_OPTION" 
 #define  QC_PATH_KEY                       "QC_PATH"  
 #define  QC_WORKFLOW_KEY                   "QC_WORKFLOW"
-#define  REFCASE_KEY                       "REFCASE"
-#define  REFCASE_LIST_KEY                  "REFCASE_LIST"
+
+
 #define  REPORT_CONTEXT_KEY                "REPORT_CONTEXT"
 #define  REPORT_SEARCH_PATH_KEY            "REPORT_SEARCH_PATH"
 #define  REPORT_LARGE_KEY                  "REPORT_LARGE"   
@@ -148,14 +162,14 @@ extern "C" {
 #define  RUN_TEMPLATE_KEY                  "RUN_TEMPLATE"
 #define  RFT_CONFIG_KEY                    "RFT_CONFIG"
 #define  RFTPATH_KEY                       "RFTPATH"
-#define  SCHEDULE_FILE_KEY                 "SCHEDULE_FILE"
+
 #define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
 #define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
 #define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
 #define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
 #define  SELECT_CASE_KEY                   "SELECT_CASE"
 #define  SETENV_KEY                        "SETENV"
-#define  STATIC_KW_KEY                     "ADD_STATIC_KW"
+
 #define  STD_CUTOFF_KEY                    "STD_CUTOFF"
 #define  SUMMARY_KEY                       "SUMMARY"  
 #define  SURFACE_KEY                       "SURFACE"
