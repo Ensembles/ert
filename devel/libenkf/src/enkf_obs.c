@@ -1070,8 +1070,7 @@ const char * enkf_obs_get_config_file( const enkf_obs_type * enkf_obs) {
 void enkf_obs_fprintf_config( const enkf_obs_type * enkf_obs , FILE * stream) {
   if (enkf_obs->config_file != NULL) {
     fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
-    fprintf( stream , CONFIG_COMMENT_FORMAT , "The observations are stored in a separate config file.");
-    fprintf( stream , CONFIG_COMMENT_FORMAT , "Unfortunately there is separate config language for the observations ... :-(");
+    fprintf( stream , CONFIG_COMMENT_FORMAT , "The observations are stored in the following config file.");
     fprintf(stream , CONFIG_KEY_FORMAT      , OBS_CONFIG_KEY);
     fprintf(stream , CONFIG_ENDVALUE_FORMAT , enkf_obs->config_file );
     fprintf(stream , "\n\n");

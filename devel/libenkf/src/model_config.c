@@ -639,8 +639,4 @@ void model_config_fprintf_config( const model_config_type * model_config , int e
     fprintf( stream , CONFIG_KEY_FORMAT      , JOBNAME_KEY );
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , model_config->jobname_fmt );
   }
-  if(model_config->jobname != NULL){
-    fprintf( stream , CONFIG_KEY_FORMAT      , JOBNAME_KEY );
-    fprintf( stream , CONFIG_ENDVALUE_FORMAT , model_config->jobname_fmt );
-  }
 }
