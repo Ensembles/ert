@@ -37,6 +37,7 @@ extern "C" {
 #define  GRID_KEY                          "GRID"
 #define  INIT_SECTION_KEY                  "INIT_SECTION"
 #define  END_DATE_KEY                      "END_DATE"
+#define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
 
 #define  FORWARD_INIT_KEY                  "FORWARD_INIT"
 #define  MIN_STD_KEY                       "MIN_STD"
@@ -163,10 +164,7 @@ extern "C" {
 #define  RFT_CONFIG_KEY                    "RFT_CONFIG"
 #define  RFTPATH_KEY                       "RFTPATH"
 
-#define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
-#define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
-#define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
-#define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
+
 #define  SELECT_CASE_KEY                   "SELECT_CASE"
 #define  SETENV_KEY                        "SETENV"
 
