@@ -792,12 +792,6 @@ void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stre
   }
 
   
-    if (ecl_config->refcase != NULL) {
-    fprintf( stream , CONFIG_KEY_FORMAT      , REFCASE_KEY );
-    fprintf( stream , CONFIG_ENDVALUE_FORMAT , ecl_config_get_refcase_name( ecl_config ));
-    }
-  
-
   if (ecl_config->grid != NULL) {
     fprintf( stream , CONFIG_KEY_FORMAT      , GRID_KEY );
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , ecl_config_get_gridfile( ecl_config ));
@@ -829,10 +823,24 @@ void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stre
     hash_iter_free( iter );
   }
 
-  if (config->merge_observations != DEFAULT_MERGE_OBSERVATIONS) {
-    fprintf( stream , CONFIG_KEY_FORMAT        , ENKF_MERGE_OBSERVATIONS_KEY);
-    fprintf( stream , CONFIG_ENDVALUE_FORMAT   , CONFIG_BOOL_STRING( config->merge_observations ));
+  {
+    if(ecl_config_get_refcase_name(ecl_config)!=NULL){
+      int size = ecl_refcase_list_get_size( ecl_config->refcase_list );
+      if (size > 0) {
+	int i;
+	fprintf( stream , CONFIG_KEY_FORMAT      , REFCASE_LIST_KEY );
+	for (i=0; i < size; i++)
+	  if (i < (size -1 ))
+	    fprintf( stream , CONFIG_VALUE_FORMAT      , ecl_refcase_list_iget_pathcase( ecl_config->refcase_list , i));
+	  else
+	    fprintf( stream , CONFIG_ENDVALUE_FORMAT      , ecl_refcase_list_iget_pathcase( ecl_config->refcase_list , i));
+      }  
+    }
   }
-  
+  if (ecl_config->end_date != NULL) {
+    fprintf( stream , CONFIG_KEY_FORMAT      , END_DATE_KEY );
+    fprintf( stream , CONFIG_ENDVALUE_FORMAT , util_alloc_date_string(ecl_config->end_date )); 
+  }
   fprintf(stream , "\n\n");
 }
+  
