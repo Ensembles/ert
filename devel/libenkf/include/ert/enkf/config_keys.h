@@ -38,11 +38,29 @@ extern "C" {
 #define  INIT_SECTION_KEY                  "INIT_SECTION"
 #define  END_DATE_KEY                      "END_DATE"
 #define  SCHEDULE_PREDICTION_FILE_KEY      "SCHEDULE_PREDICTION_FILE"
+/* Config options in model_config.c*/
+#define  FORWARD_MODEL_KEY                 "FORWARD_MODEL"
+#define  ENKF_SCHED_FILE_KEY               "ENKF_SCHED_FILE"
+#define  RUNPATH_KEY                       "RUNPATH"
+#define  RERUN_PATH_KEY                    "RERUN_PATH" /*Not implemented in fprintf_config*/
+#define  HISTORY_SOURCE_KEY                "HISTORY_SOURCE"
+#define  CASE_TABLE_KEY                    "CASE_TABLE"
+#define  ENSPATH_KEY                       "ENSPATH" 
+#define  JOBNAME_KEY                       "JOBNAME"
+#define  RFTPATH_KEY                       "RFTPATH"
+#define  DBASE_TYPE_KEY                    "DBASE_TYPE" /*Not implemented in fprintf_config*/
+#define  MAX_RESAMPLE_KEY                  "MAX_RESAMPLE"
+#define  SELECT_CASE_KEY                   "SELECT_CASE"
+#define  NUM_REALIZATIONS_KEY              "NUM_REALIZATIONS"      
+
+
+#define  ENKF_MERGE_OBSERVATIONS_KEY       "ENKF_MERGE_OBSERVATIONS"
+
 
 #define  FORWARD_INIT_KEY                  "FORWARD_INIT"
 #define  MIN_STD_KEY                       "MIN_STD"
 #define  INIT_FILES_KEY                    "INIT_FILES"
-#define  KEY_KEY                           "KEY"
+#define  KEY_KEY                           "KEY" 
 #define  TEMPLATE_KEY                      "TEMPLATE"
 #define  RESULT_FILE_KEY                   "RESULT_FILE"
 #define  ECL_FILE_KEY                      "ECL_FILE"
@@ -66,12 +84,12 @@ extern "C" {
 #define  ANALYSIS_LOAD_KEY                 "ANALYSIS_LOAD"
 #define  ANALYSIS_SET_VAR_KEY              "ANALYSIS_SET_VAR"
 #define  ANALYSIS_SELECT_KEY               "ANALYSIS_SELECT"
-#define  CASE_TABLE_KEY                    "CASE_TABLE"
+
 #define  CONTAINER_KEY                     "CONTAINER"
 
 #define  DATA_KW_KEY                       "DATA_KW"  
-#define  DBASE_TYPE_KEY                    "DBASE_TYPE"
-#define  DBASE_TYPE_KEY                    "DBASE_TYPE"
+
+
 #define  DELETE_RUNPATH_KEY                "DELETE_RUNPATH"  
 
 
@@ -87,22 +105,22 @@ extern "C" {
 #define  ENKF_KERNEL_FUNC_KEY              "ENKF_KERNEL_FUNCTION"     
 #define  ENKF_KERNEL_PARAM_KEY             "ENKF_KERNEL_PARAM"     
 #define  ENKF_LOCAL_CV_KEY                 "ENKF_LOCAL_CV"     
-#define  ENKF_MERGE_OBSERVATIONS_KEY       "ENKF_MERGE_OBSERVATIONS"
+
 #define  ENKF_MODE_KEY                     "ENKF_MODE"
 #define  ENKF_RERUN_KEY                    "ENKF_RERUN"
-#define  ENKF_SCHED_FILE_KEY               "ENKF_SCHED_FILE"
+
 #define  ENKF_TRUNCATION_KEY               "ENKF_TRUNCATION"
-#define  ENSPATH_KEY                       "ENSPATH" 
+
 #define  ITER_CASE_KEY                     "ITER_CASE" 
 #define  ITER_COUNT_KEY                    "ITER_COUNT"
 #define  FIELD_KEY                         "FIELD"
-#define  FORWARD_MODEL_KEY                 "FORWARD_MODEL"
+
 #define  GEN_DATA_KEY                      "GEN_DATA"
 #define  GEN_KW_KEY                        "GEN_KW"
 #define  GEN_KW_TAG_FORMAT_KEY             "GEN_KW_TAG_FORMAT"
 #define  GEN_PARAM_KEY                     "GEN_PARAM"    
 
-#define  HISTORY_SOURCE_KEY                "HISTORY_SOURCE"
+
 #define  HOSY_TYPE_KEY                     "HOST_TYPE"
 
 #define  IMAGE_TYPE_KEY                    "IMAGE_TYPE"
@@ -110,7 +128,7 @@ extern "C" {
 
 #define  INSTALL_JOB_KEY                   "INSTALL_JOB"
 #define  JOB_SCRIPT_KEY                    "JOB_SCRIPT"
-#define  JOBNAME_KEY                       "JOBNAME"
+
 #define  KEEP_RUNPATH_KEY                  "KEEP_RUNPATH"  
 #define  LICENSE_PATH_KEY                  "LICENSE_PATH"
 #define  LOAD_SEED_KEY                     "LOAD_SEED"  
@@ -121,12 +139,12 @@ extern "C" {
 #define  LSF_RESOURCES_KEY                 "LSF_RESOURCES"
 #define  LSF_SERVER_KEY                    "LSF_SERVER"
 #define  TORQUE_QUEUE_KEY                  "TORQUE_QUEUE"
-#define  MAX_RESAMPLE_KEY                  "MAX_RESAMPLE"  
+
 #define  MAX_RUNNING_LOCAL_KEY             "MAX_RUNNING_LOCAL"
 #define  MAX_RUNNING_LSF_KEY               "MAX_RUNNING_LSF"
 #define  MAX_RUNNING_RSH_KEY               "MAX_RUNNING_RSH"
 #define  MAX_SUBMIT_KEY                    "MAX_SUBMIT" 
-#define  NUM_REALIZATIONS_KEY              "NUM_REALIZATIONS"      
+
 #define  MIN_REALIZATIONS_KEY              "MIN_REALIZATIONS" 
 #define  OBS_CONFIG_KEY                    "OBS_CONFIG"
 #define  OBS_CONFIG_KEY                    "OBS_CONFIG" 
@@ -157,15 +175,15 @@ extern "C" {
 #define  RSH_COMMAND_KEY                   "RSH_COMMAND"
 #define  RSH_HOST_KEY                      "RSH_HOST"
 #define  RUNPATH_FILE_KEY                  "RUNPATH_FILE"  
-#define  RUNPATH_KEY                       "RUNPATH"
+
 #define  ITER_RUNPATH_KEY                  "ITER_RUNPATH"
-#define  RERUN_PATH_KEY                    "RERUN_PATH"
+
 #define  RUN_TEMPLATE_KEY                  "RUN_TEMPLATE"
 #define  RFT_CONFIG_KEY                    "RFT_CONFIG"
-#define  RFTPATH_KEY                       "RFTPATH"
 
 
-#define  SELECT_CASE_KEY                   "SELECT_CASE"
+
+
 #define  SETENV_KEY                        "SETENV"
 
 #define  STD_CUTOFF_KEY                    "STD_CUTOFF"
