@@ -633,10 +633,15 @@ void model_config_fprintf_config( const model_config_type * model_config , int e
   
   fprintf(stream , CONFIG_KEY_FORMAT , NUM_REALIZATIONS_KEY);
   fprintf(stream , CONFIG_INT_FORMAT , ens_size);
-  fprintf(stream , "\n\n");
+
   
   if(model_config->jobname_fmt != NULL){
     fprintf( stream , CONFIG_KEY_FORMAT      , JOBNAME_KEY );
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , model_config->jobname_fmt );
   }
+  if(model_config->dbase_type != DEFAULT_DBASE_TYPE){
+    fprintf(stream , CONFIG_KEY_FORMAT      , DBASE_TYPE_KEY);
+    fprintf(stream , CONFIG_ENDVALUE_FORMAT , model_config->dbase_type);
+  }
+  fprintf(stream , "\n\n");
 }

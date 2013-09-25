@@ -48,7 +48,7 @@ extern "C" {
 #define  ENSPATH_KEY                       "ENSPATH" 
 #define  JOBNAME_KEY                       "JOBNAME"
 #define  RFTPATH_KEY                       "RFTPATH"
-#define  DBASE_TYPE_KEY                    "DBASE_TYPE" /*Not implemented in fprintf_config*/
+#define  DBASE_TYPE_KEY                    "DBASE_TYPE" 
 #define  MAX_RESAMPLE_KEY                  "MAX_RESAMPLE"
 #define  SELECT_CASE_KEY                   "SELECT_CASE"
 #define  NUM_REALIZATIONS_KEY              "NUM_REALIZATIONS"      
@@ -81,38 +81,71 @@ extern "C" {
 #define  ANALYSIS_SET_VAR_KEY              "ANALYSIS_SET_VAR" /*Not implemented in fprintf_config*/
 #define  ANALYSIS_SELECT_KEY               "ANALYSIS_SELECT" /*Not implemented in fprintf_config*/
 
-
-#define  FORWARD_INIT_KEY                  "FORWARD_INIT"
-#define  MIN_STD_KEY                       "MIN_STD"
-#define  INIT_FILES_KEY                    "INIT_FILES"
-#define  KEY_KEY                           "KEY" 
-#define  TEMPLATE_KEY                      "TEMPLATE"
-#define  RESULT_FILE_KEY                   "RESULT_FILE"
-#define  ECL_FILE_KEY                      "ECL_FILE"
+/* Config options in analysis_config.c*/
+#define  GEN_DATA_KEY                      "GEN_DATA"
+#define  GEN_KW_KEY                        "GEN_KW"
+#define  GEN_KW_TAG_FORMAT_KEY             "GEN_KW_TAG_FORMAT"
+#define  GEN_PARAM_KEY                     "GEN_PARAM" 
+#define  SUMMARY_KEY                       "SUMMARY"  
+#define  SURFACE_KEY                       "SURFACE"
+#define  CONTAINER_KEY                     "CONTAINER"
+#define  FIELD_KEY                         "FIELD"
 #define  INPUT_FORMAT_KEY                  "INPUT_FORMAT"
 #define  OUTPUT_FORMAT_KEY                 "OUTPUT_FORMAT"
-#define  OUTPUT_FILE_KEY                   "OUTPUT_FILE"
-#define  MAX_KEY                           "MAX"
+#define  INIT_FILES_KEY                    "INIT_FILES"
+#define  TEMPLATE_KEY                      "TEMPLATE"
+#define  KEY_KEY                           "KEY" 
+#define  RESULT_FILE_KEY                   "RESULT_FILE"
+#define  MIN_STD_KEY                       "MIN_STD"
+#define  FORWARD_INIT_KEY                  "FORWARD_INIT"
+#define  BASE_SURFACE_KEY                  "BASE_SURFACE"
 #define  MIN_KEY                           "MIN"
-#define  INPUT_TRANSFORM_KEY               "INPUT_TRANSFORM"
+#define  MAX_KEY                           "MAX"
+#define  OUTPUT_FILE_KEY                   "OUTPUT_FILE"
+#define  DYNAMIC_KEY                       "DYNAMIC" 
 #define  INIT_TRANSFORM_KEY                "INIT_TRANSFORM"
 #define  OUTPUT_TRANSFORM_KEY              "OUTPUT_TRANSFORM"
-#define  DYNAMIC_KEY                       "DYNAMIC" 
 #define  PARAMETER_KEY                     "PARAMETER"
 #define  GENERAL_KEY                       "GENERAL"
-#define  INCLUDE_KEY                       "INCLUDE"
-#define  DEFINE_KEY                        "DEFINE"  
-#define  BASE_SURFACE_KEY                  "BASE_SURFACE"
-
-
-
-
-#define  CONTAINER_KEY                     "CONTAINER"
-
-#define  DATA_KW_KEY                       "DATA_KW"  
-
-
+#define  INPUT_TRANSFORM_KEY               "INPUT_TRANSFORM"
+/* Config options in local_config.c*/
+#define  LOCAL_CONFIG_KEY                  "LOCAL_CONFIG"
+/* Config options printed in enkf_main_fprintf_config*/
+#define  PRE_CLEAR_RUNPATH_KEY             "PRE_CLEAR_RUNPATH"
+#define  KEEP_RUNPATH_KEY                  "KEEP_RUNPATH"  
 #define  DELETE_RUNPATH_KEY                "DELETE_RUNPATH"  
+#define  LOG_FILE_KEY                      "LOG_FILE"
+#define  LOG_LEVEL_KEY                     "LOG_LEVEL"
+#define  RFT_CONFIG_KEY                    "RFT_CONFIG"
+#define  DATA_KW_KEY                       "DATA_KW"  /*Implementation for printing in enkf_main_data_kw_fprintf_config present but not in use.*/
+#define  INCLUDE_KEY                       "INCLUDE"
+#define  DEFINE_KEY                        "DEFINE" 
+
+
+
+#define  ECL_FILE_KEY                      "ECL_FILE"
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
 
 
 #define  ENKF_BOOTSTRAP_KEY                "ENKF_BOOTSTRAP"
@@ -131,12 +164,9 @@ extern "C" {
 
 #define  ITER_CASE_KEY                     "ITER_CASE" 
 #define  ITER_COUNT_KEY                    "ITER_COUNT"
-#define  FIELD_KEY                         "FIELD"
 
-#define  GEN_DATA_KEY                      "GEN_DATA"
-#define  GEN_KW_KEY                        "GEN_KW"
-#define  GEN_KW_TAG_FORMAT_KEY             "GEN_KW_TAG_FORMAT"
-#define  GEN_PARAM_KEY                     "GEN_PARAM"    
+
+   
 
 
 #define  HOSY_TYPE_KEY                     "HOST_TYPE"
@@ -147,12 +177,11 @@ extern "C" {
 #define  INSTALL_JOB_KEY                   "INSTALL_JOB"
 #define  JOB_SCRIPT_KEY                    "JOB_SCRIPT"
 
-#define  KEEP_RUNPATH_KEY                  "KEEP_RUNPATH"  
+
 #define  LICENSE_PATH_KEY                  "LICENSE_PATH"
 #define  LOAD_SEED_KEY                     "LOAD_SEED"  
-#define  LOCAL_CONFIG_KEY                  "LOCAL_CONFIG"
-#define  LOG_FILE_KEY                      "LOG_FILE"
-#define  LOG_LEVEL_KEY                     "LOG_LEVEL"
+
+
 #define  LSF_QUEUE_KEY                     "LSF_QUEUE"
 #define  LSF_RESOURCES_KEY                 "LSF_RESOURCES"
 #define  LSF_SERVER_KEY                    "LSF_SERVER"
@@ -174,7 +203,7 @@ extern "C" {
 #define  PLOT_REFCASE_KEY                  "PLOT_REFCASE"
 
 #define  PLOT_WIDTH_KEY                    "PLOT_WIDTH"        
-#define  PRE_CLEAR_RUNPATH_KEY             "PRE_CLEAR_RUNPATH"
+
 #define  QUEUE_SYSTEM_KEY                  "QUEUE_SYSTEM"
 #define  QUEUE_OPTION_KEY                  "QUEUE_OPTION" 
 #define  QC_PATH_KEY                       "QC_PATH"  
@@ -197,7 +226,7 @@ extern "C" {
 #define  ITER_RUNPATH_KEY                  "ITER_RUNPATH"
 
 #define  RUN_TEMPLATE_KEY                  "RUN_TEMPLATE"
-#define  RFT_CONFIG_KEY                    "RFT_CONFIG"
+
 
 
 
@@ -205,8 +234,7 @@ extern "C" {
 #define  SETENV_KEY                        "SETENV"
 
 
-#define  SUMMARY_KEY                       "SUMMARY"  
-#define  SURFACE_KEY                       "SURFACE"
+
 
 #define  UPDATE_PATH_KEY                   "UPDATE_PATH"
 

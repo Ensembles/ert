@@ -1754,7 +1754,7 @@ void local_config_fprintf( const local_config_type * local_config , const char *
 
 void local_config_fprintf_config( const local_config_type * local_config , FILE * stream) {
   fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
-  fprintf( stream , CONFIG_COMMENT_FORMAT , "Here comes the config files used for setting up local analysis.");
+  fprintf( stream , CONFIG_COMMENT_FORMAT , "Configuration settings for local analysis are in the following file.");  
   for (int i=0; i < stringlist_get_size( local_config->config_files ); i++) {
     fprintf(stream , CONFIG_KEY_FORMAT      , LOCAL_CONFIG_KEY );
     fprintf(stream , CONFIG_ENDVALUE_FORMAT , stringlist_iget( local_config->config_files , i ));
