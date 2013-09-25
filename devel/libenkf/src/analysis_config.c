@@ -557,6 +557,7 @@ void analysis_config_add_config_items( config_type * config ) {
   config_add_key_value( config , ENKF_MERGE_OBSERVATIONS_KEY , false , CONFIG_BOOL);
   config_add_key_value( config , UPDATE_RESULTS_KEY          , false , CONFIG_BOOL);
   config_add_key_value( config , SINGLE_NODE_UPDATE_KEY      , false , CONFIG_BOOL);
+  /*
   config_add_key_value( config , ENKF_CROSS_VALIDATION_KEY   , false , CONFIG_BOOL);
   config_add_key_value( config , ENKF_LOCAL_CV_KEY           , false , CONFIG_BOOL);
   config_add_key_value( config , ENKF_PEN_PRESS_KEY          , false , CONFIG_BOOL);
@@ -567,6 +568,7 @@ void analysis_config_add_config_items( config_type * config ) {
   config_add_key_value( config , ENKF_FORCE_NCOMP_KEY        , false , CONFIG_BOOL);
   config_add_key_value( config , ENKF_NCOMP_KEY              , false , CONFIG_INT);
   config_add_key_value( config , ENKF_CV_FOLDS_KEY           , false , CONFIG_INT);
+  */
   config_add_key_value( config , ENKF_RERUN_KEY              , false , CONFIG_BOOL);
   config_add_key_value( config , RERUN_START_KEY             , false , CONFIG_INT);
   config_add_key_value( config , UPDATE_LOG_PATH_KEY         , false , CONFIG_STRING);
@@ -590,8 +592,7 @@ void analysis_config_add_config_items( config_type * config ) {
 
 void analysis_config_fprintf_config( analysis_config_type * config , FILE * stream) {
   fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
-  fprintf( stream , CONFIG_COMMENT_FORMAT , "Here comes configuration information related to the EnKF analysis.");
-  
+  fprintf( stream , CONFIG_COMMENT_FORMAT , "Configuration information related to the EnKF analysis.");  
   
   if (config->merge_observations != DEFAULT_MERGE_OBSERVATIONS) {
     fprintf( stream , CONFIG_KEY_FORMAT        , ENKF_MERGE_OBSERVATIONS_KEY);
@@ -635,7 +636,11 @@ void analysis_config_fprintf_config( analysis_config_type * config , FILE * stre
     fprintf( stream , CONFIG_KEY_FORMAT      , UPDATE_LOG_PATH_KEY);
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , config->log_path );
   }
-  
+  if (config-> min_realisations != DEFAULT_ANALYSIS_MIN_REALISATIONS) {
+    fprintf( stream , CONFIG_KEY_FORMAT   , MIN_REALIZATIONS_KEY);
+    fprintf( stream , CONFIG_INT_FORMAT   , config->min_realisations );
+    fprintf( stream , "\n");
+  }
   fprintf(stream , "\n\n");
 }
 

@@ -52,9 +52,34 @@ extern "C" {
 #define  MAX_RESAMPLE_KEY                  "MAX_RESAMPLE"
 #define  SELECT_CASE_KEY                   "SELECT_CASE"
 #define  NUM_REALIZATIONS_KEY              "NUM_REALIZATIONS"      
-
-
+/* Config options in ens_obs.c*/
+#define  OBS_CONFIG_KEY                    "OBS_CONFIG"
+/* Config options in analysis_config.c*/
 #define  ENKF_MERGE_OBSERVATIONS_KEY       "ENKF_MERGE_OBSERVATIONS"
+#define  UPDATE_RESULTS_KEY                "UPDATE_RESULTS"
+#define  STD_CUTOFF_KEY                    "STD_CUTOFF"
+#define  ENKF_ALPHA_KEY                    "ENKF_ALPHA"
+#define  SINGLE_NODE_UPDATE_KEY            "SINGLE_NODE_UPDATE"
+#define  ENKF_RERUN_KEY                    "ENKF_RERUN"
+#define  RERUN_START_KEY                   "RERUN_START"
+#define  UPDATE_LOG_PATH_KEY               "UPDATE_LOG_PATH"
+#define  MIN_REALIZATIONS_KEY              "MIN_REALIZATIONS" 
+/*
+#define  ENKF_CROSS_VALIDATION_KEY         "ENKF_CROSS_VALIDATION"
+#define  ENKF_LOCAL_CV_KEY                 "ENKF_LOCAL_CV"     
+#define  ENKF_PEN_PRESS_KEY                "ENKF_PEN_PRESS"
+#define  ENKF_SCALING_KEY                  "ENKF_SCALING"     
+#define  ENKF_KERNEL_REG_KEY               "ENKF_KERNEL_REGRESSION"     
+#define  ENKF_KERNEL_FUNC_KEY              "ENKF_KERNEL_FUNCTION"     
+#define  ENKF_KERNEL_PARAM_KEY             "ENKF_KERNEL_PARAM"     
+#define  ENKF_CV_FOLDS_KEY                 "ENKF_CV_FOLDS"     
+#define  ENKF_FORCE_NCOMP_KEY              "ENKF_FORCE_NCOMP"
+#define  ENKF_NCOMP_KEY                    "ENKF_NCOMP"     */
+
+#define  ANALYSIS_COPY_KEY                 "ANALYSIS_COPY" /*Not implemented in fprintf_config*/
+#define  ANALYSIS_LOAD_KEY                 "ANALYSIS_LOAD" /*Not implemented in fprintf_config*/
+#define  ANALYSIS_SET_VAR_KEY              "ANALYSIS_SET_VAR" /*Not implemented in fprintf_config*/
+#define  ANALYSIS_SELECT_KEY               "ANALYSIS_SELECT" /*Not implemented in fprintf_config*/
 
 
 #define  FORWARD_INIT_KEY                  "FORWARD_INIT"
@@ -80,10 +105,7 @@ extern "C" {
 #define  BASE_SURFACE_KEY                  "BASE_SURFACE"
 
 
-#define  ANALYSIS_COPY_KEY                 "ANALYSIS_COPY"
-#define  ANALYSIS_LOAD_KEY                 "ANALYSIS_LOAD"
-#define  ANALYSIS_SET_VAR_KEY              "ANALYSIS_SET_VAR"
-#define  ANALYSIS_SELECT_KEY               "ANALYSIS_SELECT"
+
 
 #define  CONTAINER_KEY                     "CONTAINER"
 
@@ -94,20 +116,16 @@ extern "C" {
 
 
 #define  ENKF_BOOTSTRAP_KEY                "ENKF_BOOTSTRAP"
-#define  ENKF_PEN_PRESS_KEY                "ENKF_PEN_PRESS"
-#define  ENKF_ALPHA_KEY                    "ENKF_ALPHA"
-#define  ENKF_CROSS_VALIDATION_KEY         "ENKF_CROSS_VALIDATION"
-#define  ENKF_CV_FOLDS_KEY                 "ENKF_CV_FOLDS"     
-#define  ENKF_FORCE_NCOMP_KEY              "ENKF_FORCE_NCOMP"
-#define  ENKF_NCOMP_KEY                    "ENKF_NCOMP"     
-#define  ENKF_SCALING_KEY                  "ENKF_SCALING"     
-#define  ENKF_KERNEL_REG_KEY               "ENKF_KERNEL_REGRESSION"     
-#define  ENKF_KERNEL_FUNC_KEY              "ENKF_KERNEL_FUNCTION"     
-#define  ENKF_KERNEL_PARAM_KEY             "ENKF_KERNEL_PARAM"     
-#define  ENKF_LOCAL_CV_KEY                 "ENKF_LOCAL_CV"     
+
+
+
+
+
+
+
 
 #define  ENKF_MODE_KEY                     "ENKF_MODE"
-#define  ENKF_RERUN_KEY                    "ENKF_RERUN"
+
 
 #define  ENKF_TRUNCATION_KEY               "ENKF_TRUNCATION"
 
@@ -145,9 +163,9 @@ extern "C" {
 #define  MAX_RUNNING_RSH_KEY               "MAX_RUNNING_RSH"
 #define  MAX_SUBMIT_KEY                    "MAX_SUBMIT" 
 
-#define  MIN_REALIZATIONS_KEY              "MIN_REALIZATIONS" 
-#define  OBS_CONFIG_KEY                    "OBS_CONFIG"
-#define  OBS_CONFIG_KEY                    "OBS_CONFIG" 
+
+
+
 #define  PLOT_DRIVER_KEY                   "PLOT_DRIVER"
 #define  PLOT_ERRORBAR_MAX_KEY             "PLOT_ERRORBAR_MAX" 
 #define  PLOT_ERRORBAR_KEY                 "PLOT_ERRORBAR"
@@ -171,7 +189,7 @@ extern "C" {
 #define  REPORT_WELL_LIST_KEY              "REPORT_WELL_LIST"
 #define  REPORT_GROUP_LIST_KEY             "REPORT_GROUP_LIST"
 #define  REPORT_TIMEOUT_KEY                "REPORT_TIMEOUT"
-#define  RERUN_START_KEY                   "RERUN_START"
+
 #define  RSH_COMMAND_KEY                   "RSH_COMMAND"
 #define  RSH_HOST_KEY                      "RSH_HOST"
 #define  RUNPATH_FILE_KEY                  "RUNPATH_FILE"  
@@ -186,13 +204,13 @@ extern "C" {
 
 #define  SETENV_KEY                        "SETENV"
 
-#define  STD_CUTOFF_KEY                    "STD_CUTOFF"
+
 #define  SUMMARY_KEY                       "SUMMARY"  
 #define  SURFACE_KEY                       "SURFACE"
-#define  UPDATE_LOG_PATH_KEY               "UPDATE_LOG_PATH"
+
 #define  UPDATE_PATH_KEY                   "UPDATE_PATH"
-#define  UPDATE_RESULTS_KEY                "UPDATE_RESULTS"
-#define  SINGLE_NODE_UPDATE_KEY            "SINGLE_NODE_UPDATE"
+
+
 #define  STORE_SEED_KEY                    "STORE_SEED"
 #define  UMASK_KEY                         "UMASK"   
 #define  WORKFLOW_JOB_DIRECTORY_KEY        "WORKFLOW_JOB_DIRECTORY"
