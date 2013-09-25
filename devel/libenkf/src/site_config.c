@@ -906,7 +906,7 @@ void site_config_fprintf_config(const site_config_type * site_config, FILE * str
 
   /* Storing jobscript */
   if (!util_string_equal(site_config->job_script, site_config->job_script_site)) {
-    fprintf(stream, CONFIG_KEY_FORMAT, LICENSE_PATH_KEY);
+    fprintf(stream, CONFIG_KEY_FORMAT, JOB_SCRIPT_KEY);
     fprintf(stream, CONFIG_ENDVALUE_FORMAT, site_config->job_script);
   }
 
@@ -946,7 +946,7 @@ void site_config_fprintf_config(const site_config_type * site_config, FILE * str
     }
 
     if (!util_string_equal(site_config_get_rsh_command(site_config), site_config->rsh_command_site)) {
-      fprintf(stream, CONFIG_KEY_FORMAT, LICENSE_PATH_KEY);
+      fprintf(stream, CONFIG_KEY_FORMAT, RSH_COMMAND_KEY);
       fprintf(stream, CONFIG_ENDVALUE_FORMAT, site_config_get_rsh_command(site_config));
     }
 

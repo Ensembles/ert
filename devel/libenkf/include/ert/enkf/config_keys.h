@@ -108,6 +108,7 @@ extern "C" {
 #define  PARAMETER_KEY                     "PARAMETER"
 #define  GENERAL_KEY                       "GENERAL"
 #define  INPUT_TRANSFORM_KEY               "INPUT_TRANSFORM"
+#define  ECL_FILE_KEY                      "ECL_FILE"
 /* Config options in local_config.c*/
 #define  LOCAL_CONFIG_KEY                  "LOCAL_CONFIG"
 /* Config options printed in enkf_main_fprintf_config*/
@@ -120,127 +121,57 @@ extern "C" {
 #define  DATA_KW_KEY                       "DATA_KW"  /*Implementation for printing in enkf_main_data_kw_fprintf_config present but not in use.*/
 #define  INCLUDE_KEY                       "INCLUDE"
 #define  DEFINE_KEY                        "DEFINE" 
-
-
-
-#define  ECL_FILE_KEY                      "ECL_FILE"
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define  ENKF_BOOTSTRAP_KEY                "ENKF_BOOTSTRAP"
-
-
-
-
-
-
-
-
-#define  ENKF_MODE_KEY                     "ENKF_MODE"
-
-
-#define  ENKF_TRUNCATION_KEY               "ENKF_TRUNCATION"
-
-#define  ITER_CASE_KEY                     "ITER_CASE" 
-#define  ITER_COUNT_KEY                    "ITER_COUNT"
-
-
-   
-
-
-#define  HOSY_TYPE_KEY                     "HOST_TYPE"
-
-#define  IMAGE_TYPE_KEY                    "IMAGE_TYPE"
-#define  IMAGE_VIEWER_KEY                  "IMAGE_VIEWER"      
-
+/*Config options in ert_templates.c*/
+#define  RUN_TEMPLATE_KEY                  "RUN_TEMPLATE"
+/*Config options in site_config.c*/
 #define  INSTALL_JOB_KEY                   "INSTALL_JOB"
-#define  JOB_SCRIPT_KEY                    "JOB_SCRIPT"
-
-
+#define  SETENV_KEY                        "SETENV"
+#define  QUEUE_SYSTEM_KEY                  "QUEUE_SYSTEM"
+#define  UMASK_KEY                         "UMASK"   
+#define  MAX_SUBMIT_KEY                    "MAX_SUBMIT" 
 #define  LICENSE_PATH_KEY                  "LICENSE_PATH"
-#define  LOAD_SEED_KEY                     "LOAD_SEED"  
-
-
-#define  LSF_QUEUE_KEY                     "LSF_QUEUE"
-#define  LSF_RESOURCES_KEY                 "LSF_RESOURCES"
-#define  LSF_SERVER_KEY                    "LSF_SERVER"
-#define  TORQUE_QUEUE_KEY                  "TORQUE_QUEUE"
-
+#define  JOB_SCRIPT_KEY                    "JOB_SCRIPT"
 #define  MAX_RUNNING_LOCAL_KEY             "MAX_RUNNING_LOCAL"
 #define  MAX_RUNNING_LSF_KEY               "MAX_RUNNING_LSF"
 #define  MAX_RUNNING_RSH_KEY               "MAX_RUNNING_RSH"
-#define  MAX_SUBMIT_KEY                    "MAX_SUBMIT" 
-
-
-
-
+#define  LSF_QUEUE_KEY                     "LSF_QUEUE"
+#define  LSF_RESOURCES_KEY                 "LSF_RESOURCES"
+#define  RSH_COMMAND_KEY                   "RSH_COMMAND"
+#define  RSH_HOST_KEY                      "RSH_HOST"
+#define  UPDATE_PATH_KEY                   "UPDATE_PATH" /*Not printed*/
+#define  LSF_SERVER_KEY                    "LSF_SERVER" /*Not printed*/
+#define  QUEUE_OPTION_KEY                  "QUEUE_OPTION" /*Not printed*/
+/* Report options are currently not printed*/
+#define  REPORT_SEARCH_PATH_KEY            "REPORT_SEARCH_PATH"/*Not printed*/
+#define  REPORT_CONTEXT_KEY                "REPORT_CONTEXT"/*Not printed*/
+#define  REPORT_LARGE_KEY                  "REPORT_LARGE"   /*Not printed*/
+#define  REPORT_LIST_KEY                   "REPORT_LIST"/*Not printed*/
+#define  REPORT_PATH_KEY                   "REPORT_PATH"/*Not printed*/
+#define  REPORT_WELL_LIST_KEY              "REPORT_WELL_LIST"/*Not printed*/
+#define  REPORT_GROUP_LIST_KEY             "REPORT_GROUP_LIST"/*Not printed*/
+#define  REPORT_TIMEOUT_KEY                "REPORT_TIMEOUT"/*Not printed*/
+/*Config options in rng_config.c*/
+#define  LOAD_SEED_KEY                     "LOAD_SEED"  
+#define  STORE_SEED_KEY                    "STORE_SEED"
+/*Config options in analysis_iter_config.c*/
+#define  ITER_CASE_KEY                     "ITER_CASE" 
+#define  ITER_COUNT_KEY                    "ITER_COUNT"
+#define  ITER_RUNPATH_KEY                  "ITER_RUNPATH"
+/* QC module options are currently not printed*/
+#define  RUNPATH_FILE_KEY                  "RUNPATH_FILE"  
+#define  QC_PATH_KEY                       "QC_PATH"  
+#define  QC_WORKFLOW_KEY                   "QC_WORKFLOW"
+/*Plot options are currently not plotted.*/
+#define  IMAGE_TYPE_KEY                    "IMAGE_TYPE"
+#define  IMAGE_VIEWER_KEY                  "IMAGE_VIEWER"      
 #define  PLOT_DRIVER_KEY                   "PLOT_DRIVER"
 #define  PLOT_ERRORBAR_MAX_KEY             "PLOT_ERRORBAR_MAX" 
 #define  PLOT_ERRORBAR_KEY                 "PLOT_ERRORBAR"
 #define  PLOT_HEIGHT_KEY                   "PLOT_HEIGHT"       
 #define  PLOT_PATH_KEY                     "PLOT_PATH"         
 #define  PLOT_REFCASE_KEY                  "PLOT_REFCASE"
-
-#define  PLOT_WIDTH_KEY                    "PLOT_WIDTH"        
-
-#define  QUEUE_SYSTEM_KEY                  "QUEUE_SYSTEM"
-#define  QUEUE_OPTION_KEY                  "QUEUE_OPTION" 
-#define  QC_PATH_KEY                       "QC_PATH"  
-#define  QC_WORKFLOW_KEY                   "QC_WORKFLOW"
-
-
-#define  REPORT_CONTEXT_KEY                "REPORT_CONTEXT"
-#define  REPORT_SEARCH_PATH_KEY            "REPORT_SEARCH_PATH"
-#define  REPORT_LARGE_KEY                  "REPORT_LARGE"   
-#define  REPORT_LIST_KEY                   "REPORT_LIST"
-#define  REPORT_PATH_KEY                   "REPORT_PATH"
-#define  REPORT_WELL_LIST_KEY              "REPORT_WELL_LIST"
-#define  REPORT_GROUP_LIST_KEY             "REPORT_GROUP_LIST"
-#define  REPORT_TIMEOUT_KEY                "REPORT_TIMEOUT"
-
-#define  RSH_COMMAND_KEY                   "RSH_COMMAND"
-#define  RSH_HOST_KEY                      "RSH_HOST"
-#define  RUNPATH_FILE_KEY                  "RUNPATH_FILE"  
-
-#define  ITER_RUNPATH_KEY                  "ITER_RUNPATH"
-
-#define  RUN_TEMPLATE_KEY                  "RUN_TEMPLATE"
-
-
-
-
-
-#define  SETENV_KEY                        "SETENV"
-
-
-
-
-#define  UPDATE_PATH_KEY                   "UPDATE_PATH"
-
-
-#define  STORE_SEED_KEY                    "STORE_SEED"
-#define  UMASK_KEY                         "UMASK"   
+#define  PLOT_WIDTH_KEY                    "PLOT_WIDTH" 
+/*Workflow options are currently not printed.*/
 #define  WORKFLOW_JOB_DIRECTORY_KEY        "WORKFLOW_JOB_DIRECTORY"
 #define  LOAD_WORKFLOW_KEY                 "LOAD_WORKFLOW"                       
 #define  LOAD_WORKFLOW_JOB_KEY             "LOAD_WORKFLOW_JOB"

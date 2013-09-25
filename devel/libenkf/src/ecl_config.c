@@ -837,7 +837,7 @@ void ecl_config_fprintf_config( const ecl_config_type * ecl_config , FILE * stre
       }  
     }
   }
-  if (ecl_config->end_date != NULL) {
+  if (ecl_config->end_date != -1) {
     fprintf( stream , CONFIG_KEY_FORMAT      , END_DATE_KEY );
     fprintf( stream , CONFIG_ENDVALUE_FORMAT , util_alloc_date_string(ecl_config->end_date )); 
   }
