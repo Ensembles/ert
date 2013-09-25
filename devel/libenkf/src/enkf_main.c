@@ -3595,7 +3595,16 @@ void enkf_main_log_fprintf_config( const enkf_main_type * enkf_main , FILE * str
   fprintf(stream , "\n");
   fprintf(stream , "\n");
 }
-
+void enkf_main_rft_fprintf_config( const enkf_main_type * enkf_main , FILE * stream ) {
+  if(enkf_main_get_rft_config_file(enkf_main) != NULL){
+    fprintf( stream , CONFIG_COMMENTLINE_FORMAT );
+    fprintf( stream , CONFIG_COMMENT_FORMAT  , "Here comes configuration information about RFTs.");
+    fprintf( stream , CONFIG_KEY_FORMAT      , RFT_CONFIG_KEY );
+    fprintf( stream , CONFIG_ENDVALUE_FORMAT , enkf_main_get_rft_config_file( enkf_main ));
+    fprintf(stream , "\n");
+    fprintf(stream , "\n");
+  }
+}
 
 void enkf_main_install_SIGNALS(void) {
   signal(SIGSEGV , util_abort_signal);    /* Segmentation violation, i.e. overwriting memory ... */
@@ -3726,6 +3735,8 @@ void enkf_main_fprintf_config( const enkf_main_type * enkf_main ) {
     enkf_main_log_fprintf_config( enkf_main , stream );
     site_config_fprintf_config( enkf_main->site_config , stream );    
     rng_config_fprintf_config( enkf_main->rng_config , stream );
+    enkf_main_rft_fprintf_config( enkf_main, stream );
+    analysis_config_iter_config_fprintf_config( enkf_main->analysis_config , stream );
     fclose( stream );
   }
 }

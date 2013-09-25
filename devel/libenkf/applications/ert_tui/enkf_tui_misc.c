@@ -62,7 +62,10 @@ static void enkf_tui_misc_list_jobs(void * arg) {
   stringlist_free( job_names );
 }
 
-
+static void enkf_tui_misc_print_config_to_file(void * arg) {
+  enkf_main_type * enkf_main              = enkf_main_safe_cast( arg );
+  enkf_main_fprintf_config( enkf_main );
+}
 
 
 void enkf_tui_misc_menu( void * arg) {
@@ -70,6 +73,7 @@ void enkf_tui_misc_menu( void * arg) {
   menu_type       * menu       = menu_alloc( "Misceallanous stuff" , "Back" , "bB");
   menu_add_item(menu , "List all \'magic\' <...> strings" , "lL"    , enkf_tui_misc_printf_subst_list , enkf_main , NULL); 
   menu_add_item(menu , "List all available forward model jobs","jJ" , enkf_tui_misc_list_jobs , enkf_main , NULL );
+  menu_add_item(menu , "Print configuration to file" , "pP" , enkf_tui_misc_print_config_to_file , enkf_main , NULL);
   menu_add_item(menu , "Help","hH" , enkf_tui_help_menu_misc , enkf_main , NULL );
   menu_run(menu);
   menu_free(menu);
