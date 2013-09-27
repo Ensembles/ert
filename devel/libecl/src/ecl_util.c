@@ -1389,6 +1389,38 @@ void ecl_util_init_month_range( time_t_vector_type * date_list , time_t start_da
 }
 
 
+
+
+time_t ecl_util_make_date__(int mday , int month , int year, int * __year_offset) {
+time_t date;
+
+#ifdef TIME_T64
+  *__year_offset = 0;
+  date = util_make_date(mday , month , year);
+#else
+  static bool offset_initialized = false;
+  static int  year_offset = 0;
+
+  if (!offset_initialized) {
+    if (year < 1970) {
+      year_offset = 2000 - year;
+      fprintf(stderr,"Warning: all year values will be shifted %d years forward. \n", year_offset);
+    }
+    offset_initialized = true;
+  }
+  *__year_offset = year_offset;
+  date = util_make_date(mday , month , year + year_offset);
+#endif
+
+  return date;
+}
+
+
+time_t ecl_util_make_date(int mday , int month , int year) {
+  int year_offset;
+  return ecl_util_make_date__( mday , month , year , &year_offset);
+}
+
 /*****************************************************************/
 /* Small functions to support enum introspection. */
 
