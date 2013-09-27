@@ -1,3 +1,8 @@
+check_type_size(time_t SIZE_OF_TIME_T)
+if (${SIZE_OF_TIME_T} EQUAL 8)
+   add_definitions( -DTIME_T64 )
+endif()
+
 check_function_exists( fseeko HAVE_FSEEKO )
 if (HAVE_HFSEEKO)
    add_definitions( -DHAVE_FSEEKO )                       
