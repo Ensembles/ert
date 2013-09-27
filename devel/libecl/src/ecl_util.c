@@ -1235,7 +1235,7 @@ time_t ecl_util_get_start_date(const char * data_file) {
     int day, year, month_nr;
     if ( util_sscanf_int( stringlist_iget( tokens , 0 ) , &day)   &&   util_sscanf_int( stringlist_iget(tokens , 2) , &year)) {
       month_nr   = ecl_util_get_month_nr(stringlist_iget( tokens , 1));
-      start_date = util_make_date(day , month_nr , year );
+      start_date = ecl_util_make_date(day , month_nr , year );
     } else
       util_abort("%s: failed to parse DAY MONTH YEAR from : \"%s\" \n",__func__ , buffer);
     stringlist_free( tokens );
@@ -1364,7 +1364,7 @@ void ecl_util_append_month_range( time_t_vector_type * date_list , time_t start_
       } else
         month += 1;
       
-      current_date = util_make_date( 1 , month , year );
+      current_date = ecl_util_make_date( 1 , month , year );
       if (current_date < end_date)
         time_t_vector_append( date_list , current_date );
       else {
