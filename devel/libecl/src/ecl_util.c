@@ -1281,6 +1281,7 @@ int ecl_util_get_num_parallel_cpu__(parser_type* parser, FILE* stream, const cha
   buffer_size = (ftell(stream) - start_pos)  ;
   buffer = util_calloc( buffer_size + 1  , sizeof * buffer );
   fseek( stream , start_pos , SEEK_SET);
+
   util_fread( buffer , sizeof * buffer , buffer_size ,stream ,  __func__);
   buffer[buffer_size] = '\0';
 
