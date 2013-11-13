@@ -99,6 +99,11 @@ add_executable( ert_util_addr2line ert_util_addr2line.c )
 target_link_libraries( ert_util_addr2line ert_util test_util )
 add_test( ert_util_addr2line ${EXECUTABLE_OUTPUT_PATH}/ert_util_addr2line)
 
+
+add_executable( ert_util_clamp ert_util_clamp.c )
+target_link_libraries( ert_util_clamp ert_util test_util )
+add_test( ert_util_clamp  ${EXECUTABLE_OUTPUT_PATH}/ert_util_clamp )
+
 add_executable( ert_util_work_area ert_util_work_area.c )
 target_link_libraries( ert_util_work_area ert_util test_util )
 add_test( NAME ert_util_work_area 
