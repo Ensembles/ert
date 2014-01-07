@@ -3,7 +3,7 @@ project( ERT C CXX )
 
 set( ERT_VERSION_MAJOR 1 )
 set( ERT_VERSION_MINOR 3 )
-set( ERT_VERSION_MICRO 2 )
+set( ERT_VERSION_MICRO 3 )
 
 option( BUILD_ERT           "Build the full ERT application - Linux only" OFF)
 option( BUILD_ENS_PLOT      "Build small Eclipse plotting program - no" OFF)
