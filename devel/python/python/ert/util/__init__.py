@@ -52,7 +52,7 @@ import ert.cwrap.clib as clib
 UTIL_LIB = clib.ert_load("libert_util")
 
 from .enums import RngAlgTypeEnum, RngInitModeEnum
-
+from .ctime import CTime
 from .vector_template import VectorTemplate, PermutationVector
 from .double_vector import DoubleVector
 from .int_vector import IntVector
@@ -65,7 +65,6 @@ from .matrix import Matrix
 from .log import Log
 from .lookup_table import LookupTable
 from .buffer import Buffer
-from .ctime import ctime
 from .hash import Hash, StringHash, DoubleHash, IntegerHash
 from .latex import LaTeX
 from .substitution_list import SubstitutionList
