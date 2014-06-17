@@ -111,13 +111,13 @@ struct rml_enkf_data_struct {
   int       iteration_nr;          // Keep track of the outer iteration loop
   double    Sk;                    // Objective function value
   double    Std;                   // Standard Deviation of the Objective function
-  double  * Csc;
-  matrix_type *Am;
-  matrix_type *active_prior;
-  matrix_type *prior0;
-  matrix_type *state;
-  bool_vector_type * ens_mask;
-  bool use_prior;
+
+  double  * Csc;                   // Vector with scalings for non-dimensionalizing states
+  matrix_type *Am;                 // Scaled right singular vectors of ensemble anomalies.
+  matrix_type *prior;              // m_pr
+  matrix_type *state;              // m_l
+  bool_vector_type * ens_mask;     // Tells you which of the realisations are in use.
+  bool use_prior;                  // Use exact/approximate scheme? Approximate scheme drops the "prior" term in the LM step.
 
   double    lambda;                 // parameter to control the setp length in Marquardt levenberg optimization 
   double    lambda0;
@@ -318,8 +318,7 @@ void * rml_enkf_data_alloc( rng_type * rng) {
   data->Std          = 0; 
   data->ens_mask     = bool_vector_alloc(0,false);
   data->state        = matrix_alloc(1,1);
-  data->active_prior = matrix_alloc(1,1);
-  data->prior0       = matrix_alloc(1,1);
+  data->prior        = matrix_alloc(1,1);
   return data;
 }
 
@@ -327,8 +326,7 @@ void rml_enkf_data_free( void * arg ) {
   rml_enkf_data_type * data = rml_enkf_data_safe_cast( arg );
 
   matrix_free( data->state );
-  matrix_free( data->prior0 );
-  matrix_free( data->active_prior );
+  matrix_free( data->prior );
 
   util_safe_free( data->log_file );
   bool_vector_free( data->ens_mask );
@@ -349,10 +347,10 @@ static void rml_enkf_init1__( rml_enkf_data_type * data) {
 	// Um*Wm^(-1) are the scaled, truncated, right singular vectors of data->prior
   
 
-  int state_size    = matrix_get_rows( data->active_prior );
-  int ens_size      = matrix_get_columns( data->active_prior );
+  int state_size    = matrix_get_rows( data->prior );
+  int ens_size      = matrix_get_columns( data->prior );
   int nrmin         = util_int_min( ens_size , state_size); 
-  matrix_type * Dm  = matrix_alloc_copy( data->active_prior );
+  matrix_type * Dm  = matrix_alloc_copy( data->prior );
   matrix_type * Um  = matrix_alloc( state_size , nrmin  );     /* Left singular vectors.  */
   matrix_type * VmT = matrix_alloc( nrmin , ens_size );        /* Right singular vectors. */
   double * Wm       = util_calloc( nrmin , sizeof * Wm ); 
@@ -382,11 +380,11 @@ static void rml_enkf_init1__( rml_enkf_data_type * data) {
 void rml_enkf_init_Csc(rml_enkf_data_type * data){
 	// This seems a strange choice of scaling matrix. Review?
 	
-  int state_size = matrix_get_rows( data->active_prior );
-  int ens_size   = matrix_get_columns( data->active_prior );
+  int state_size = matrix_get_rows( data->prior );
+  int ens_size   = matrix_get_columns( data->prior );
 
   for (int row=0; row < state_size; row++) {
-    double sumrow = matrix_get_row_sum(data->active_prior , row);
+    double sumrow = matrix_get_row_sum(data->prior , row);
     double tmp    = sumrow / ens_size;
 
     if (abs(tmp)< 1)
@@ -454,16 +452,16 @@ static void rml_enkf_initA__(rml_enkf_data_type * data, matrix_type * A, matrix_
 }
 
 // Calculate prior mismatch update (delta m_2).
-void rml_enkf_init2__( rml_enkf_data_type * data, matrix_type *A, matrix_type *Acopy, double * Wdr, matrix_type * VdTr) {
+void rml_enkf_init2__( rml_enkf_data_type * data, matrix_type *A, double * Wdr, matrix_type * VdTr) {
 	// Distinguish from init1__ which only makes preparations, and is only called at iter=0
 
 
-  int state_size   = matrix_get_rows( Acopy );
-  int ens_size     = matrix_get_columns( Acopy );
+  int state_size   = matrix_get_rows( A );
+  int ens_size     = matrix_get_columns( A );
   double nsc       = 1/sqrt(ens_size-1); 
 
   matrix_type *Am  = matrix_alloc_copy(data->Am);
-  matrix_type *Apr = matrix_alloc_copy(data->active_prior);
+  matrix_type *Apr = matrix_alloc_copy(data->prior);
 
  // fprintf(stdout,"\n");
  // fprintf(stdout,"A: %d x %d\n", matrix_get_rows(A), matrix_get_columns(A));
@@ -488,12 +486,12 @@ void rml_enkf_init2__( rml_enkf_data_type * data, matrix_type *A, matrix_type *A
   matrix_type * X6  = matrix_alloc(ens_size,ens_size);
   matrix_type * X7  = matrix_alloc(ens_size,ens_size);
   matrix_type * dA2 = matrix_alloc(state_size , ens_size);
-  matrix_type * Dk1 = matrix_alloc_copy( Acopy );
+  matrix_type * Dk1 = matrix_alloc_copy( A );
   
 	// Dk = Csc^(-1) * (A - Aprior)
 	// X4 = Am' * Dk
   {
-    matrix_type * Dk = matrix_alloc_copy( Acopy );
+    matrix_type * Dk = matrix_alloc_copy( A );
     matrix_inplace_sub(Dk, Apr);
     rml_enkf_common_scaleA(Dk , data->Csc , true);
     matrix_dgemm(X4 , Am , Dk , true, false, 1.0, 0.0);
@@ -549,10 +547,9 @@ static void rml_enkf_updateA_iter0(rml_enkf_data_type * data, matrix_type * A, m
   else
     data->lambda = data->lambda0;
   
-	// state = A, prior0 = A, active_prior = prior0 (NB: size difference)
+	// state = A, prior = A
   rml_enkf_common_store_state( data->state  , A , data->ens_mask );
-  rml_enkf_common_store_state( data->prior0 , A , data->ens_mask );
-  rml_enkf_common_recover_state( data->prior0 , data->active_prior , data->ens_mask );
+  rml_enkf_common_recover_state( A , data->prior , data->ens_mask );
 
 	// Update dependant on data mismatch
   rml_enkf_initA__(data , A, S , Cd , E , D , Ud , Wd , VdT);
@@ -612,14 +609,11 @@ void rml_enkf_updateA(void * module_data, matrix_type * A, matrix_type * S, matr
     matrix_type * Skm   = matrix_alloc(ens_size,ens_size);      // Mismatch
     Sk_new              = enkf_linalg_data_mismatch(D,Cd,Skm);  // Skm = D'*inv(Cd)*D; Sk_new = trace(Skm)/N
     Std_new             = matrix_diag_std(Skm,Sk_new);          // Standard deviation of mismatches.
-		matrix_type * Acopy  = matrix_alloc_copy (A);
 
 
 		// Lambda = Normalized data mismatch (rounded)
     if (data->lambda_recalculate)
       data->lambda = pow(10 , floor(log10(Sk_new / (2*nrobs))) );
-    
-    rml_enkf_common_recover_state( data->prior0 , data->active_prior , data->ens_mask );
 
 		// Accept/Reject update? Lambda calculation.
     {
@@ -662,11 +656,10 @@ void rml_enkf_updateA(void * module_data, matrix_type * A, matrix_type * S, matr
 		// Update dependant on prior mismatch (delta m_2)
     if (data->use_prior) {
       rml_enkf_init_Csc( data );
-      rml_enkf_init2__(data , A , Acopy , Wd , VdT);
+      rml_enkf_init2__(data , A , Wd , VdT);
     }
 		
 		// Free
-    matrix_free(Acopy);
     matrix_free(Skm);
     matrix_free( Ud );
     matrix_free( VdT );
