@@ -37,10 +37,10 @@ class LoadResultsPanel(QWidget):
         self.activateWindow()
 
         layout = QFormLayout()
-        current_case = CaseSelectorModel().getCurrentChoice()
+        self.__current_case = CaseSelectorModel().getCurrentChoice()
 
         run_path_text = QTextEdit()
-        run_path_text.setText(self.readCurrentRunPath)
+        run_path_text.setText(self.readCurrentRunPath())
         run_path_text.setDisabled(True)
         run_path_text.setFixedHeight(80)
 
@@ -51,7 +51,7 @@ class LoadResultsPanel(QWidget):
         self.__case_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.__case_combo.setMinimumContentsLength(20)
         self.__case_combo.setModel(self.__case_model)
-        self.__case_combo.setCurrentIndex(self.__case_model.indexOf(current_case))
+        self.__case_combo.setCurrentIndex(self.__case_model.indexOf(self.__current_case))
         layout.addRow("Load into case:",self.__case_combo)
 
 
@@ -71,8 +71,8 @@ class LoadResultsPanel(QWidget):
 
     def readCurrentRunPath(self):
         run_path = LoadResultsModel().getCurrentRunPath()
-        run_path = run_path.replace("<ERTCASE>",current_case)
-        run_path = run_path.replace("<ERT-CASE>",current_case)
+        run_path = run_path.replace("<ERTCASE>",self.__current_case)
+        run_path = run_path.replace("<ERT-CASE>",self.__current_case)
         return run_path
 
 
