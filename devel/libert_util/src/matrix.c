@@ -471,6 +471,21 @@ void matrix_safe_free( matrix_type * matrix ) {
 
 
 /*****************************************************************/
+void matrix_pretty_fprint_submat(const matrix_type * matrix , const char * name , const char * fmt , FILE * stream, int m, int M, int n, int N) {
+  int i,j;
+
+ if (m<0 || m>M || M >= matrix->rows || n<0 || n>N || N >= matrix->columns)
+         util_abort("%s: matrix:%s not compatible with print subdimensions. \n",__func__ , matrix->name);
+
+ fprintf(stream ,  "%s =" , name);
+  for (i=m; i < M; i++) {
+    fprintf(stream , " [");
+    for (j=n; j < N; j++)
+      fprintf(stream , fmt , matrix_iget(matrix , i,j));
+    fprintf(stream , "]\n");
+  }
+}
+/*****************************************************************/
 
 void matrix_pretty_fprint(const matrix_type * matrix , const char * name , const char * fmt , FILE * stream) {
   int i,j;
@@ -1173,8 +1188,8 @@ void matrix_shift_row(matrix_type * matrix , int row , double shift) {
 */
 
 void matrix_subtract_row_mean(matrix_type * matrix) {
-        int i; 
-        for ( i=0; i < matrix->rows; i++) {
+		int i; 
+		for ( i=0; i < matrix->rows; i++) {
     double row_mean = matrix_get_row_sum(matrix , i) / matrix->columns;
     matrix_shift_row( matrix , i , -row_mean);
   }
