@@ -2,8 +2,8 @@ cmake_minimum_required( VERSION 2.8 )
 project( ERT C CXX )
 
 set( ERT_VERSION_MAJOR 1 )
-set( ERT_VERSION_MINOR 6 )
-set( ERT_VERSION_MICRO X )
+set( ERT_VERSION_MINOR 7 )
+set( ERT_VERSION_MICRO 0 )
 
 
 option( BUILD_ERT           "Build the full ERT application - Linux only" OFF)
