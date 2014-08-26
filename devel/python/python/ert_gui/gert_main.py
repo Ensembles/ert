@@ -131,7 +131,22 @@ from ert_gui.widgets import util
 
 import ert_gui.widgets.util
 
-ert_gui.widgets.util.img_prefix = os.getenv("ERT_SHARE_PATH") + "/gui/img/"
+try:
+    import site_config
+    site_config_file = site_config.config_file
+except ImportError:
+    site_config_file = None
+
+if os.getenv("ERT_SHARE_PATH"):
+    ert_share_path = os.getenv("ERT_SHARE_PATH")
+else:
+    # If the ERT_SHARE_PATH variable is not set we try to use the
+    # source location relative to the location of the current file;
+    # assuming we are in the source directory. Will not work if we are
+    # in an arbitrary build directory.
+    ert_share_path = os.path.realpath( os.path.join( os.path.dirname( os.path.abspath( __file__)) , "../../../share"))
+    
+ert_gui.widgets.util.img_prefix = ert_share_path + "/gui/img/"
 
 from ert_gui.newconfig import NewConfigurationDialog
 
@@ -174,6 +189,10 @@ def main(argv):
     app.processEvents()
 
     strict = True
+
+    if os.getenv("ERT_SITE_CONFIG"):
+        site_config_file = os.getenv("ERT_SITE_CONFIG")
+
     site_config = os.getenv("ERT_SITE_CONFIG")
     if len(argv) == 1:
         print("-----------------------------------------------------------------")
@@ -200,17 +219,18 @@ def main(argv):
                 dbase_type = new_configuration_dialog.getDBaseType()
                 num_realizations = new_configuration_dialog.getNumberOfRealizations()
                 storage_path = new_configuration_dialog.getStoragePath()
-
                 EnKFMain.createNewConfig(enkf_config, storage_path, first_case_name, dbase_type, num_realizations)
                 strict = False
 
-        ert = Ert(EnKFMain(enkf_config, site_config=site_config, strict=strict))
+        ert = Ert(EnKFMain(enkf_config, site_config=site_config_file, strict=strict))
         ErtConnector.setErt(ert.ert())
 
 
         splash.showMessage("Creating GUI...", Qt.AlignLeft, Qt.white)
         app.processEvents()
 
+        ert = Ert(EnKFMain(enkf_config, site_config = site_config_file, strict=strict))
+        ErtConnector.setErt(ert.ert())
 
         window = GertMainWindow()
         window.setWidget(SimulationPanel())
