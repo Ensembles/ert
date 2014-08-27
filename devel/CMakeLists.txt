@@ -3,7 +3,7 @@ project( ERT C CXX )
 
 set( ERT_VERSION_MAJOR 1 )
 set( ERT_VERSION_MINOR 7 )
-set( ERT_VERSION_MICRO 4 )
+set( ERT_VERSION_MICRO 5 )
 
 
 option( BUILD_ERT           "Build the full ERT application - Linux only" OFF)
