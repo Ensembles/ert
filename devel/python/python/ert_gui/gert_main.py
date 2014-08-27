@@ -131,11 +131,6 @@ from ert_gui.widgets import util
 
 import ert_gui.widgets.util
 
-try:
-    import site_config
-    site_config_file = site_config.config_file
-except ImportError:
-    site_config_file = None
 
 if os.getenv("ERT_SHARE_PATH"):
     ert_share_path = os.getenv("ERT_SHARE_PATH")
@@ -173,6 +168,15 @@ class Ert(object):
 
 
 def main(argv):
+    try:
+        import site_config
+        site_config_file = site_config.config_file
+    except ImportError:
+        site_config_file = None
+
+    if os.getenv("ERT_SITE_CONFIG"):
+        site_config_file = os.getenv("ERT_SITE_CONFIG")
+
     app = QApplication(argv) #Early so that QT is initialized before other imports
     app.setWindowIcon(util.resourceIcon("application/window_icon_cutout"))
 
@@ -190,10 +194,6 @@ def main(argv):
 
     strict = True
 
-    if os.getenv("ERT_SITE_CONFIG"):
-        site_config_file = os.getenv("ERT_SITE_CONFIG")
-
-    site_config = os.getenv("ERT_SITE_CONFIG")
     if len(argv) == 1:
         print("-----------------------------------------------------------------")
         print("-- You must supply the name of configuration file as the first --")
