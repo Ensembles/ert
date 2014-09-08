@@ -15,3 +15,8 @@ if (BUILD_TESTS)
    add_subdirectory( tests )
 endif()
 
+try_compile( HAVE_PLWIDTH ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/Tests/test_plwidth.c )
+if (HAVE_PLWIDTH)
+  add_definitions( -DHAVE_PLWIDTH )
+endif()
+
