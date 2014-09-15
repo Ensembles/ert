@@ -2831,8 +2831,6 @@ enkf_main_type * enkf_main_bootstrap(const char * _site_config, const char * _mo
     /*
       Initializing the various 'large' sub config objects. 
     */
-    rng_config_init( enkf_main->rng_config , config );
-    enkf_main_rng_init( enkf_main );  /* Must be called before the ensmeble is created. */
     enkf_main_init_subst_list( enkf_main );
     ert_workflow_list_init( enkf_main->workflow_list , config );
     
