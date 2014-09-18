@@ -55,6 +55,7 @@
 #include <ert/ecl/ecl_io_config.h>
 
 #include <ert/job_queue/job_queue.h>
+#include <ert/job_queue/job_queue_manager.h>
 #include <ert/job_queue/local_driver.h>
 #include <ert/job_queue/rsh_driver.h>
 #include <ert/job_queue/lsf_driver.h>
@@ -1492,6 +1493,8 @@ void enkf_main_run_post_workflow( enkf_main_type * enkf_main ) {
 }
 
 
+
+
 /**
   If all simulations have completed successfully the function will
   return true, otherwise it will return false.  
@@ -1538,20 +1541,14 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
 
     job_size = bool_vector_count_equal( iactive , true );
     {
-      pthread_t        queue_thread;
       job_queue_type * job_queue = site_config_get_job_queue(enkf_main->site_config);
-      
+      job_queue_manager_type * queue_manager = job_queue_manager_alloc( job_queue );
       
       /* Start the queue */
       if (run_mode != INIT_ONLY) {
-        if (site_config_has_job_script( enkf_main->site_config )) {
-          arg_pack_type  * queue_args = arg_pack_alloc();    /* This arg_pack will be freed() in the job_que_run_jobs__() */
-          arg_pack_append_ptr(queue_args  , job_queue);
-          arg_pack_append_int(queue_args  , job_size);
-          arg_pack_append_bool(queue_args , verbose_queue);
-          job_queue_reset(job_queue);
-          pthread_create( &queue_thread , NULL , job_queue_run_jobs__ , queue_args);
-        } else
+        if (site_config_has_job_script( enkf_main->site_config )) 
+          job_queue_manager_start_queue( queue_manager , job_size , verbose_queue );
+        else
           util_exit("No job script specified, can not start any jobs. Use the key JOB_SCRIPT in the config file\n");
       }
 
@@ -1617,8 +1614,9 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
           enkf_main_monitor_job_queue( enkf_main );
         }
         
-        pthread_join( queue_thread , NULL );   /* Wait for the job_queue_run_jobs() function to complete. */
+        job_queue_manager_wait( queue_manager );
       }
+      job_queue_manager_free( queue_manager );
     }
 
     
