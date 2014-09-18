@@ -83,7 +83,8 @@ set( source_files
      cases_config.c 
      state_map.c    
      ert_test_context.c
-     ert_log.c)
+     ert_log.c
+     run_info.c)
 
 set( header_files 
      ert_report.h 
@@ -178,7 +179,8 @@ set( header_files
      cases_config.h 
      state_map.h
      ert_test_context.h
-     ert_log.h)
+     ert_log.h
+     run_info.h)
 
 
 add_library( enkf  ${LIBRARY_TYPE} ${source_files} )

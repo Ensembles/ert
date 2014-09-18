@@ -1524,35 +1524,35 @@ void enkf_main_submit_jobs( enkf_main_type * enkf_main ,
     for (iens = 0; iens < active_ens_size; iens++) {
       enkf_state_type * enkf_state = enkf_main->ensemble[iens];
       if (bool_vector_iget(iactive , iens)) {
-      int load_start = step1;
-      if (step1 > 0)
-        load_start++;
-      
-      enkf_state_init_run(enkf_state , 
-                          run_mode ,
-                          true , 
-                          max_internal_submit ,
-                          init_step_parameter ,
-                          init_state_parameter,
-                          init_state_dynamic  ,
-                          load_start ,
+        int load_start = step1;
+        if (step1 > 0)
+          load_start++;
+        
+        enkf_state_init_run(enkf_state , 
+                            run_mode ,
+                            true , 
+                            max_internal_submit ,
+                            init_step_parameter ,
+                            init_state_parameter,
+                            init_state_dynamic  ,
+                            load_start ,
+                            iter ,
+                            step1 ,
+                            step2 );
+        
+        runpath_list_add( runpath_list , 
+                          iens , 
                           iter ,
-                          step1 ,
-                          step2 );
-      
-      runpath_list_add( runpath_list , 
-                        iens , 
-                        iter ,
-                        enkf_state_get_run_path( enkf_state ) , 
-                        enkf_state_get_eclbase( enkf_state ));
-      {
-        arg_pack_type * arg_pack = arg_pack_alloc( );   // This is discarded by the enkf_state_start_forward_model__() function. */
-        
-        arg_pack_append_ptr( arg_pack , enkf_state );
-        arg_pack_append_ptr( arg_pack , fs );
-        
-        thread_pool_add_job(submit_threads , enkf_state_start_forward_model__ , arg_pack);
-      }
+                          enkf_state_get_run_path( enkf_state ) , 
+                          enkf_state_get_eclbase( enkf_state ));
+        {
+          arg_pack_type * arg_pack = arg_pack_alloc( );   // This is discarded by the enkf_state_start_forward_model__() function. */
+          
+          arg_pack_append_ptr( arg_pack , enkf_state );
+          arg_pack_append_ptr( arg_pack , fs );
+          
+          thread_pool_add_job(submit_threads , enkf_state_start_forward_model__ , arg_pack);
+        }
       } else
         enkf_state_set_inactive( enkf_state );
     }
