@@ -72,20 +72,20 @@ void run_info_init_for_load(run_info_type * run_info ,
 
 
 
-void run_info_set(run_info_type * run_info        , 
-                  run_mode_type run_mode          , 
-                  bool active                     , 
-                  int max_internal_submit         ,
-                  int init_step_parameters        ,      
-                  state_enum init_state_parameter ,
-                  state_enum init_state_dynamic   ,
-                  int load_start                  , 
-                  int step1                       , 
-                  int step2                       ,
-                  int iter                        ,
-                  int iens                             , 
-                  path_fmt_type * run_path_fmt ,
-                  const subst_list_type * state_subst_list) {
+void run_info_init(run_info_type * run_info        , 
+                   run_mode_type run_mode          , 
+                   bool active                     , 
+                   int max_internal_submit         ,
+                   int init_step_parameters        ,      
+                   state_enum init_state_parameter ,
+                   state_enum init_state_dynamic   ,
+                   int load_start                  , 
+                   int step1                       , 
+                   int step2                       ,
+                   int iter                        ,
+                   int iens                             , 
+                   path_fmt_type * run_path_fmt ,
+                   const subst_list_type * state_subst_list) {
   
   run_info->active               = active;
   run_info->init_step_parameters = init_step_parameters;

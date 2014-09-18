@@ -199,7 +199,8 @@ void enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs , co
 */
 
 const char * enkf_state_get_run_path(const enkf_state_type * enkf_state) { 
-  return enkf_state->run_info->run_path; 
+  run_info_type * run_info = enkf_state->run_info;
+  return run_info->run_path; 
 }
 
 
@@ -647,7 +648,7 @@ static bool enkf_state_internalize_dynamic_eclipse_results(enkf_state_type * enk
         int_vector_free( time_index );
         return true;
       } else {
-        fprintf(stderr , "** Warning: could not load ECLIPSE summary data from %s - this will probably fail later ...\n" , enkf_state->run_info->run_path);
+        fprintf(stderr , "** Warning: could not load ECLIPSE summary data from %s - this will probably fail later ...\n" , run_info->run_path);
         return false;
       }
     }
@@ -1818,7 +1819,8 @@ static void enkf_state_internal_retry(enkf_state_type * enkf_state , enkf_fs_typ
 */
    
 run_status_type enkf_state_get_simple_run_status(const enkf_state_type * state) {
-  return state->run_info->run_status;
+  run_info_type * run_info = state->run_info;
+  return run_info->run_status;
 }
 
    
@@ -1975,7 +1977,7 @@ static bool enkf_state_complete_forward_modelOK(enkf_state_type * enkf_state , e
     
     enkf_state_clear_runpath( enkf_state );
     run_info->__ready = false;                    /* Setting it to false - for the next round ??? */
-    run_info_complete_run(enkf_state->run_info);  /* free() on runpath */
+    run_info_complete_run(run_info);              /* free() on runpath */
   } 
   return (0 == result) ? true : false; 
 }
@@ -2071,11 +2073,13 @@ void enkf_state_invalidate_cache( enkf_state_type * enkf_state ) {
 
 
 void enkf_state_set_inactive(enkf_state_type * state) {
-  state->run_info->active = false;
+  run_info_type * run_info = state->run_info;
+  run_info->active = false;
 }
 
 int enkf_state_get_queue_index(const enkf_state_type * enkf_state) {
-  return enkf_state->run_info->queue_index;
+  run_info_type * run_info = enkf_state->run_info;
+  return run_info->queue_index;
 }
 
 
@@ -2095,20 +2099,20 @@ void enkf_state_init_run(enkf_state_type * state ,
   shared_info_type   * shared_info  = state->shared_info;
 
   
-  run_info_set( state->run_info , 
-                run_mode        , 
-                active          , 
-                max_internal_submit,
-                init_step_parameter , 
-                init_state_parameter , 
-                init_state_dynamic  , 
-                load_start , 
-                step1 , 
-                step2 , 
-                iter ,
-                member_config_get_iens( my_config ), 
-                model_config_get_runpath_fmt( shared_info->model_config ),
-                state->subst_list );
+  run_info_init( state->run_info , 
+                 run_mode        , 
+                 active          , 
+                 max_internal_submit,
+                 init_step_parameter , 
+                 init_state_parameter , 
+                 init_state_dynamic  , 
+                 load_start , 
+                 step1 , 
+                 step2 , 
+                 iter ,
+                 member_config_get_iens( my_config ), 
+                 model_config_get_runpath_fmt( shared_info->model_config ),
+                 state->subst_list );
 }
 
 
