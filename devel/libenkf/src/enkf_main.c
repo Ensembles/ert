@@ -1502,6 +1502,72 @@ void enkf_main_run_post_workflow( enkf_main_type * enkf_main ) {
 
 
 
+void enkf_main_submit_jobs( enkf_main_type * enkf_main , 
+                            run_mode_type run_mode , 
+                            const bool_vector_type * iactive , 
+                            int step1 , 
+                            int step2 , 
+                            int max_internal_submit , 
+                            int init_step_parameter , 
+                            state_enum init_state_parameter , 
+                            state_enum init_state_dynamic ,
+                            int iter ) {
+  
+  thread_pool_type * submit_threads = thread_pool_alloc( 4 , true );
+  enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
+  runpath_list_type * runpath_list = qc_module_get_runpath_list( enkf_main->qc_module );
+  const int active_ens_size = util_int_min( bool_vector_size( iactive ) , enkf_main_get_ensemble_size( enkf_main ));
+
+  runpath_list_clear( runpath_list );
+  {
+    int iens;
+    for (iens = 0; iens < active_ens_size; iens++) {
+      enkf_state_type * enkf_state = enkf_main->ensemble[iens];
+      if (bool_vector_iget(iactive , iens)) {
+      int load_start = step1;
+      if (step1 > 0)
+        load_start++;
+      
+      enkf_state_init_run(enkf_state , 
+                          run_mode ,
+                          true , 
+                          max_internal_submit ,
+                          init_step_parameter ,
+                          init_state_parameter,
+                          init_state_dynamic  ,
+                          load_start ,
+                          iter ,
+                          step1 ,
+                          step2 );
+      
+      runpath_list_add( runpath_list , 
+                        iens , 
+                        iter ,
+                        enkf_state_get_run_path( enkf_state ) , 
+                        enkf_state_get_eclbase( enkf_state ));
+      {
+        arg_pack_type * arg_pack = arg_pack_alloc( );   // This is discarded by the enkf_state_start_forward_model__() function. */
+        
+        arg_pack_append_ptr( arg_pack , enkf_state );
+        arg_pack_append_ptr( arg_pack , fs );
+        
+        thread_pool_add_job(submit_threads , enkf_state_start_forward_model__ , arg_pack);
+      }
+      } else
+        enkf_state_set_inactive( enkf_state );
+    }
+    /*
+      After this join all directories/files for the simulations
+      have been set up correctly, and all the jobs have been added
+      to the job_queue manager.
+    */
+    qc_module_export_runpath_list( enkf_main->qc_module );
+    thread_pool_join(submit_threads);        
+    thread_pool_free(submit_threads);        
+  }
+}
+
+
 
 /**
   If all simulations have completed successfully the function will
@@ -1559,58 +1625,9 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
         else
           util_exit("No job script specified, can not start any jobs. Use the key JOB_SCRIPT in the config file\n");
       }
-
       
-      {
-        thread_pool_type * submit_threads = thread_pool_alloc( 4 , true );
-        enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
-        runpath_list_type * runpath_list = qc_module_get_runpath_list( enkf_main->qc_module );
-        runpath_list_clear( runpath_list );
-
-        for (iens = 0; iens < active_ens_size; iens++) {
-          enkf_state_type * enkf_state = enkf_main->ensemble[iens];
-          if (bool_vector_iget(iactive , iens)) {
-            int load_start = step1;
-            if (step1 > 0)
-              load_start++;
-            
-            enkf_state_init_run(enkf_state , 
-                                run_mode ,
-                                true , 
-                                max_internal_submit ,
-                                init_step_parameter ,
-                                init_state_parameter,
-                                init_state_dynamic  ,
-                                load_start ,
-                                iter ,
-                                step1 ,
-                                step2 );
-
-            runpath_list_add( runpath_list , 
-                              iens , 
-                              iter ,
-                              enkf_state_get_run_path( enkf_state ) , 
-                              enkf_state_get_eclbase( enkf_state ));
-            {
-              arg_pack_type * arg_pack = arg_pack_alloc( );   // This is discarded by the enkf_state_start_forward_model__() function. */
-              
-              arg_pack_append_ptr( arg_pack , enkf_state );
-              arg_pack_append_ptr( arg_pack , fs );
-              
-              thread_pool_add_job(submit_threads , enkf_state_start_forward_model__ , arg_pack);
-            }
-          } else
-            enkf_state_set_inactive( enkf_state );
-        }
-        /*
-          After this join all directories/files for the simulations
-          have been set up correctly, and all the jobs have been added
-          to the job_queue manager.
-        */
-        qc_module_export_runpath_list( enkf_main->qc_module );
-        thread_pool_join(submit_threads);        
-        thread_pool_free(submit_threads);        
-      }
+      enkf_main_submit_jobs( enkf_main , run_mode , iactive , step1 , step2 , max_internal_submit , init_step_parameter , init_state_parameter , init_state_dynamic , iter );
+      
       if (run_mode != INIT_ONLY) {
         job_queue_submit_complete( job_queue );
         ert_log_add_message( 1 , NULL , "All jobs submitted to internal queue - waiting for completion" ,  false);
