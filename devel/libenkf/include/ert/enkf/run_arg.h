@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2014  Statoil ASA, Norway. 
     
-   The file 'run_info.c' is part of ERT - Ensemble based Reservoir Tool. 
+   The file 'run_arg.c' is part of ERT - Ensemble based Reservoir Tool. 
     
    ERT is free software: you can redistribute it and/or modify 
    it under the terms of the GNU General Public License as published by 
@@ -16,8 +16,8 @@
    for more details. 
 */
 
-#ifndef __RUN_INFO_H__
-#define __RUN_INFO_H__
+#ifndef __RUN_ARG_H__
+#define __RUN_ARG_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +35,7 @@ extern "C" {
    object before a forward_step starts.
 */
  
-typedef struct run_info_struct {
+typedef struct run_arg_struct {
   bool                    __ready;              /* An attempt to check the internal state - not active yet. */
   bool                    active;               /* Is this state object active at all - used for instance in ensemble experiments where only some of the members are integrated. */
   int                     init_step_parameters; /* The report step we initialize parameters from - will often be equal to step1, but can be different. */
@@ -53,17 +53,17 @@ typedef struct run_info_struct {
   /******************************************************************/
   /* Return value - set by the called routine!!  */
   run_status_type         run_status;
-} run_info_type;
+} run_arg_type;
   
 
   
 
-  void run_info_set_run_path(run_info_type * run_info , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list);
+  void run_arg_set_run_path(run_arg_type * run_arg , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list);
 
-  run_info_type * run_info_alloc();
-  void run_info_free(run_info_type * run_info);
-  void run_info_complete_run(run_info_type * run_info);
-  void run_info_init_for_load(run_info_type * run_info , 
+  run_arg_type * run_arg_alloc();
+  void run_arg_free(run_arg_type * run_arg);
+  void run_arg_complete_run(run_arg_type * run_arg);
+  void run_arg_init_for_load(run_arg_type * run_arg , 
                               int load_start, 
                               int step1,
                               int step2,
@@ -73,7 +73,7 @@ typedef struct run_info_struct {
                               const subst_list_type * state_subst_list);
 
 
-  void run_info_init(run_info_type * run_info        , 
+  void run_arg_init(run_arg_type * run_arg        , 
                      run_mode_type run_mode          , 
                      bool active                     , 
                      int max_internal_submit         ,

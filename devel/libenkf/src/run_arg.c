@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2014  Statoil ASA, Norway. 
     
-   The file 'run_info.c' is part of ERT - Ensemble based Reservoir Tool. 
+   The file 'run_arg.c' is part of ERT - Ensemble based Reservoir Tool. 
     
    ERT is free software: you can redistribute it and/or modify 
    it under the terms of the GNU General Public License as published by 
@@ -21,14 +21,14 @@
 #include <ert/util/subst_list.h>
 
 #include <ert/enkf/enkf_types.h>
-#include <ert/enkf/run_info.h>
+#include <ert/enkf/run_arg.h>
 
-void run_info_set_run_path(run_info_type * run_info , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list) {
-  util_safe_free(run_info->run_path);
+void run_arg_set_run_path(run_arg_type * run_arg , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list) {
+  util_safe_free(run_arg->run_path);
   {
-    char * tmp1 = path_fmt_alloc_path(run_path_fmt , false , iens, run_info->iter);   /* 1: Replace first %d with iens, if a second %d replace with iter */
+    char * tmp1 = path_fmt_alloc_path(run_path_fmt , false , iens, run_arg->iter);   /* 1: Replace first %d with iens, if a second %d replace with iter */
     char * tmp2 = subst_list_alloc_filtered_string( state_subst_list , tmp1 );        /* 2: Filter out various magic strings like <CASE> and <CWD>. */
-    run_info->run_path = util_alloc_abs_path( tmp2 );                                 /* 3: Ensure that the path is absolute. */
+    run_arg->run_path = util_alloc_abs_path( tmp2 );                                 /* 3: Ensure that the path is absolute. */
     free( tmp1 );
     free( tmp2 );
   }
@@ -37,7 +37,7 @@ void run_info_set_run_path(run_info_type * run_info , int iens , path_fmt_type *
 
 
 /**
-   This function sets the run_info parameters. This is typically called
+   This function sets the run_arg parameters. This is typically called
    (via an enkf_state__ routine) by the external scope handling the forward model.
 
    When this initialization code has been run we are certain that the
@@ -45,9 +45,9 @@ void run_info_set_run_path(run_info_type * run_info , int iens , path_fmt_type *
    forward.
 
    
-   This function inits the necessary fields in the run_info structure
+   This function inits the necessary fields in the run_arg structure
    to be able to use the xxx_internalize_xxx() functions. Observe that
-   trying actually run after the run_info structure has only been
+   trying actually run after the run_arg structure has only been
    initialized here will lead to hard failure.
 
    The inits performed are essential for running, not only for the
@@ -55,7 +55,7 @@ void run_info_set_run_path(run_info_type * run_info , int iens , path_fmt_type *
 */
 
 
-void run_info_init_for_load(run_info_type * run_info , 
+void run_arg_init_for_load(run_arg_type * run_arg , 
                             int load_start, 
                             int step1,
                             int step2,
@@ -63,16 +63,16 @@ void run_info_init_for_load(run_info_type * run_info ,
                             int iter , 
                             path_fmt_type * run_path_fmt ,
                             const subst_list_type * state_subst_list) {
-  run_info->step1      = step1;
-  run_info->step2      = step2;
-  run_info->load_start = load_start;
-  run_info->iter       = iter;
-  run_info_set_run_path(run_info , iens , run_path_fmt , state_subst_list );
+  run_arg->step1      = step1;
+  run_arg->step2      = step2;
+  run_arg->load_start = load_start;
+  run_arg->iter       = iter;
+  run_arg_set_run_path(run_arg , iens , run_path_fmt , state_subst_list );
 }
 
 
 
-void run_info_init(run_info_type * run_info        , 
+void run_arg_init(run_arg_type * run_arg        , 
                    run_mode_type run_mode          , 
                    bool active                     , 
                    int max_internal_submit         ,
@@ -87,35 +87,35 @@ void run_info_init(run_info_type * run_info        ,
                    path_fmt_type * run_path_fmt ,
                    const subst_list_type * state_subst_list) {
   
-  run_info->active               = active;
-  run_info->init_step_parameters = init_step_parameters;
-  run_info->init_state_parameter = init_state_parameter;
-  run_info->init_state_dynamic   = init_state_dynamic;
-  run_info->run_status           = JOB_NOT_STARTED;
-  run_info->__ready              = true;
-  run_info->run_mode             = run_mode;
-  run_info->max_internal_submit  = max_internal_submit;
-  run_info->num_internal_submit  = 0;
-  run_info_init_for_load( run_info , load_start , step1 , step2 , iens , iter , run_path_fmt , state_subst_list);
+  run_arg->active               = active;
+  run_arg->init_step_parameters = init_step_parameters;
+  run_arg->init_state_parameter = init_state_parameter;
+  run_arg->init_state_dynamic   = init_state_dynamic;
+  run_arg->run_status           = JOB_NOT_STARTED;
+  run_arg->__ready              = true;
+  run_arg->run_mode             = run_mode;
+  run_arg->max_internal_submit  = max_internal_submit;
+  run_arg->num_internal_submit  = 0;
+  run_arg_init_for_load( run_arg , load_start , step1 , step2 , iens , iter , run_path_fmt , state_subst_list);
 }
 
 
-run_info_type * run_info_alloc() {
-  run_info_type * run_info = util_malloc(sizeof * run_info );
-  run_info->run_path = NULL;
-  return run_info;
+run_arg_type * run_arg_alloc() {
+  run_arg_type * run_arg = util_malloc(sizeof * run_arg );
+  run_arg->run_path = NULL;
+  return run_arg;
 }
 
 
-void run_info_free(run_info_type * run_info) {
-  util_safe_free(run_info->run_path);
-  free(run_info);
+void run_arg_free(run_arg_type * run_arg) {
+  util_safe_free(run_arg->run_path);
+  free(run_arg);
 }
 
 
-void run_info_complete_run(run_info_type * run_info) {
-  if (run_info->run_status == JOB_RUN_OK) {
-    util_safe_free(run_info->run_path);
-    run_info->run_path = NULL;
+void run_arg_complete_run(run_arg_type * run_arg) {
+  if (run_arg->run_status == JOB_RUN_OK) {
+    util_safe_free(run_arg->run_path);
+    run_arg->run_path = NULL;
   }
 }
