@@ -123,3 +123,21 @@ class FortIOTest(ExtendedTestCase):
             f.close()
 
             self.assertFilesAreEqual("test", "complete")
+
+
+
+
+    def test_context(self):
+        with TestAreaContext("python/fortio/context"):
+            kw1 = EclKW.create("KW" , 2456 , EclTypeEnum.ECL_FLOAT_TYPE)
+            for i in range(len(kw1)):
+                kw1[i] = randint(0,1000)
+
+            with FortIO("file" , mode = FortIO.WRITE_MODE) as f:
+                kw1.fwrite( f )
+
+            with FortIO("file") as f:
+                kw2 = EclKW.fread( f )
+
+            self.assertTrue( kw1 == kw2 )
+                
