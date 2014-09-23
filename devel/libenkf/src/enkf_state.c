@@ -1816,85 +1816,11 @@ run_status_type enkf_state_get_simple_run_status(const enkf_state_type * state) 
 }
 
    
-job_status_type enkf_state_get_run_status( const enkf_state_type * enkf_state ) {
-  run_arg_type             * run_arg    = enkf_state->run_arg;
-  /** 
-      The submission process happens in another thread, and might not
-      be complete, must therefor check the value of queue_index prior
-      to invoking the job_queue layer.
-  */
-  if (run_arg->active && run_arg->queue_index >= 0) {
-    const shared_info_type    * shared_info = enkf_state->shared_info;
-    return job_queue_iget_job_status(shared_info->job_queue , run_arg->queue_index);
-  } else
-    return JOB_QUEUE_NOT_ACTIVE;
-}
-
-
-time_t enkf_state_get_start_time( const enkf_state_type * enkf_state ) {
-  run_arg_type             * run_arg    = enkf_state->run_arg;
-  if (run_arg->active) {
-    const shared_info_type    * shared_info = enkf_state->shared_info;
-    return job_queue_iget_sim_start(shared_info->job_queue , run_arg->queue_index);
-  } else
-    return -1;
-}
-
-
-time_t enkf_state_get_submit_time( const enkf_state_type * enkf_state ) {
-  run_arg_type             * run_arg    = enkf_state->run_arg;
-  if (run_arg->active) {
-    const shared_info_type * shared_info = enkf_state->shared_info;
-    return job_queue_iget_submit_time(shared_info->job_queue , run_arg->queue_index);
-  } else
-    return -1;
-}
 
 
 
 
-/**
-   Will return true if the simulation is actually killed, and false if
-   the "kill command" is ignored (only jobs with status matching
-   JOB_QUEUE_CAN_KILL will actually be killed).
-*/
 
-bool enkf_state_kill_simulation( const enkf_state_type * enkf_state ) {
-  const shared_info_type * shared_info = enkf_state->shared_info;
-  const run_arg_type * run_arg       = enkf_state->run_arg;             
-  return job_queue_kill_job(shared_info->job_queue , run_arg->queue_index);
-}
-
-
-/**
-   This function is very similar to the enkf_state_internal_retry() -
-   they should be refactored.
-
-   Will return true if the simulation is actually resubmitted, and
-   false if it is not restarted.
-*/
-
-bool enkf_state_resubmit_simulation( enkf_state_type * enkf_state , enkf_fs_type * fs , bool resample) {
-  const shared_info_type * shared_info = enkf_state->shared_info;
-  const run_arg_type * run_arg       = enkf_state->run_arg;             
-  int iens                       = member_config_get_iens( enkf_state->my_config );
-  job_status_type current_status = job_queue_iget_job_status(shared_info->job_queue , run_arg->queue_index);
-  if (current_status & JOB_QUEUE_CAN_RESTART) { 
-    /* Reinitialization of the nodes */
-    if (resample) {
-      stringlist_type * init_keys = ensemble_config_alloc_keylist_from_var_type( enkf_state->ensemble_config , DYNAMIC_STATE + PARAMETER );
-      for (int ikey=0; ikey < stringlist_get_size( init_keys ); ikey++) {
-        enkf_node_type * node = enkf_state_get_node( enkf_state , stringlist_iget( init_keys , ikey) );
-        enkf_node_initialize( node , iens , enkf_state->rng );
-      }
-      stringlist_free( init_keys );
-    }
-    enkf_state_init_eclipse( enkf_state , run_arg , fs );                                           /* Possibly clear the directory and do a FULL rewrite of ALL the necessary files. */
-    job_queue_iset_external_restart( shared_info->job_queue , run_arg->queue_index );    /* Here we inform the queue system that it should pick up this job and try again. */
-    return true;
-  } else
-    return false; /* The job was not resubmitted. */
-}
 
 
 
