@@ -225,7 +225,7 @@ typedef enum {
   PARTLY_ACTIVE = 3        /* Partly active - must supply additonal type spesific information on what is active.*/
 } active_mode_type; 
 
-
+  
   typedef struct {
     int        report_step;
     int        iens;  

@@ -41,7 +41,6 @@ int main(int argc , char ** argv) {
 
 
   {
-    enkf_state_type * state = NULL;
     run_mode_type run_mode = ENSEMBLE_EXPERIMENT;
     bool strict = true;
 
@@ -61,18 +60,25 @@ int main(int argc , char ** argv) {
       bool_vector_type * iactive = bool_vector_alloc( enkf_main_get_ensemble_size( enkf_main_single_run ) , true );
       enkf_main_init_run(enkf_main_single_run , iactive , run_mode , INIT_NONE);     /* This is ugly */
 
-      state = enkf_main_iget_state( enkf_main_single_run , 0 );
-      enkf_state_init_run(state, run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
-      char * path_single_run0 = util_alloc_sprintf("%s/sim/run0", cwd);
-      test_assert_string_equal(enkf_state_get_run_path(state), path_single_run0);
+      {
+        enkf_state_type * state = enkf_main_iget_state( enkf_main_single_run , 0 );
+        run_arg_type * run_arg = enkf_state_get_run_arg( state );
+        enkf_state_init_run(state , run_arg , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
+        char * path_single_run0 = util_alloc_sprintf("%s/sim/run0", cwd);
+        test_assert_string_equal(run_arg_get_runpath(run_arg) , path_single_run0);
+        free(path_single_run0);
+      }
 
-      state = enkf_main_iget_state( enkf_main_single_run, 1);
-      enkf_state_init_run(state, run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
-      char * path_single_run1 = util_alloc_sprintf("%s/sim/run1", cwd);
-      test_assert_string_equal(enkf_state_get_run_path(state), path_single_run1);
-
-      free(path_single_run0);
-      free(path_single_run1);
+      
+      {
+        enkf_state_type * state = enkf_main_iget_state( enkf_main_single_run, 1);
+        run_arg_type * run_arg = enkf_state_get_run_arg( state );
+        enkf_state_init_run(state, run_arg , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
+        char * path_single_run1 = util_alloc_sprintf("%s/sim/run1", cwd);
+        test_assert_string_equal(run_arg_get_runpath(run_arg) , path_single_run1);
+        free(path_single_run1);
+      }
+      
       bool_vector_free( iactive );
       enkf_main_free(enkf_main_single_run);
     }
@@ -82,19 +88,25 @@ int main(int argc , char ** argv) {
       enkf_main_type * enkf_main_iter = enkf_main_bootstrap( NULL , config_file_multiple_iter , strict , true );
       bool_vector_type * iactive = bool_vector_alloc( enkf_main_get_ensemble_size( enkf_main_iter ) , true );
       enkf_main_init_run(enkf_main_iter , iactive , run_mode , INIT_NONE);     /* This is ugly */
-      state = enkf_main_iget_state( enkf_main_iter , 0 );
 
-      enkf_state_init_run(state, run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
-      char * path_iter0_run0  = util_alloc_sprintf("%s/sim/run0/iter0", cwd);
-      test_assert_string_equal(enkf_state_get_run_path(state), path_iter0_run0);
+      {
+        enkf_state_type * state = enkf_main_iget_state( enkf_main_iter , 0 );
+        run_arg_type * run_arg = enkf_state_get_run_arg( state );
+        enkf_state_init_run(state, run_arg , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
+        char * path_iter0_run0  = util_alloc_sprintf("%s/sim/run0/iter0", cwd);
+        test_assert_string_equal(run_arg_get_runpath(run_arg) , path_iter0_run0);
+        free(path_iter0_run0);
+      }
 
-      state = enkf_main_iget_state( enkf_main_iter , 1 );
-      enkf_state_init_run(state, run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 1, step1, step2);
-      char * path_iter1_run1  = util_alloc_sprintf("%s/sim/run1/iter1", cwd);
-      test_assert_string_equal(enkf_state_get_run_path(state), path_iter1_run1);
+      {
+        enkf_state_type * state = enkf_main_iget_state( enkf_main_iter , 1 );
+        run_arg_type * run_arg = enkf_state_get_run_arg( state );
+        enkf_state_init_run(state, run_arg , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 1, step1, step2);
+        char * path_iter1_run1  = util_alloc_sprintf("%s/sim/run1/iter1", cwd);
+        test_assert_string_equal(run_arg_get_runpath(run_arg) , path_iter1_run1);
+        free(path_iter1_run1);
+      }
 
-      free(path_iter0_run0);
-      free(path_iter1_run1);
       bool_vector_free( iactive );
       enkf_main_free(enkf_main_iter);
     }

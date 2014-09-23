@@ -19,16 +19,23 @@
 
 #include <ert/util/path_fmt.h>
 #include <ert/util/subst_list.h>
+#include <ert/util/type_macros.h>
 
 #include <ert/enkf/enkf_types.h>
 #include <ert/enkf/run_arg.h>
 
+
+#define RUN_ARG_TYPE_ID 66143287
+
+UTIL_SAFE_CAST_FUNCTION( run_arg , RUN_ARG_TYPE_ID )
+
+
 void run_arg_set_run_path(run_arg_type * run_arg , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list) {
   util_safe_free(run_arg->run_path);
   {
-    char * tmp1 = path_fmt_alloc_path(run_path_fmt , false , iens, run_arg->iter);   /* 1: Replace first %d with iens, if a second %d replace with iter */
+    char * tmp1 = path_fmt_alloc_path(run_path_fmt , false , iens, run_arg->iter);    /* 1: Replace first %d with iens, if a second %d replace with iter */
     char * tmp2 = subst_list_alloc_filtered_string( state_subst_list , tmp1 );        /* 2: Filter out various magic strings like <CASE> and <CWD>. */
-    run_arg->run_path = util_alloc_abs_path( tmp2 );                                 /* 3: Ensure that the path is absolute. */
+    run_arg->run_path = util_alloc_abs_path( tmp2 );                                  /* 3: Ensure that the path is absolute. */
     free( tmp1 );
     free( tmp2 );
   }
@@ -72,7 +79,7 @@ void run_arg_init_for_load(run_arg_type * run_arg ,
 
 
 
-void run_arg_init(run_arg_type * run_arg        , 
+void run_arg_init( run_arg_type * run_arg        , 
                    run_mode_type run_mode          , 
                    bool active                     , 
                    int max_internal_submit         ,
@@ -87,6 +94,7 @@ void run_arg_init(run_arg_type * run_arg        ,
                    path_fmt_type * run_path_fmt ,
                    const subst_list_type * state_subst_list) {
   
+  run_arg->iens                 = iens;
   run_arg->active               = active;
   run_arg->init_step_parameters = init_step_parameters;
   run_arg->init_state_parameter = init_state_parameter;
@@ -100,9 +108,40 @@ void run_arg_init(run_arg_type * run_arg        ,
 }
 
 
-run_arg_type * run_arg_alloc() {
+run_arg_type * run_arg_alloc_deprecated() {
   run_arg_type * run_arg = util_malloc(sizeof * run_arg );
+  UTIL_TYPE_ID_INIT(run_arg , RUN_ARG_TYPE_ID);
   run_arg->run_path = NULL;
+  return run_arg;
+}
+
+
+run_arg_type * run_arg_alloc(int iens , 
+                             run_mode_type run_mode          , 
+                             int init_step_parameters        ,      
+                             state_enum init_state_parameter ,
+                             state_enum init_state_dynamic   ,
+                             int load_start                  , 
+                             int step1                       , 
+                             int step2                       ,
+                             int iter                        ,
+                             const char * runpath) {
+  
+  run_arg_type * run_arg = util_malloc(sizeof * run_arg );
+  UTIL_TYPE_ID_INIT(run_arg , RUN_ARG_TYPE_ID);
+  
+  run_arg->iens = iens;
+  run_arg->run_mode = run_mode;
+  run_arg->init_step_parameters = init_step_parameters;
+  run_arg->init_state_parameter = init_state_parameter;
+  run_arg->init_state_dynamic = init_state_dynamic;
+  run_arg->load_start = load_start;
+  run_arg->step1 = step1;
+  run_arg->step2 = step2;
+  run_arg->iter = iter;
+  run_arg->run_path = util_alloc_string_copy( runpath );
+  run_arg->num_internal_submit = 0;
+  
   return run_arg;
 }
 
@@ -113,9 +152,42 @@ void run_arg_free(run_arg_type * run_arg) {
 }
 
 
+void run_arg_free__(void * arg) {
+  run_arg_type * run_arg = run_arg_safe_cast( arg );
+  run_arg_free( run_arg );
+}
+
+
 void run_arg_complete_run(run_arg_type * run_arg) {
   if (run_arg->run_status == JOB_RUN_OK) {
     util_safe_free(run_arg->run_path);
     run_arg->run_path = NULL;
   }
+}
+
+
+
+void run_arg_increase_submit_count( run_arg_type * run_arg ) {
+  run_arg->num_internal_submit++;
+}
+
+
+
+const char * run_arg_get_runpath( const run_arg_type * run_arg) {
+  return run_arg->run_path;
+}
+
+
+run_status_type run_arg_get_run_status( const run_arg_type * run_arg ) {
+  return run_arg->run_status;
+}
+
+
+void run_arg_set_inactive( run_arg_type * run_arg ) {
+  run_arg->active = false;
+}
+
+
+int run_arg_get_queue_index( const run_arg_type * run_arg ) {
+  return run_arg->queue_index;
 }

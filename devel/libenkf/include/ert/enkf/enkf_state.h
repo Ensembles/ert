@@ -51,6 +51,7 @@ extern "C" {
 #include <ert/enkf/enkf_node.h>
 #include <ert/enkf/enkf_util.h>
 #include <ert/enkf/enkf_serialize.h>
+#include <ert/enkf/run_arg.h>
 
 typedef struct enkf_state_struct    enkf_state_type;
 
@@ -76,14 +77,18 @@ typedef struct enkf_state_struct    enkf_state_type;
   void             * enkf_state_start_forward_model__(void * );
 
   void               enkf_state_load_from_forward_model(enkf_state_type * enkf_state , 
-                                          enkf_fs_type * fs , 
-                                          int * result , 
-                                          bool interactive , 
-                                          stringlist_type * msg_list);
+                                                        run_arg_type * run_arg , 
+                                                        enkf_fs_type * fs , 
+                                                        int * result , 
+                                                        bool interactive , 
+                                                        stringlist_type * msg_list);
 
   void enkf_state_forward_init(enkf_state_type * enkf_state , 
+                               run_arg_type * run_arg , 
                                enkf_fs_type * fs , 
                                int * result );
+
+  void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * run_arg , enkf_fs_type * fs);
     
   enkf_state_type  * enkf_state_alloc(int ,
                                       rng_type        * main_rng , 
@@ -106,7 +111,7 @@ typedef struct enkf_state_struct    enkf_state_type;
   void               enkf_state_sample(enkf_state_type * , int);
   void               enkf_state_fwrite(const enkf_state_type *  , enkf_fs_type * fs , int  , int  , state_enum );
   void               enkf_state_ens_read(       enkf_state_type * , const char * , int);
-  void               enkf_state_ecl_write(enkf_state_type *, enkf_fs_type * fs);
+  void               enkf_state_ecl_write(enkf_state_type *, const run_arg_type * run_arg , enkf_fs_type * fs);
   void               enkf_state_free(enkf_state_type * );
   void               enkf_state_apply(enkf_state_type * , enkf_node_ftype1 * , int );
   void               enkf_state_serialize(enkf_state_type * , size_t);
@@ -121,9 +126,9 @@ typedef struct enkf_state_struct    enkf_state_type;
   unsigned int       enkf_state_get_random( enkf_state_type * enkf_state );
   
 /*****************************************************************/
-  void enkf_state_set_inactive(enkf_state_type * state);
   
   void enkf_state_init_run(enkf_state_type * state , 
+                           run_arg_type * run_arg , 
                            run_mode_type           ,  
                            bool active             , 
                            int max_internal_submit , 
@@ -134,10 +139,18 @@ typedef struct enkf_state_struct    enkf_state_type;
                            int iter ,
                            int step1 , 
                            int step2 );
-  int enkf_state_get_queue_index(const enkf_state_type * enkf_state);
   
   
   run_status_type enkf_state_get_simple_run_status(const enkf_state_type * state);
+  run_arg_type * enkf_state_get_run_arg( const enkf_state_type * enkf_state );
+
+/******************************************************************/
+/* Forward model callbacks: */
+
+bool enkf_state_complete_forward_modelOK__(void * arg );
+bool enkf_state_complete_forward_modelRETRY__(void * arg );
+bool enkf_state_complete_forward_modelEXIT__(void * arg );
+
 #ifdef __cplusplus
 }
 #endif

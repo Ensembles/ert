@@ -26,6 +26,7 @@
 #include <ert/util/util.h>
 
 #include <ert/enkf/enkf_main.h>
+#include <ert/enkf/run_arg.h>
 
 
 int test_load_manually_to_new_case(enkf_main_type * enkf_main) {
@@ -66,6 +67,7 @@ void initialize(enkf_main_type * enkf_main) {
   int step1 = 1;
   int step2 = 1;
   enkf_state_type * state = enkf_main_iget_state( enkf_main , 0 );
+  run_arg_type * run_arg = enkf_state_get_run_arg( state );
   bool active = true;
   int max_internal_sumbit = 1;
   int init_step_parameter = 1;
@@ -73,7 +75,8 @@ void initialize(enkf_main_type * enkf_main) {
   state_enum init_state_dynamic = FORECAST;
   int load_start = 1;
 
-  enkf_state_init_run(state, run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
+
+  enkf_state_init_run(state, run_arg , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
   
   bool_vector_free( iactive );
 }

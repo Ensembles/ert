@@ -24,9 +24,15 @@
 #include <ert/util/test_work_area.h>
 #include <ert/util/util.h>
 
-#include <ert/enkf/enkf_main.h>
-#include <ert/enkf/enkf_config_node.h>
 #include <ert/ecl/ecl_kw_magic.h>
+
+#include <ert/enkf/enkf_main.h>
+#include <ert/enkf/run_arg.h>
+#include <ert/enkf/enkf_config_node.h>
+
+
+
+
 
 
 void create_runpath(enkf_main_type * enkf_main ) {
@@ -76,6 +82,7 @@ int main(int argc , char ** argv) {
   bool strict = true;
   enkf_main_type * enkf_main = enkf_main_bootstrap( NULL , config_file , strict , true );
   enkf_state_type * state = enkf_main_iget_state( enkf_main , 0 );
+  run_arg_type * run_arg = enkf_state_get_run_arg( state );
   enkf_node_type * field_node = enkf_state_get_node( state , "PORO" );
   
   bool forward_init;
@@ -98,7 +105,7 @@ int main(int argc , char ** argv) {
     int error = 0;
     stringlist_type * msg_list = stringlist_alloc_new();  
     enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
-    enkf_state_load_from_forward_model( state , fs , &error , false , msg_list );
+    enkf_state_load_from_forward_model( state , run_arg ,  fs , &error , false , msg_list );
     stringlist_free( msg_list );
     bool_vector_free( iactive );
     test_assert_int_equal(error, 0); 

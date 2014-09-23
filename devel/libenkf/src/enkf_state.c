@@ -118,13 +118,16 @@ struct enkf_state_struct {
                                                       - which will describe initialization of ECLIPSE (EQUIL or RESTART).*/
   ensemble_config_type  * ensemble_config;         /* The config nodes for the enkf_node objects contained in node_hash. */
   
-  run_arg_type         * run_arg;                /* Various pieces of information needed by the enkf_state object when running the forward model. Updated for each report step.*/
+  run_arg_type          * __run_arg;               
   shared_info_type      * shared_info;             /* Pointers to shared objects which is needed by the enkf_state object (read only). */
   member_config_type    * my_config;               /* Private config information for this member; not updated during a simulation. */
   rng_type              * rng;
 };
 
 /*****************************************************************/
+
+
+static UTIL_SAFE_CAST_FUNCTION( enkf_state , ENKF_STATE_TYPE_ID )
 
 
 static shared_info_type * shared_info_alloc(const site_config_type * site_config , model_config_type * model_config, const ecl_config_type * ecl_config , ert_templates_type * templates) {
@@ -187,24 +190,6 @@ void enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs , co
 
 
 
-/**
-   The run_arg->run_path variable is in general NULL. It is given a
-   valid value before a simulation starts, holds on to that value
-   through the simulation, and is then freed (and set to NULL) when
-   the simulation ends.
-
-   The *ONLY* point when an external call to this function should give
-   anything is when the forward model has failed, then
-   run_arg_complete_run() has left the run_path intact.
-*/
-
-const char * enkf_state_get_run_path(const enkf_state_type * enkf_state) { 
-  run_arg_type * run_arg = enkf_state->run_arg;
-  return run_arg->run_path; 
-}
-
-
-
 
 /*
   void enkf_state_set_iens(enkf_state_type * enkf_state , int iens) {
@@ -221,7 +206,6 @@ member_config_type * enkf_state_get_member_config(const enkf_state_type * enkf_s
 }
 
 
-static UTIL_SAFE_CAST_FUNCTION( enkf_state , ENKF_STATE_TYPE_ID )
 
 
 static void enkf_state_add_subst_kw(enkf_state_type * enkf_state , const char * kw , const char * value , const char * doc_string) {
@@ -349,7 +333,7 @@ enkf_state_type * enkf_state_alloc(int iens,
 
   enkf_state->ensemble_config   = ensemble_config;
   enkf_state->shared_info       = shared_info_alloc(site_config , model_config , ecl_config , templates);
-  enkf_state->run_arg          = run_arg_alloc();
+  enkf_state->__run_arg         = run_arg_alloc_deprecated( );
   
   enkf_state->node_hash         = hash_alloc();
   enkf_state->restart_kw_list   = stringlist_alloc_new();
@@ -1002,9 +986,9 @@ static void enkf_state_internalize_results(enkf_state_type * enkf_state , run_ar
 
 
 void enkf_state_forward_init(enkf_state_type * enkf_state , 
+                             run_arg_type * run_arg , 
                              enkf_fs_type * fs , 
                              int * result ) {
-  run_arg_type * run_arg   = enkf_state->run_arg;
 
   if (run_arg->step1 == 0) {
     int iens = enkf_state_get_iens( enkf_state );
@@ -1047,15 +1031,15 @@ void enkf_state_forward_init(enkf_state_type * enkf_state ,
 
 
 void enkf_state_load_from_forward_model(enkf_state_type * enkf_state , 
+                                        run_arg_type * run_arg , 
                                         enkf_fs_type * fs , 
                                         int * result, 
                                         bool interactive , 
                                         stringlist_type * msg_list) {
   
-  run_arg_type * run_arg = enkf_state->run_arg;
   
   if (ensemble_config_have_forward_init( enkf_state->ensemble_config ))
-    enkf_state_forward_init( enkf_state , fs , result );
+    enkf_state_forward_init( enkf_state , run_arg , fs , result );
   
   enkf_state_internalize_results( enkf_state , run_arg , fs , result , interactive , msg_list );
   {
@@ -1087,20 +1071,22 @@ void * enkf_state_load_from_forward_model_mt( void * arg ) {
   int iens                     = member_config_get_iens( enkf_state->my_config );
   int iter                     = arg_pack_iget_int( arg_pack , 8 );
   int * result                 = arg_pack_iget_ptr( arg_pack , 9 );
-  
+  run_arg_type * run_arg = enkf_state_get_run_arg( enkf_state );
+
+
   if (manual_load)
     state_map_update_undefined(enkf_fs_get_state_map(fs) , iens , STATE_INITIALIZED);
 
-  run_arg_init_for_load( enkf_state->run_arg , 
-                          load_start , 
-                          step1 , 
-                          step2 , 
-                          iens , 
-                          iter , 
-                          model_config_get_runpath_fmt( enkf_state->shared_info->model_config ) , 
-                          enkf_state->subst_list );
+  run_arg_init_for_load( run_arg , 
+                         load_start , 
+                         step1 , 
+                         step2 , 
+                         iens , 
+                         iter , 
+                         model_config_get_runpath_fmt( enkf_state->shared_info->model_config ) , 
+                         enkf_state->subst_list );
   
-  enkf_state_load_from_forward_model( enkf_state , fs , result , interactive , msg_list );
+  enkf_state_load_from_forward_model( enkf_state , run_arg , fs , result , interactive , msg_list );
   if (*result & REPORT_STEP_INCOMPATIBLE) {
     // If refcase has been used for observations: crash and burn.
     fprintf(stderr,"** Warning the timesteps in refcase and current simulation are not in accordance - something wrong with schedule file?\n");
@@ -1200,9 +1186,7 @@ static void enkf_state_write_restart_file(enkf_state_type * enkf_state , const r
   The writing of restart file is delegated to enkf_state_write_restart_file().
 */
 
-void enkf_state_ecl_write(enkf_state_type * enkf_state, enkf_fs_type * fs) {
-  const run_arg_type * run_arg         = enkf_state->run_arg;
-  
+void enkf_state_ecl_write(enkf_state_type * enkf_state, const run_arg_type * run_arg , enkf_fs_type * fs) {
   if (run_arg->step1 > 0)
     enkf_state_write_restart_file(enkf_state , run_arg , fs);
   else {
@@ -1472,7 +1456,7 @@ void enkf_state_free(enkf_state_type *enkf_state) {
   subst_list_free(enkf_state->subst_list);
   stringlist_free(enkf_state->restart_kw_list);
   member_config_free(enkf_state->my_config);
-  run_arg_free(enkf_state->run_arg);
+  run_arg_free(enkf_state->__run_arg);
   shared_info_free(enkf_state->shared_info);
   free(enkf_state);
 }
@@ -1634,7 +1618,7 @@ void enkf_state_printf_subst_list(enkf_state_type * enkf_state , int step1 , int
 */
 
 
-static void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * run_arg , enkf_fs_type * fs) {
+void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * run_arg , enkf_fs_type * fs) {
   const member_config_type  * my_config = enkf_state->my_config;  
   const ecl_config_type * ecl_config = enkf_state->shared_info->ecl_config;
   {
@@ -1680,7 +1664,7 @@ static void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_t
 
     enkf_state_set_dynamic_subst_kw(  enkf_state , run_arg->run_path , run_arg->step1 , run_arg->step2);
     ert_templates_instansiate( enkf_state->shared_info->templates , run_arg->run_path , enkf_state->subst_list );
-    enkf_state_ecl_write( enkf_state , fs);
+    enkf_state_ecl_write( enkf_state , run_arg , fs);
     
     if (member_config_get_eclbase( my_config ) != NULL) {
 
@@ -1704,55 +1688,10 @@ static void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_t
 
 
 
-/**
-   xx_run_forward_model() has been split in two functions:
-
-   1: enkf_state_start_forward_model()
-
-   2: enkf_state_complete_forward_model()
-
-   Because the first is quite CPU intensive (gunzip), and the number of
-   concurrent threads should be limited. For the second there is one
-   thread for each ensemble member. This is handled by the calling scope.
-*/
 
 bool enkf_state_complete_forward_modelOK__(void * arg );
 bool enkf_state_complete_forward_modelEXIT__(void * arg );
 bool enkf_state_complete_forward_modelRETRY__(void * arg );
-
-static void enkf_state_start_forward_model(enkf_state_type * enkf_state , run_arg_type * run_arg , enkf_fs_type * fs) {
-  if (run_arg->active) {  /* if the job is not active we just return .*/
-    const shared_info_type    * shared_info   = enkf_state->shared_info;
-    const member_config_type  * my_config     = enkf_state->my_config;
-    const site_config_type    * site_config   = shared_info->site_config;
-    enkf_state_init_eclipse( enkf_state , run_arg , fs );
-
-    if (run_arg->run_mode != INIT_ONLY) {
-      // The job_queue_node will take ownership of this arg_pack; and destroy it when
-      // the job_queue_node is discarded.
-      arg_pack_type             * load_arg      = arg_pack_alloc();
-
-      /*
-        Prepare the job and submit it to the queue
-      */
-      arg_pack_append_ptr( load_arg , enkf_state );
-      arg_pack_append_ptr( load_arg , fs );
-      
-      run_arg->queue_index = job_queue_add_job_mt( shared_info->job_queue , 
-                                                    site_config_get_job_script( site_config ),
-                                                    enkf_state_complete_forward_modelOK__ , 
-                                                    enkf_state_complete_forward_modelRETRY__ , 
-                                                    enkf_state_complete_forward_modelEXIT__,
-                                                    load_arg , 
-                                                    ecl_config_get_num_cpu( shared_info->ecl_config ),
-                                                    run_arg->run_path     , 
-                                                    member_config_get_jobname(my_config) , 
-                                                    1, 
-                                                    (const char *[1]) { run_arg->run_path } );
-      run_arg->num_internal_submit++;
-    }
-  }
-}
 
 
 /** 
@@ -1805,17 +1744,7 @@ static void enkf_state_internal_retry(enkf_state_type * enkf_state , run_arg_typ
 }
 
 
-/**
-   Checks that both the run has completed OK - that also includes the
-   loading back of results.
-*/
-   
-run_status_type enkf_state_get_simple_run_status(const enkf_state_type * state) {
-  run_arg_type * run_arg = state->run_arg;
-  return run_arg->run_status;
-}
 
-   
 
 
 
@@ -1872,7 +1801,7 @@ static bool enkf_state_complete_forward_modelOK(enkf_state_type * enkf_state , r
      is OK the final status is updated, otherwise: restart.
   */
   ert_log_add_fmt_message( 2 , NULL , "[%03d:%04d-%04d] Forward model complete - starting to load results." , iens , run_arg->step1, run_arg->step2);
-  enkf_state_load_from_forward_model(enkf_state , fs , &result , false , NULL); 
+  enkf_state_load_from_forward_model(enkf_state , run_arg , fs , &result , false , NULL); 
   
   if (result & REPORT_STEP_INCOMPATIBLE) {
     // If refcase has been used for observations: crash and burn.
@@ -1903,14 +1832,13 @@ bool enkf_state_complete_forward_modelOK__(void * arg ) {
   enkf_state_type * enkf_state;
   enkf_fs_type * fs;
   arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
-  
-  enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
-  fs         = arg_pack_iget_ptr( arg_pack , 1 );
-  {
-    run_arg_type * run_arg = enkf_state->run_arg;
+  run_arg_type * run_arg;
 
-    return enkf_state_complete_forward_modelOK( enkf_state , run_arg , fs );
-  }
+  enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
+  run_arg    = arg_pack_iget_ptr( arg_pack , 1 );
+  fs         = arg_pack_iget_ptr( arg_pack , 2 );
+  
+  return enkf_state_complete_forward_modelOK( enkf_state , run_arg , fs );
 }
 
 
@@ -1945,17 +1873,13 @@ static bool enkf_state_complete_forward_model_EXIT_handler__(enkf_state_type * e
 }
 
 static bool enkf_state_complete_forward_model_EXIT_handler(void * arg, bool allow_retry ) {
-  enkf_state_type * enkf_state;
-  enkf_fs_type * fs;
-  {
-    arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
-    enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
-    fs         = arg_pack_iget_ptr( arg_pack , 1 );
-  }
-  {
-    run_arg_type * run_arg = enkf_state->run_arg;
-    return enkf_state_complete_forward_model_EXIT_handler__( enkf_state , run_arg , fs, allow_retry );
-  }
+  arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
+  
+  enkf_state_type * enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
+  run_arg_type * run_arg = arg_pack_iget_ptr( arg_pack , 1 );
+  enkf_fs_type * fs = arg_pack_iget_ptr( arg_pack , 2 );
+  
+  return enkf_state_complete_forward_model_EXIT_handler__( enkf_state , run_arg , fs, allow_retry );
 }
 
 
@@ -1965,20 +1889,6 @@ bool enkf_state_complete_forward_modelEXIT__(void * arg ) {
 
 bool enkf_state_complete_forward_modelRETRY__(void * arg ) {
   return enkf_state_complete_forward_model_EXIT_handler(arg, true );
-}
-
-
-void * enkf_state_start_forward_model__(void * arg) {
-  arg_pack_type * arg_pack     = arg_pack_safe_cast( arg );
-  enkf_state_type * enkf_state = enkf_state_safe_cast( arg_pack_iget_ptr( arg_pack , 0));
-  enkf_fs_type * fs            = enkf_fs_safe_cast( arg_pack_iget_ptr( arg_pack , 1));
-  {
-    run_arg_type * run_arg = enkf_state->run_arg;
-    
-    enkf_state_start_forward_model( enkf_state , run_arg , fs);
-    arg_pack_free( arg_pack );
-  }
-  return NULL ; 
 }
 
 
@@ -1994,19 +1904,15 @@ void enkf_state_invalidate_cache( enkf_state_type * enkf_state ) {
 
 /*****************************************************************/
 
-
-void enkf_state_set_inactive(enkf_state_type * state) {
-  run_arg_type * run_arg = state->run_arg;
-  run_arg->active = false;
+run_arg_type * enkf_state_get_run_arg( const enkf_state_type * enkf_state ) {
+  return enkf_state->__run_arg;
 }
 
-int enkf_state_get_queue_index(const enkf_state_type * enkf_state) {
-  run_arg_type * run_arg = enkf_state->run_arg;
-  return run_arg->queue_index;
-}
+
 
 
 void enkf_state_init_run(enkf_state_type * state , 
+                         run_arg_type * run_arg , 
                          run_mode_type run_mode  , 
                          bool active                    , 
                          int max_internal_submit,
@@ -2020,20 +1926,20 @@ void enkf_state_init_run(enkf_state_type * state ,
 
   shared_info_type   * shared_info  = state->shared_info;
   
-  run_arg_init( state->run_arg , 
-                 run_mode        , 
-                 active          , 
-                 max_internal_submit,
-                 init_step_parameter , 
-                 init_state_parameter , 
-                 init_state_dynamic  , 
-                 load_start , 
-                 step1 , 
-                 step2 , 
-                 iter ,
-                 member_config_get_iens( state->my_config ), 
-                 model_config_get_runpath_fmt( shared_info->model_config ),
-                 state->subst_list );
+  run_arg_init( run_arg , 
+                run_mode        , 
+                active          , 
+                max_internal_submit,
+                init_step_parameter , 
+                init_state_parameter , 
+                init_state_dynamic  , 
+                load_start , 
+                step1 , 
+                step2 , 
+                iter ,
+                member_config_get_iens( state->my_config ), 
+                model_config_get_runpath_fmt( shared_info->model_config ),
+                state->subst_list );
 }
 
 
@@ -2056,3 +1962,4 @@ void enkf_state_set_keep_runpath( enkf_state_type * enkf_state , keep_runpath_ty
 keep_runpath_type enkf_state_get_keep_runpath( const enkf_state_type * enkf_state ) {
   return member_config_get_keep_runpath( enkf_state->my_config );
 }
+

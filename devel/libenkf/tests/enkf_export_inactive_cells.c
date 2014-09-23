@@ -24,12 +24,17 @@
 #include <ert/enkf/ert_test_context.h>
 #include <ert/util/util.h>
 
+#include <ert/ecl/ecl_kw_magic.h>
+#include <ert/ecl/ecl_kw.h>
+
+#include <ert/rms/rms_util.h>
+
 #include <ert/enkf/enkf_main.h>
 #include <ert/enkf/field.h>
 #include <ert/enkf/enkf_config_node.h>
-#include <ert/ecl/ecl_kw_magic.h>
-#include <ert/ecl/ecl_kw.h>
-#include <ert/rms/rms_util.h>
+#include <ert/enkf/run_arg.h>
+
+
 
 
 void check_exported_data(const char * exported_file,
@@ -131,8 +136,9 @@ void forward_initialize_node(enkf_main_type * enkf_main, const char * init_file,
     enkf_state_type * state = enkf_main_iget_state( enkf_main , iens );
     enkf_fs_type * fs       = enkf_main_get_fs(enkf_main);
     int error               = 0;
+    run_arg_type  * run_arg = enkf_state_get_run_arg( state );
 
-    enkf_state_forward_init( state , fs , &error );
+    enkf_state_forward_init( state , run_arg , fs , &error );
   }
 }
 
