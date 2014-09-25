@@ -136,7 +136,7 @@ void forward_initialize_node(enkf_main_type * enkf_main, const char * init_file,
     enkf_state_type * state = enkf_main_iget_state( enkf_main , iens );
     enkf_fs_type * fs       = enkf_main_get_fs(enkf_main);
     int error               = 0;
-    run_arg_type  * run_arg = enkf_state_get_run_arg( state );
+    run_arg_type  * run_arg = run_arg_alloc_INIT_ONLY( 0 ,0 , "simulations/run0");
 
     enkf_state_forward_init( state , run_arg , fs , &error );
   }

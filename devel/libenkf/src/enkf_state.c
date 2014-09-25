@@ -118,7 +118,6 @@ struct enkf_state_struct {
                                                       - which will describe initialization of ECLIPSE (EQUIL or RESTART).*/
   ensemble_config_type  * ensemble_config;         /* The config nodes for the enkf_node objects contained in node_hash. */
   
-  run_arg_type          * __run_arg;               
   shared_info_type      * shared_info;             /* Pointers to shared objects which is needed by the enkf_state object (read only). */
   member_config_type    * my_config;               /* Private config information for this member; not updated during a simulation. */
   rng_type              * rng;
@@ -333,7 +332,6 @@ enkf_state_type * enkf_state_alloc(int iens,
 
   enkf_state->ensemble_config   = ensemble_config;
   enkf_state->shared_info       = shared_info_alloc(site_config , model_config , ecl_config , templates);
-  enkf_state->__run_arg         = run_arg_alloc_deprecated( );
   
   enkf_state->node_hash         = hash_alloc();
   enkf_state->restart_kw_list   = stringlist_alloc_new();
@@ -403,7 +401,7 @@ enkf_state_type * enkf_state_alloc(int iens,
 
 
 
-static bool enkf_state_has_node(const enkf_state_type * enkf_state , const char * node_key) {
+bool enkf_state_has_node(const enkf_state_type * enkf_state , const char * node_key) {
   bool has_node = hash_has_key(enkf_state->node_hash , node_key);
   return has_node;
 }
@@ -1059,32 +1057,19 @@ void enkf_state_load_from_forward_model(enkf_state_type * enkf_state ,
 */
 
 void * enkf_state_load_from_forward_model_mt( void * arg ) {
-  arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
-  enkf_state_type * enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
-  enkf_fs_type * fs            = arg_pack_iget_ptr( arg_pack , 1 );
-  int load_start               = arg_pack_iget_int( arg_pack , 2 );
-  int step1                    = arg_pack_iget_int( arg_pack , 3 );
-  int step2                    = arg_pack_iget_int( arg_pack , 4 );
-  bool interactive             = arg_pack_iget_bool( arg_pack , 5 );  
-  stringlist_type * msg_list   = arg_pack_iget_ptr( arg_pack , 6 );
-  bool manual_load             = arg_pack_iget_bool( arg_pack , 7 );
-  int iens                     = member_config_get_iens( enkf_state->my_config );
-  int iter                     = arg_pack_iget_int( arg_pack , 8 );
-  int * result                 = arg_pack_iget_ptr( arg_pack , 9 );
-  run_arg_type * run_arg = enkf_state_get_run_arg( enkf_state );
-
-
+  arg_pack_type * arg_pack     = arg_pack_safe_cast( arg );
+  enkf_state_type * enkf_state = enkf_state_safe_cast(arg_pack_iget_ptr( arg_pack  , 0 ));
+  enkf_fs_type * fs            = arg_pack_iget_ptr( arg_pack  , 1 );
+  run_arg_type * run_arg       = arg_pack_iget_ptr( arg_pack  , 2 );
+  bool interactive             = arg_pack_iget_bool( arg_pack , 3 );  
+  stringlist_type * msg_list   = arg_pack_iget_ptr( arg_pack  , 4 );
+  bool manual_load             = arg_pack_iget_bool( arg_pack , 5 );
+  int * result                 = arg_pack_iget_ptr( arg_pack  , 6 );
+  
+  int iens                     = run_arg_get_iens( run_arg ); 
+  
   if (manual_load)
     state_map_update_undefined(enkf_fs_get_state_map(fs) , iens , STATE_INITIALIZED);
-
-  run_arg_init_for_load( run_arg , 
-                         load_start , 
-                         step1 , 
-                         step2 , 
-                         iens , 
-                         iter , 
-                         model_config_get_runpath_fmt( enkf_state->shared_info->model_config ) , 
-                         enkf_state->subst_list );
   
   enkf_state_load_from_forward_model( enkf_state , run_arg , fs , result , interactive , msg_list );
   if (*result & REPORT_STEP_INCOMPATIBLE) {
@@ -1456,7 +1441,6 @@ void enkf_state_free(enkf_state_type *enkf_state) {
   subst_list_free(enkf_state->subst_list);
   stringlist_free(enkf_state->restart_kw_list);
   member_config_free(enkf_state->my_config);
-  run_arg_free(enkf_state->__run_arg);
   shared_info_free(enkf_state->shared_info);
   free(enkf_state);
 }
@@ -1653,6 +1637,7 @@ void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * r
     */
 
     /* Loading parameter information: loaded from timestep: run_arg->init_step_parameters. */
+    printf("Loading parameters. Load param:%d \n",run_arg->init_state_parameter);
     enkf_state_fread(enkf_state , fs , PARAMETER , run_arg->init_step_parameters , run_arg->init_state_parameter);
     
     
@@ -1903,45 +1888,6 @@ void enkf_state_invalidate_cache( enkf_state_type * enkf_state ) {
 
 
 /*****************************************************************/
-
-run_arg_type * enkf_state_get_run_arg( const enkf_state_type * enkf_state ) {
-  return enkf_state->__run_arg;
-}
-
-
-
-
-void enkf_state_init_run(enkf_state_type * state , 
-                         run_arg_type * run_arg , 
-                         run_mode_type run_mode  , 
-                         bool active                    , 
-                         int max_internal_submit,
-                         int init_step_parameter         , 
-                         state_enum init_state_parameter , 
-                         state_enum init_state_dynamic   , 
-                         int load_start          , 
-                         int iter                ,
-                         int step1               , 
-                         int step2) {
-
-  shared_info_type   * shared_info  = state->shared_info;
-  
-  run_arg_init( run_arg , 
-                run_mode        , 
-                active          , 
-                max_internal_submit,
-                init_step_parameter , 
-                init_state_parameter , 
-                init_state_dynamic  , 
-                load_start , 
-                step1 , 
-                step2 , 
-                iter ,
-                member_config_get_iens( state->my_config ), 
-                model_config_get_runpath_fmt( shared_info->model_config ),
-                state->subst_list );
-}
-
 
 
 rng_type * enkf_state_get_rng( const enkf_state_type * enkf_state ) {

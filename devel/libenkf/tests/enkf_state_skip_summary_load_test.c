@@ -32,12 +32,12 @@ bool check_ecl_sum_loaded(const enkf_main_type * enkf_main)
 {
   stringlist_type * msg_list = stringlist_alloc_new();
   enkf_state_type * state1   = enkf_main_iget_state( enkf_main , 0 );
-  run_arg_type * run_arg1 = enkf_state_get_run_arg( state1 );
+  run_arg_type * run_arg1    = run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run0");
   enkf_state_type * state2   = enkf_main_iget_state( enkf_main , 1 );
-  run_arg_type * run_arg2 = enkf_state_get_run_arg( state2 );
+  run_arg_type * run_arg2    =  run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run1");
   enkf_fs_type    * fs       = enkf_main_get_fs( enkf_main );
   
-
+  
 
   state_map_type * state_map = enkf_fs_get_state_map(fs);
   state_map_iset(state_map, 0, STATE_INITIALIZED);
@@ -65,10 +65,11 @@ int main(int argc , char ** argv) {
   bool strict = true;
   enkf_main_type * enkf_main = enkf_main_bootstrap( NULL , config_file , strict , true );
   
+  /*
   {
     run_mode_type run_mode = ENSEMBLE_EXPERIMENT; 
     bool_vector_type * iactive = bool_vector_alloc( enkf_main_get_ensemble_size(enkf_main) , true);
-    enkf_main_init_run(enkf_main , iactive , run_mode , INIT_NONE);     /* This is ugly */
+    enkf_main_init_run(enkf_main , iactive , run_mode , INIT_NONE);     
     
     enkf_state_type * state1 = enkf_main_iget_state( enkf_main , 0 );
     enkf_state_type * state2 = enkf_main_iget_state( enkf_main , 1 );
@@ -87,8 +88,8 @@ int main(int argc , char ** argv) {
     enkf_state_init_run(state2, run_arg2 , run_mode, active, max_internal_sumbit, init_step_parameter, init_state_parameter, init_state_dynamic, load_start, 0, step1, step2);
     bool_vector_free( iactive );
   }
-
-  test_assert_true(check_ecl_sum_loaded(enkf_main));
+  */
+  test_assert_true( check_ecl_sum_loaded(enkf_main) );
   
   enkf_main_free( enkf_main );
   test_work_area_free(work_area); 

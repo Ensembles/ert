@@ -19,7 +19,16 @@ import threading
 import json
 import os
 
-from ert.enkf import EnKFMain
+from ert.enkf import EnKFMain,RunArg
+from ert.enkf.enums import EnkfRunType , EnkfStateType
+from ert.enkf import NodeId
+
+from .run_context import RunContext
+
+class ErtCmdError(Exception):
+    pass
+
+
 
 class ErtServer(object):
     site_config = None
@@ -31,6 +40,16 @@ class ErtServer(object):
                 self.open( config_file )
             else:
                 raise IOError("The config file:%s does not exist" % config_file)
+        self.initCmdTable()
+        self.run_context = None
+
+
+
+    def initCmdTable(self):
+        self.cmd_table = {"STATUS" : self.handleSTATUS ,
+                          "INIT_SIMULATIONS" : self.handleINIT_SIMULATIONS ,
+                          "ADD_SIMULATION" : self.handleADD_SIMULATION ,
+                          "SET_VARIABLE" : self.handleSET_VARIABLE }
 
 
     def open(self , config_file):
@@ -59,8 +78,58 @@ class ErtServer(object):
 
     def evalCmd(self , cmd_expr):
         cmd = cmd_expr[0]
-        if cmd == "STATUS":
-            if self.isConnected():
-                return ["OPEN"]
+        func = self.cmd_table.get(cmd)
+
+        if func:
+            return func(cmd_expr[1:])
+        else:
+            raise ErtCmdError("The command:%s was not recognized" % cmd)
+
+
+    def handleSTATUS(self , args):
+        if self.isConnected():
+            if self.run_context is None:
+                return ["READY"]
             else:
-                return ["CLOSED"]
+                return ["RUNNING" , self.run_context.getNumRunning() , self.run_context.getNumComplete()]
+        else:
+            return ["CLOSED"]
+
+
+    def handleINIT_SIMULATIONS(self , args):
+        if len(args) == 2:
+            if self.run_context is None:
+                run_size = args[0]
+                init_case = args[1]
+                self.run_context = RunContext(self.ert_handle , run_size , init_case)
+                return self.handleSTATUS([])
+            else:
+                raise ErtCmdError("The ert server has already started simulations")
+        else:
+            raise ErtCmdError("The INIT_SIMULATIONS command expects two arguments: [ensemble_size , init_case]")
+
+
+
+    def handleSET_VARIABLE(self , args):
+        iens = args[0]
+        kw = str(args[1])
+        ensembleConfig = self.ert_handle.ensembleConfig()
+        if ensembleConfig.hasKey(kw):
+            state = self.ert_handle[iens]
+            node = state[kw]
+            gen_kw = node.asGenKw()
+            print "Arguments: %s" % args[2:]
+            gen_kw.setValues(args[2:])
+            
+            fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
+            node_id = NodeId(0 , iens , EnkfStateType.ANALYZED )
+            node.save( fs , node_id )
+        else:
+            raise ErtCmdError("The keyword:%s is not recognized" % kw)
+            
+
+
+    def handleADD_SIMULATION(self , args):
+        iens = args[0]
+        run_arg = RunArg(EnkfRunType.ENSEMBLE_EXPERIMENT , iens , "simulations/run%s" % iens)
+        self.ert_handle.submitSimulation( run_arg )

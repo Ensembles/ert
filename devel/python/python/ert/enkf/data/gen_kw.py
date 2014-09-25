@@ -80,7 +80,8 @@ class GenKw(BaseCClass):
     def setValues(self , values):
         if len(values) == len(self):
             d = DoubleVector()
-            for (v,index) in enumerate(values):
+            for (index,v) in enumerate(values):
+                print index,v
                 d[index] = v
                 
             GenKw.cNamespace().set_values( self , d )

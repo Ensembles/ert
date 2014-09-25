@@ -26,6 +26,8 @@ extern "C" {
 #include <ert/util/subst_list.h>
 #include <ert/util/type_macros.h>
 
+#include <ert/enkf/enkf_types.h>
+
 /**
    This struct is a pure utility structure used to pack the various
    bits and pieces of information needed to start, monitor, and load
@@ -59,7 +61,7 @@ typedef struct run_arg_struct {
   
 
 UTIL_SAFE_CAST_HEADER( run_arg );
-  
+UTIL_IS_INSTANCE_HEADER( run_arg );  
 
   void run_arg_set_run_path(run_arg_type * run_arg , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list);
 
@@ -68,45 +70,24 @@ UTIL_SAFE_CAST_HEADER( run_arg );
                                int init_step_parameters        ,      
                                state_enum init_state_parameter ,
                                state_enum init_state_dynamic   ,
-                               int load_start                  , 
                                int step1                       , 
                                int step2                       ,
                                int iter                        ,
                                const char * runpath);
   
+  
+  run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(int iens , int iter , const char * runpath);
+  run_arg_type * run_arg_alloc_INIT_ONLY(int iens , int iter , const char * runpath);
 
+  int            run_arg_get_iens( const run_arg_type * run_arg );
+  int            run_arg_get_iter( const run_arg_type * run_arg );
   void           run_arg_increase_submit_count( run_arg_type * run_arg );
-  run_arg_type * run_arg_alloc_deprecated();
   void run_arg_free(run_arg_type * run_arg);
   void run_arg_free__(void * arg);
   const char * run_arg_get_runpath( const run_arg_type * run_arg);
   void run_arg_complete_run(run_arg_type * run_arg);
   run_status_type run_arg_get_run_status( const run_arg_type * run_arg );
-  void run_arg_init_for_load(run_arg_type * run_arg , 
-                              int load_start, 
-                              int step1,
-                              int step2,
-                              int iens,
-                              int iter , 
-                              path_fmt_type * run_path_fmt ,
-                              const subst_list_type * state_subst_list);
-
-
-  void run_arg_init(run_arg_type * run_arg        , 
-                     run_mode_type run_mode          , 
-                     bool active                     , 
-                     int max_internal_submit         ,
-                     int init_step_parameters        ,      
-                     state_enum init_state_parameter ,
-                     state_enum init_state_dynamic   ,
-                     int load_start                  , 
-                     int step1                       , 
-                     int step2                       ,
-                     int iter                        ,
-                     int iens                             , 
-                     path_fmt_type * run_path_fmt ,
-                     const subst_list_type * state_subst_list);
-
+  
   void run_arg_set_inactive( run_arg_type * run_arg );
   int  run_arg_get_queue_index( const run_arg_type * run_arg );
 

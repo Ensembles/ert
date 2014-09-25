@@ -18,27 +18,83 @@
 #include <stdlib.h>
 
 #include <ert/util/test_util.h>
+#include <ert/util/path_fmt.h>
+#include <ert/util/subst_list.h>
 
 #include <ert/enkf/ert_run_context.h>
+#include <ert/enkf/run_arg.h>
 
 void test_create() {
   bool_vector_type * iactive = bool_vector_alloc(10,true);
   bool_vector_iset( iactive , 6 , false );
   bool_vector_iset( iactive , 8 , false );
   {
-    ert_run_context_type * context = ert_run_context_alloc( iactive , ENSEMBLE_EXPERIMENT , 0 , 0 , ANALYZED , ANALYZED , 0 , 0 , 0 );
+    subst_list_type * subst_list = subst_list_alloc( NULL );
+    path_fmt_type * runpath_fmt = path_fmt_alloc_directory_fmt("/tmp/path/%04d");
+    ert_run_context_type * context = ert_run_context_alloc( iactive , runpath_fmt , subst_list , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED ,  13 , 0 , 0 );
     
     test_assert_true( ert_run_context_is_instance( context ));
     test_assert_int_equal( 8 , ert_run_context_get_size( context ));
-    
+
+    {
+      run_arg_type * run_arg0 = ert_run_context_iget_arg( context , 0 );
+      
+      test_assert_int_equal( 13 , run_arg_get_iter( run_arg0 ));
+      test_assert_string_equal( "/tmp/path/0000" , run_arg_get_runpath( run_arg0 ));
+      
+      test_assert_true( run_arg_is_instance( run_arg0 ));
+    }
     ert_run_context_free( context );
+    path_fmt_free( runpath_fmt );
+  }
+  bool_vector_free( iactive );
+}
+
+
+void test_create_ENSEMBLE_EXPERIMENT() {
+  bool_vector_type * iactive = bool_vector_alloc(10,true);
+  bool_vector_iset( iactive , 0 , false );
+  bool_vector_iset( iactive , 8 , false );
+  {
+    subst_list_type * subst_list = subst_list_alloc( NULL );
+    path_fmt_type * runpath_fmt = path_fmt_alloc_directory_fmt("/tmp/path/%04d/%d");
+    ert_run_context_type * context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( iactive , runpath_fmt , subst_list , 7 );
+    
+    test_assert_true( ert_run_context_is_instance( context ));
+    test_assert_int_equal( 8 , ert_run_context_get_size( context ));
+
+    {
+      run_arg_type * run_arg0 = ert_run_context_iens_get_arg( context , 0 );
+      run_arg_type * run_arg2 = ert_run_context_iens_get_arg( context , 2 );
+      run_arg_type * run_argi = ert_run_context_iget_arg( context , 1 );
+      
+      test_assert_NULL( run_arg0 );
+      test_assert_true( run_arg_is_instance( run_argi ));
+      test_assert_ptr_equal( run_arg2 , run_argi);
+    }
+
+    {
+      run_arg_type * run_arg1 = ert_run_context_iget_arg( context , 1 );
+
+      test_assert_int_equal( 7 , run_arg_get_iter( run_arg1 ));
+      test_assert_string_equal( "/tmp/path/0002/7" , run_arg_get_runpath( run_arg1 ));
+      
+      test_assert_true( run_arg_is_instance( run_arg1 ));
+    }
+    ert_run_context_free( context );
+    path_fmt_free( runpath_fmt );
   }
   bool_vector_free( iactive );
 }
 
 
 
+
+
+
+
 int main( int argc , char ** argv) {
   test_create();
+  test_create_ENSEMBLE_EXPERIMENT();
   exit(0);
 }

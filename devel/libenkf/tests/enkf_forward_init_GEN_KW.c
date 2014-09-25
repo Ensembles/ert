@@ -85,7 +85,7 @@ int main(int argc , char ** argv) {
     
     if (forward_init) {
       enkf_state_type * state   = enkf_main_iget_state( enkf_main , 0 );
-      run_arg_type * run_arg = enkf_state_get_run_arg( state );
+      run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run0");
       enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
       enkf_node_type * gen_kw_node = enkf_state_get_node( state , "MULTFLT" );
       node_id_type node_id = {.report_step = 0 ,  
@@ -175,6 +175,7 @@ int main(int argc , char ** argv) {
         test_assert_double_equal( 123456.0 , value);
       }
       util_clear_directory( "simulations" , true , true );
+      run_arg_free( run_arg );
     }
     enkf_main_free( enkf_main );
   }

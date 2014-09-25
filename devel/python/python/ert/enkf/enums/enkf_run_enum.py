@@ -17,17 +17,17 @@ from ert.cwrap import BaseCEnum
 from ert.enkf import ENKF_LIB
 
 
-class EnkfRunEnum(BaseCEnum):
+class EnkfRunType(BaseCEnum):
     ENKF_ASSIMILATION = None
     ENSEMBLE_EXPERIMENT = None
     SMOOTHER_UPDATED = None
     INIT_ONLY = None
     
 
-EnkfRunEnum.addEnum("ENKF_ASSIMILATION" , 1)
-EnkfRunEnum.addEnum("ENSEMBLE_EXPERIMENT" , 2)
-EnkfRunEnum.addEnum("SMOOTHER_UPDATE" , 4)
-EnkfRunEnum.addEnum("INIT_ONLY" , 8)
+EnkfRunType.addEnum("ENKF_ASSIMILATION" , 1)
+EnkfRunType.addEnum("ENSEMBLE_EXPERIMENT" , 2)
+EnkfRunType.addEnum("SMOOTHER_UPDATE" , 4)
+EnkfRunType.addEnum("INIT_ONLY" , 8)
 
-
+EnkfRunType.registerEnum( ENKF_LIB , "enkf_run_mode_enum")
 

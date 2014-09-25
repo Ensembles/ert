@@ -24,21 +24,30 @@ extern "C" {
 
 #include <ert/util/type_macros.h>
 #include <ert/util/bool_vector.h>
+#include <ert/util/path_fmt.h>
+#include <ert/util/subst_list.h>
 
 #include <ert/enkf/enkf_types.h>
-  
+#include <ert/enkf/run_arg.h>
 
 typedef struct ert_run_context_struct ert_run_context_type;
 
-  ert_run_context_type *   ert_run_context_alloc(bool_vector_type * iactive , 
+  ert_run_context_type *   ert_run_context_alloc(const bool_vector_type * iactive , 
+                                                 path_fmt_type * path_fmt , 
+                                                 subst_list_type * subst_list , 
                                                  run_mode_type run_mode , 
-                                                 int load_start , 
                                                  int init_step_parameter , 
                                                  state_enum init_state_parameter,
                                                  state_enum init_state_dynamic , 
                                                  int iter , 
                                                  int step1 , 
                                                  int step2 );
+  
+  ert_run_context_type * ert_run_context_alloc_ENSEMBLE_EXPERIMENT(const bool_vector_type * iactive , 
+                                                                   path_fmt_type * runpath_fmt , 
+                                                                   subst_list_type * subst_list ,
+                                                                   int iter);
+
 
   void                     ert_run_context_free( ert_run_context_type * );
   int                      ert_run_context_get_size( const ert_run_context_type * context );
@@ -46,6 +55,8 @@ typedef struct ert_run_context_struct ert_run_context_type;
   const bool_vector_type * ert_run_context_get_iactive( const ert_run_context_type * context );
   int                      ert_run_context_get_step1( const ert_run_context_type * context );
   int                      ert_run_context_get_step2( const ert_run_context_type * context );
+  run_arg_type           * ert_run_context_iget_arg( const ert_run_context_type * context , int index);
+  run_arg_type           * ert_run_context_iens_get_arg( const ert_run_context_type * context , int iens);
 
   UTIL_IS_INSTANCE_HEADER( ert_run_context );
   

@@ -59,7 +59,7 @@ void test_write_gen_kw_export_file(enkf_main_type * enkf_main)
 {
   test_assert_not_NULL(enkf_main);
   enkf_state_type * state = enkf_main_iget_state( enkf_main , 0 );
-  run_arg_type * run_arg = enkf_state_get_run_arg( state );
+  run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( 0 ,0 , "simulations/run0");
   test_assert_not_NULL(state);
   enkf_node_type * enkf_node = enkf_state_get_node( state , "MULTFLT" );
   test_assert_not_NULL(enkf_node);
@@ -69,8 +69,9 @@ void test_write_gen_kw_export_file(enkf_main_type * enkf_main)
   if (GEN_KW == enkf_config_node_get_impl_type(config_node)) {
     enkf_fs_type * fs = enkf_main_get_fs(enkf_main);
     enkf_state_ecl_write(state, run_arg , fs);
-    test_assert_true(util_file_exists("parameters.txt"));
+    test_assert_true(util_file_exists("simulations/run0/parameters.txt"));
   }
+  run_arg_free( run_arg );
 }
 
 

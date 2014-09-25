@@ -71,6 +71,7 @@ typedef struct enkf_state_struct    enkf_state_type;
   void               enkf_state_swapin_node(const enkf_state_type *  , const char *);
   void               enkf_state_iset_eclpath(enkf_state_type * , int , const char *);
   enkf_node_type   * enkf_state_get_node(const enkf_state_type * , const char * );
+  bool               enkf_state_has_node(const enkf_state_type * enkf_state , const char * node_key);
   void               enkf_state_del_node(enkf_state_type * , const char * );
   void               enkf_state_load_ecl_summary(enkf_state_type * , bool , int );
   void             * enkf_state_run_eclipse__(void * );
@@ -124,25 +125,7 @@ typedef struct enkf_state_struct    enkf_state_type;
 
   rng_type         * enkf_state_get_rng( const enkf_state_type * enkf_state );
   unsigned int       enkf_state_get_random( enkf_state_type * enkf_state );
-  
-/*****************************************************************/
-  
-  void enkf_state_init_run(enkf_state_type * state , 
-                           run_arg_type * run_arg , 
-                           run_mode_type           ,  
-                           bool active             , 
-                           int max_internal_submit , 
-                           int init_step_parameter , 
-                           state_enum init_state_parameter , 
-                           state_enum init_state_dynamic , 
-                           int load_start ,
-                           int iter ,
-                           int step1 , 
-                           int step2 );
-  
-  
   run_status_type enkf_state_get_simple_run_status(const enkf_state_type * state);
-  run_arg_type * enkf_state_get_run_arg( const enkf_state_type * enkf_state );
 
 /******************************************************************/
 /* Forward model callbacks: */

@@ -82,7 +82,7 @@ int main(int argc , char ** argv) {
   bool strict = true;
   enkf_main_type * enkf_main = enkf_main_bootstrap( NULL , config_file , strict , true );
   enkf_state_type * state = enkf_main_iget_state( enkf_main , 0 );
-  run_arg_type * run_arg = enkf_state_get_run_arg( state );
+  run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( 0 ,0 , "simulations/run0");
   enkf_node_type * field_node = enkf_state_get_node( state , "PORO" );
   
   bool forward_init;
@@ -113,6 +113,7 @@ int main(int argc , char ** argv) {
 
   test_assert_true(check_original_exported_data_equal(field_node));
 
+  run_arg_free( run_arg );
   enkf_main_free(enkf_main);    
   test_work_area_free(work_area); 
 }
