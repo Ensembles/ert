@@ -1503,7 +1503,7 @@ void enkf_main_run_post_workflow( enkf_main_type * enkf_main ) {
 
 void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg , enkf_fs_type * fs) {
   const ecl_config_type * ecl_config = enkf_main_get_ecl_config( enkf_main );
-  enkf_state_type * enkf_state = enkf_main->ensemble[ run_arg->iens ];
+  enkf_state_type * enkf_state = enkf_main->ensemble[ run_arg_get_iens(run_arg) ];
   const member_config_type  * member_config = enkf_state_get_member_config( enkf_state );
   const site_config_type    * site_config   = enkf_main_get_site_config( enkf_main );
   const char * job_script                   = site_config_get_job_script( site_config );
@@ -1520,7 +1520,7 @@ void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg 
   }
   
   enkf_state_init_eclipse( enkf_state , run_arg , fs );
-  if (run_arg->run_mode != INIT_ONLY) {
+  if (run_arg_get_run_mode(run_arg) != INIT_ONLY) {
     // The job_queue_node will take ownership of this arg_pack; and destroy it when
     // the job_queue_node is discarded.
     arg_pack_type             * load_arg      = arg_pack_alloc();
@@ -1531,19 +1531,23 @@ void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg 
     arg_pack_append_ptr( load_arg , enkf_state );
     arg_pack_append_ptr( load_arg , run_arg );
     arg_pack_append_ptr( load_arg , fs );
-    
-    run_arg->queue_index = job_queue_add_job_mt( job_queue , 
-                                                 job_script , 
-                                                 enkf_state_complete_forward_modelOK__ , 
-                                                 enkf_state_complete_forward_modelRETRY__ , 
-                                                 enkf_state_complete_forward_modelEXIT__,
-                                                 load_arg , 
-                                                 ecl_config_get_num_cpu( ecl_config ),
-                                                 run_path , 
-                                                 member_config_get_jobname( member_config ) , 
-                                                 1, 
-                                                 (const char *[1]) { run_path } );
-    run_arg_increase_submit_count( run_arg );
+
+    {
+      int queue_index = job_queue_add_job_mt( job_queue , 
+                                              job_script , 
+                                              enkf_state_complete_forward_modelOK__ , 
+                                              enkf_state_complete_forward_modelRETRY__ , 
+                                              enkf_state_complete_forward_modelEXIT__,
+                                              load_arg , 
+                                              ecl_config_get_num_cpu( ecl_config ),
+                                              run_path , 
+                                              member_config_get_jobname( member_config ) , 
+                                              1, 
+                                              (const char *[1]) { run_path } );
+
+      run_arg_set_queue_index( run_arg , queue_index );
+      run_arg_increase_submit_count( run_arg );
+    }
   }
 }
 

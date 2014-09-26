@@ -27,20 +27,33 @@
 
 #define RUN_ARG_TYPE_ID 66143287
 
+
+
+struct run_arg_struct {
+  UTIL_TYPE_ID_DECLARATION;
+  bool                    __ready;              /* An attempt to check the internal state - not really used. */
+  int                     iens;
+  bool                    active;               /* Is this state object active at all - used for instance in ensemble experiments where only some of the members are integrated. */
+  int                     init_step_parameters; /* The report step we initialize parameters from - will often be equal to step1, but can be different. */
+  state_enum              init_state_parameter; /* Whether we should init from a forecast or an analyzed state - parameters. */
+  state_enum              init_state_dynamic;   /* Whether we should init from a forecast or an analyzed state - dynamic state variables. */
+  int                     max_internal_submit;  /* How many times the enkf_state object should try to resubmit when the queueu has said everything is OK - but the load fails. */  
+  int                     num_internal_submit;   
+  int                     load_start;           /* When loading back results - start at this step. */
+  int                     step1;                /* The forward model is integrated: step1 -> step2 */
+  int                     step2;
+  int                     iter;
+  char                  * run_path;             /* The currently used  runpath - is realloced / freed for every step. */
+  run_mode_type           run_mode;             /* What type of run this is */
+  int                     queue_index;          /* The job will in general have a different index in the queue than the iens number. */
+  /******************************************************************/
+  /* Return value - set by the called routine!!  */
+  run_status_type         run_status;
+};
+  
+
 UTIL_SAFE_CAST_FUNCTION( run_arg , RUN_ARG_TYPE_ID )
 UTIL_IS_INSTANCE_FUNCTION( run_arg , RUN_ARG_TYPE_ID )
-
-void run_arg_set_run_path(run_arg_type * run_arg , int iens , path_fmt_type * run_path_fmt, const subst_list_type * state_subst_list) {
-  util_safe_free(run_arg->run_path);
-  {
-    char * tmp1 = path_fmt_alloc_path(run_path_fmt , false , iens, run_arg->iter);    /* 1: Replace first %d with iens, if a second %d replace with iter */
-    char * tmp2 = subst_list_alloc_filtered_string( state_subst_list , tmp1 );        /* 2: Filter out various magic strings like <CASE> and <CWD>. */
-    run_arg->run_path = util_alloc_abs_path( tmp2 );                                  /* 3: Ensure that the path is absolute. */
-    free( tmp1 );
-    free( tmp2 );
-  }
-}
-
 
 
 run_arg_type * run_arg_alloc(int iens , 
@@ -113,15 +126,17 @@ void run_arg_increase_submit_count( run_arg_type * run_arg ) {
 }
 
 
+void run_arg_set_queue_index( run_arg_type * run_arg , int queue_index) {
+  run_arg->queue_index = queue_index;
+}
+
+
 
 const char * run_arg_get_runpath( const run_arg_type * run_arg) {
   return run_arg->run_path;
 }
 
 
-run_status_type run_arg_get_run_status( const run_arg_type * run_arg ) {
-  return run_arg->run_status;
-}
 
 
 int run_arg_get_iter( const run_arg_type * run_arg ) {
@@ -134,6 +149,59 @@ int run_arg_get_iens( const run_arg_type * run_arg ) {
 }
 
 
+int run_arg_get_load_start( const run_arg_type * run_arg ) {
+  return run_arg->load_start;
+}
+
+
+bool run_arg_is_ready( const run_arg_type * run_arg) {
+  return run_arg->__ready;
+}
+
+
+void run_arg_set_ready( run_arg_type * run_arg , bool ready) {
+  run_arg->__ready = ready;
+}
+
+
+int run_arg_get_step2( const run_arg_type * run_arg ) {
+  return run_arg->step2;
+}
+
+bool run_arg_can_retry( const run_arg_type * run_arg ) {
+  if (run_arg->num_internal_submit < run_arg->max_internal_submit)
+    return true;
+  else
+    return false;
+}
+
+
+int run_arg_get_step1( const run_arg_type * run_arg ) {
+  return run_arg->step1;
+}
+
+
+run_mode_type run_arg_get_run_mode( const run_arg_type * run_arg ) {
+  return run_arg->run_mode;
+}
+
+state_enum run_arg_get_dynamic_init_state( const run_arg_type * run_arg ) {
+  return run_arg->init_state_dynamic;
+}
+
+
+state_enum run_arg_get_parameter_init_state( const run_arg_type * run_arg ) {
+  return run_arg->init_state_parameter;
+}
+
+
+
+int run_arg_get_parameter_init_step( const run_arg_type * run_arg ) {
+  return run_arg->init_step_parameters;
+}
+
+
+
 void run_arg_set_inactive( run_arg_type * run_arg ) {
   run_arg->active = false;
 }
@@ -141,4 +209,14 @@ void run_arg_set_inactive( run_arg_type * run_arg ) {
 
 int run_arg_get_queue_index( const run_arg_type * run_arg ) {
   return run_arg->queue_index;
+}
+
+
+run_status_type run_arg_get_run_status( const run_arg_type * run_arg) {
+  return run_arg->run_status;
+}
+
+
+void run_arg_set_run_status( run_arg_type * run_arg , run_status_type run_status) {
+  run_arg->run_status = run_status;
 }
