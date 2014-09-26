@@ -276,11 +276,19 @@ void gen_kw_ecl_write(const gen_kw_type * gen_kw , const char * run_path , const
   if (fortio_is_instance(filestream)) {
       util_abort("%s: Called with fortio instance, aborting\n", __func__);
   } else {
-    gen_kw_write_export_file(gen_kw, filestream);
+    if (filestream)
+      gen_kw_write_export_file(gen_kw, filestream);
+    {
+      char * target_file;
+      if (run_path)
+        target_file = util_alloc_filename( run_path , base_file  , NULL);
+      else
+        target_file = util_alloc_string_copy( base_file );
 
-    char * target_file = util_alloc_filename( run_path , base_file  , NULL);
-    gen_kw_filter_file(gen_kw , target_file);
-    free( target_file );
+      gen_kw_filter_file(gen_kw , target_file);
+      
+      free( target_file );
+    }
   }
 }
 
