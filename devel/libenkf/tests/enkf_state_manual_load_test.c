@@ -38,11 +38,10 @@ int test_load_manually_to_new_case(enkf_main_type * enkf_main) {
   
   
   enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
-  run_arg_type * run_arg = run_arg_alloc_INIT_ONLY(iens , iter , "simulations/run0");
+  run_arg_type * run_arg = run_arg_alloc_INIT_ONLY(fs , iens , iter , "simulations/run0");
   {
     arg_pack_type * arg_pack = arg_pack_alloc();
     arg_pack_append_ptr( arg_pack , enkf_main_iget_state(enkf_main, 0));                
-    arg_pack_append_ptr( arg_pack , fs );                                               
     arg_pack_append_ptr( arg_pack , run_arg );
     arg_pack_append_bool( arg_pack , true );                                            
     arg_pack_append_owned_ptr( arg_pack , stringlist_alloc_new() , stringlist_free__);  

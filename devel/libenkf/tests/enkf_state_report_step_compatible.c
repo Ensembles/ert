@@ -33,14 +33,14 @@ bool check_ecl_sum_compatible(const enkf_main_type * enkf_main)
   stringlist_type * msg_list = stringlist_alloc_new();
   enkf_state_type * state    = enkf_main_iget_state( enkf_main , 0 );
   enkf_fs_type    * fs       = enkf_main_get_fs( enkf_main );
-  run_arg_type * run_arg     = run_arg_alloc_INIT_ONLY(0 , 0 , "simulations/run0");
+  run_arg_type * run_arg     = run_arg_alloc_INIT_ONLY(fs , 0 , 0 , "simulations/run0");
 
   state_map_type * state_map = enkf_fs_get_state_map(fs);
   state_map_iset(state_map, 0, STATE_INITIALIZED);
   
   int error = 0; 
 
-  enkf_state_load_from_forward_model( state , run_arg , fs , &error , false , msg_list );
+  enkf_state_load_from_forward_model( state , run_arg , &error , false , msg_list );
   
   stringlist_free( msg_list );
   return (REPORT_STEP_INCOMPATIBLE & error) ? false : true; 

@@ -79,17 +79,15 @@ typedef struct enkf_state_struct    enkf_state_type;
 
   void               enkf_state_load_from_forward_model(enkf_state_type * enkf_state , 
                                                         run_arg_type * run_arg , 
-                                                        enkf_fs_type * fs , 
                                                         int * result , 
                                                         bool interactive , 
                                                         stringlist_type * msg_list);
 
   void enkf_state_forward_init(enkf_state_type * enkf_state , 
                                run_arg_type * run_arg , 
-                               enkf_fs_type * fs , 
                                int * result );
 
-  void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * run_arg , enkf_fs_type * fs);
+  void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * run_arg );
     
   enkf_state_type  * enkf_state_alloc(int ,
                                       rng_type        * main_rng , 

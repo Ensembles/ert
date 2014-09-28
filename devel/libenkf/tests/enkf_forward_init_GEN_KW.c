@@ -85,8 +85,8 @@ int main(int argc , char ** argv) {
     
     if (forward_init) {
       enkf_state_type * state   = enkf_main_iget_state( enkf_main , 0 );
-      run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run0");
       enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
+      run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( fs , 0 , 0 , "simulations/run0");
       enkf_node_type * gen_kw_node = enkf_state_get_node( state , "MULTFLT" );
       node_id_type node_id = {.report_step = 0 ,  
                               .iens = 0,
@@ -111,7 +111,7 @@ int main(int argc , char ** argv) {
         
 
         test_assert_false( enkf_node_forward_init( gen_kw_node , "simulations/run0" , 0 ));
-        enkf_state_forward_init( state , run_arg , fs , &error );
+        enkf_state_forward_init( state , run_arg ,  &error );
         test_assert_true(LOAD_FAILURE & error);
         
         error = 0;
@@ -120,7 +120,7 @@ int main(int argc , char ** argv) {
           state_map_type * state_map = enkf_fs_get_state_map(fs);
           state_map_iset(state_map , 0 , STATE_INITIALIZED);
         }
-        enkf_state_load_from_forward_model( state , run_arg , fs , &error , false , msg_list );
+        enkf_state_load_from_forward_model( state , run_arg ,  &error , false , msg_list );
         stringlist_free( msg_list );
         bool_vector_free( iactive );
         test_assert_true(LOAD_FAILURE & error);
@@ -147,9 +147,9 @@ int main(int argc , char ** argv) {
         
 
         test_assert_true( enkf_node_forward_init( gen_kw_node , "simulations/run0" , 0 ));
-        enkf_state_forward_init( state , run_arg , fs , &error );
+        enkf_state_forward_init( state , run_arg ,  &error );
         test_assert_int_equal(0, error);
-        enkf_state_load_from_forward_model( state , run_arg , fs , &error , false , msg_list );
+        enkf_state_load_from_forward_model( state , run_arg , &error , false , msg_list );
        
         stringlist_free( msg_list );
         test_assert_int_equal(0, error);

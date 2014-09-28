@@ -1501,7 +1501,7 @@ void enkf_main_run_post_workflow( enkf_main_type * enkf_main ) {
 
 
 
-void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg , enkf_fs_type * fs) {
+void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg ) {
   const ecl_config_type * ecl_config = enkf_main_get_ecl_config( enkf_main );
   enkf_state_type * enkf_state = enkf_main->ensemble[ run_arg_get_iens(run_arg) ];
   const member_config_type  * member_config = enkf_state_get_member_config( enkf_state );
@@ -1519,7 +1519,7 @@ void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg 
                       enkf_state_get_eclbase( enkf_state ));
   }
   
-  enkf_state_init_eclipse( enkf_state , run_arg , fs );
+  enkf_state_init_eclipse( enkf_state , run_arg );
   if (run_arg_get_run_mode(run_arg) != INIT_ONLY) {
     // The job_queue_node will take ownership of this arg_pack; and destroy it when
     // the job_queue_node is discarded.
@@ -1530,7 +1530,6 @@ void enkf_main_isubmit_job( enkf_main_type * enkf_main , run_arg_type * run_arg 
       */
     arg_pack_append_ptr( load_arg , enkf_state );
     arg_pack_append_ptr( load_arg , run_arg );
-    arg_pack_append_ptr( load_arg , fs );
 
     {
       int queue_index = job_queue_add_job_mt( job_queue , 
@@ -1557,9 +1556,8 @@ static void * enkf_main_isubmit_job__( void * arg ) {
   arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
   enkf_main_type * enkf_main = enkf_main_safe_cast( arg_pack_iget_ptr( arg_pack , 0 ));
   run_arg_type * run_arg = run_arg_safe_cast( arg_pack_iget_ptr( arg_pack , 1));
-  enkf_fs_type * fs = enkf_fs_safe_cast( arg_pack_iget_ptr( arg_pack , 2 ));
 
-  enkf_main_isubmit_job( enkf_main , run_arg , fs );
+  enkf_main_isubmit_job( enkf_main , run_arg );
   arg_pack_free( arg_pack );
   return NULL;
 }
@@ -1570,8 +1568,6 @@ static void * enkf_main_isubmit_job__( void * arg ) {
   
 void enkf_main_submit_jobs( enkf_main_type * enkf_main , 
                             ert_run_context_type * run_context ) {
-  
-  enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
   runpath_list_type * runpath_list = qc_module_get_runpath_list( enkf_main->qc_module );
   
   runpath_list_clear( runpath_list );
@@ -1588,7 +1584,6 @@ void enkf_main_submit_jobs( enkf_main_type * enkf_main ,
           
         arg_pack_append_ptr( arg_pack , enkf_main );
         arg_pack_append_ptr( arg_pack , run_arg);
-        arg_pack_append_ptr( arg_pack , fs );
         
         thread_pool_add_job(submit_threads , enkf_main_isubmit_job__ , arg_pack);
       } 
@@ -1633,7 +1628,7 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
     path_fmt_type * runpath_fmt = model_config_get_runpath_fmt( enkf_main->model_config );
     bool     verbose_queue    = enkf_main->verbose;
     const int active_ens_size = util_int_min( bool_vector_size( iactive ) , enkf_main_get_ensemble_size( enkf_main ));
-    ert_run_context_type * run_context = ert_run_context_alloc( iactive , runpath_fmt , enkf_main->subst_list , run_mode , init_step_parameter , init_state_parameter , init_state_dynamic , iter , step1 , step2);
+    ert_run_context_type * run_context = ert_run_context_alloc( fs , fs , fs , iactive , runpath_fmt , enkf_main->subst_list , run_mode , init_step_parameter , init_state_parameter , init_state_dynamic , iter , step1 , step2);
     int   job_size;
     int   iens;
     
@@ -3452,7 +3447,7 @@ void enkf_main_load_from_forward_model_with_fs(enkf_main_type * enkf_main, int i
   int result[ens_size];
   model_config_type * model_config = enkf_main->model_config;
 
-  ert_run_context_type * run_context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( iactive , model_config_get_runpath_fmt( model_config ) , enkf_main->subst_list , iter );
+  ert_run_context_type * run_context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( fs , iactive , model_config_get_runpath_fmt( model_config ) , enkf_main->subst_list , iter );
   arg_pack_type ** arg_list = util_calloc( ens_size , sizeof * arg_list );
   thread_pool_type * tp     = thread_pool_alloc( 4 , true );  /* num_cpu - HARD coded. */
 
@@ -3465,12 +3460,11 @@ void enkf_main_load_from_forward_model_with_fs(enkf_main_type * enkf_main, int i
     if (bool_vector_iget(iactive, iens)) {
       enkf_state_type * enkf_state = enkf_main_iget_state( enkf_main , iens );
       arg_pack_append_ptr( arg_pack , enkf_state);                                         /* 0: */
-      arg_pack_append_ptr( arg_pack , fs );                                                /* 1: */
-      arg_pack_append_ptr( arg_pack , ert_run_context_iens_get_arg( run_context , iens )); /* 2: */
-      arg_pack_append_bool( arg_pack , true );                                             /* 3: Interactive */
-      arg_pack_append_ptr(arg_pack, realizations_msg_list[iens]);                          /* 4: List of interactive mode messages. */
-      arg_pack_append_bool( arg_pack, true );                                              /* 5: Manual load */
-      arg_pack_append_ptr(arg_pack, &result[iens]);                                        /* 6: Result */
+      arg_pack_append_ptr( arg_pack , ert_run_context_iens_get_arg( run_context , iens )); /* 1: */
+      arg_pack_append_bool( arg_pack , true );                                             /* 2: Interactive */
+      arg_pack_append_ptr(arg_pack, realizations_msg_list[iens]);                          /* 3: List of interactive mode messages. */
+      arg_pack_append_bool( arg_pack, true );                                              /* 4: Manual load */
+      arg_pack_append_ptr(arg_pack, &result[iens]);                                        /* 5: Result */
 
       thread_pool_add_job( tp , enkf_state_load_from_forward_model_mt , arg_pack);
     }

@@ -30,12 +30,12 @@
 
 bool check_ecl_sum_loaded(const enkf_main_type * enkf_main)
 {
+  enkf_fs_type    * fs       = enkf_main_get_fs( enkf_main );
   stringlist_type * msg_list = stringlist_alloc_new();
   enkf_state_type * state1   = enkf_main_iget_state( enkf_main , 0 );
-  run_arg_type * run_arg1    = run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run0");
+  run_arg_type * run_arg1    = run_arg_alloc_INIT_ONLY( fs , 0 , 0 , "simulations/run0");
   enkf_state_type * state2   = enkf_main_iget_state( enkf_main , 1 );
-  run_arg_type * run_arg2    =  run_arg_alloc_INIT_ONLY( 0 , 0 , "simulations/run1");
-  enkf_fs_type    * fs       = enkf_main_get_fs( enkf_main );
+  run_arg_type * run_arg2    = run_arg_alloc_INIT_ONLY( fs , 0 , 0 , "simulations/run1");
   
   
 
@@ -44,9 +44,9 @@ bool check_ecl_sum_loaded(const enkf_main_type * enkf_main)
   
   int error = 0; 
 
-  enkf_state_load_from_forward_model( state1 , run_arg1 , fs , &error , false , msg_list );
+  enkf_state_load_from_forward_model( state1 , run_arg1 , &error , false , msg_list );
   state_map_iset(state_map, 1, STATE_INITIALIZED);
-  enkf_state_load_from_forward_model( state2 , run_arg2 , fs , &error , false , msg_list );
+  enkf_state_load_from_forward_model( state2 , run_arg2 , &error , false , msg_list );
   
   stringlist_free( msg_list );
   return (0 == error); 
