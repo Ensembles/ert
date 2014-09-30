@@ -4,7 +4,7 @@ import socket
 import json
 
 class Connection(object):
-    def __init__(self , port , host = "localhost"):
+    def __init__(self , port , host):
         self.socket = socket.socket( socket.AF_INET , socket.SOCK_STREAM)
         self.port = port
         self.host = host
@@ -39,9 +39,14 @@ def readArgv():
 
 
 port = int(sys.argv[1])
+if len(sys.argv) >=3:
+    host = sys.argv[2]
+else:
+    host = "localhost"
+
 
 while True:
-    conn = Connection(port)
+    conn = Connection(port,host)
     cmd = raw_input("Function to send: ==> ")
 
     argv = readArgv()
