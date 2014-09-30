@@ -217,8 +217,7 @@ class EnKFMain(BaseCClass):
 
         
     def submitSimulation(self , run_arg):
-        fs = self.__fs_manager.getCurrentFileSystem()
-        EnKFMain.cNamespace().submit_simulation( self , run_arg , fs)
+        EnKFMain.cNamespace().submit_simulation( self , run_arg)
 
 
 
@@ -282,4 +281,4 @@ EnKFMain.cNamespace().export_field = cwrapper.prototype("bool enkf_main_export_f
 EnKFMain.cNamespace().export_field_with_fs = cwrapper.prototype("bool enkf_main_export_field_with_fs(enkf_main, char*, char*, bool_vector, enkf_field_file_format_enum, int, enkf_state_type_enum, enkf_fs_manager)")
 EnKFMain.cNamespace().load_from_forward_model = cwrapper.prototype("void enkf_main_load_from_forward_model_from_gui(enkf_main, int, bool_vector, enkf_fs)")
 
-EnKFMain.cNamespace().submit_simulation = cwrapper.prototype("void enkf_main_isubmit_job(enkf_main , run_arg , enkf_fs)")
+EnKFMain.cNamespace().submit_simulation = cwrapper.prototype("void enkf_main_isubmit_job(enkf_main , run_arg)")

@@ -1625,14 +1625,30 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
   
   {
     enkf_fs_type * fs         = enkf_main_get_fs( enkf_main );            
+    enkf_fs_type * target_fs = fs; //  ERRORE
     path_fmt_type * runpath_fmt = model_config_get_runpath_fmt( enkf_main->model_config );
     bool     verbose_queue    = enkf_main->verbose;
     const int active_ens_size = util_int_min( bool_vector_size( iactive ) , enkf_main_get_ensemble_size( enkf_main ));
-    ert_run_context_type * run_context = ert_run_context_alloc( fs , fs , fs , iactive , runpath_fmt , enkf_main->subst_list , run_mode , init_step_parameter , init_state_parameter , init_state_dynamic , iter , step1 , step2);
+    ert_run_context_type * run_context;
     int   job_size;
     int   iens;
     
-
+    switch (run_mode) {
+    case(INIT_ONLY):
+      run_context = ert_run_context_alloc_INIT_ONLY( fs , iactive , runpath_fmt , enkf_main->subst_list , iter );
+      break;
+    case(ENSEMBLE_EXPERIMENT):
+      run_context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( fs , iactive , runpath_fmt , enkf_main->subst_list , iter );
+      break;
+    case(SMOOTHER_UPDATE):
+      run_context = ert_run_context_alloc_SMOOTHER_RUN( fs , fs , iactive , runpath_fmt , enkf_main->subst_list , iter); 
+      break;
+    case(ENKF_ASSIMILATION):
+      run_context = ert_run_context_alloc_ENKF_ASSIMILATION( fs , iactive , runpath_fmt , enkf_main->subst_list , init_state_parameter , init_state_dynamic , step1 , step2 , iter);
+      break;
+    default:
+      util_abort("%s: what the fuck? \n",__func__);
+    }
 
     state_map_deselect_matching( enkf_fs_get_state_map( fs ) , iactive , STATE_LOAD_FAILURE | STATE_PARENT_FAILURE);
 

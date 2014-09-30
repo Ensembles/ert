@@ -23,6 +23,7 @@
 
 #include <ert/enkf/enkf_types.h>
 #include <ert/enkf/run_arg.h>
+#include <ert/enkf/enkf_fs.h>
 
 
 #define RUN_ARG_TYPE_ID 66143287
@@ -46,6 +47,11 @@ struct run_arg_struct {
   char                  * run_path;             /* The currently used  runpath - is realloced / freed for every step. */
   run_mode_type           run_mode;             /* What type of run this is */
   int                     queue_index;          /* The job will in general have a different index in the queue than the iens number. */
+  
+  enkf_fs_type          * init_fs;
+  enkf_fs_type          * result_fs;
+  enkf_fs_type          * update_target_fs;
+
   /******************************************************************/
   /* Return value - set by the called routine!!  */
   run_status_type         run_status;
@@ -56,19 +62,26 @@ UTIL_SAFE_CAST_FUNCTION( run_arg , RUN_ARG_TYPE_ID )
 UTIL_IS_INSTANCE_FUNCTION( run_arg , RUN_ARG_TYPE_ID )
 
 
-run_arg_type * run_arg_alloc(int iens , 
-                             run_mode_type run_mode          , 
-                             int init_step_parameters        ,      
-                             state_enum init_state_parameter ,
-                             state_enum init_state_dynamic   ,
-                             int step1                       , 
-                             int step2                       ,
-                             int iter                        ,
-                             const char * runpath) {
+static run_arg_type * run_arg_alloc(enkf_fs_type * init_fs , 
+                                    enkf_fs_type * result_fs , 
+                                    enkf_fs_type * update_target_fs , 
+                                    int iens , 
+                                    run_mode_type run_mode          , 
+                                    int init_step_parameters        ,      
+                                    state_enum init_state_parameter ,
+                                    state_enum init_state_dynamic   ,
+                                    int step1                       , 
+                                    int step2                       ,
+                                    int iter                        ,
+                                    const char * runpath) {
   
   run_arg_type * run_arg = util_malloc(sizeof * run_arg );
   UTIL_TYPE_ID_INIT(run_arg , RUN_ARG_TYPE_ID);
   
+  run_arg->init_fs = init_fs;
+  run_arg->result_fs = result_fs;
+  run_arg->update_target_fs = update_target_fs;
+
   run_arg->iens = iens;
   run_arg->run_mode = run_mode;
   run_arg->init_step_parameters = init_step_parameters;
@@ -89,13 +102,31 @@ run_arg_type * run_arg_alloc(int iens ,
 }
 
 
-run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(int iens , int iter , const char * runpath) {
-  return run_arg_alloc(iens , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED , 0 , 0 , iter , runpath);
+run_arg_type * run_arg_alloc_ENKF_ASSIMILATION(enkf_fs_type * fs , 
+                                               int iens , 
+                                               state_enum init_state_parameter ,
+                                               state_enum init_state_dynamic   ,
+                                               int step1                       , 
+                                               int step2                       ,
+                                               const char * runpath) {
+  
+  return run_arg_alloc(fs,fs,fs,iens,ENKF_ASSIMILATION,step1 , init_state_parameter, init_state_dynamic , step1 , step2 , 0 , runpath);
 }
 
 
-run_arg_type * run_arg_alloc_INIT_ONLY(int iens , int iter , const char * runpath) {
-  return run_arg_alloc(iens , INIT_ONLY , 0 , ANALYZED , ANALYZED , 0 , 0 , iter , runpath);
+
+run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath) {
+  return run_arg_alloc(fs , fs , NULL , iens , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED , 0 , 0 , iter , runpath);
+}
+
+
+run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath) {
+  return run_arg_alloc(init_fs , NULL , NULL , iens , INIT_ONLY , 0 , ANALYZED , ANALYZED , 0 , 0 , iter , runpath);
+}
+
+
+run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath) {
+  return run_arg_alloc(simulate_fs , simulate_fs , update_target_fs , iens , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED , 0 , 0 , iter , runpath);
 }
 
 
@@ -219,4 +250,35 @@ run_status_type run_arg_get_run_status( const run_arg_type * run_arg) {
 
 void run_arg_set_run_status( run_arg_type * run_arg , run_status_type run_status) {
   run_arg->run_status = run_status;
+}
+
+
+
+enkf_fs_type * run_arg_get_init_fs(const run_arg_type * run_arg) {
+  if (run_arg->init_fs)
+    return run_arg->init_fs;
+  else {
+    util_abort("%s: internal error - tried to access run_arg->init_fs when init_fs == NULL\n",__func__);
+    return NULL;
+  }
+}
+
+
+enkf_fs_type * run_arg_get_result_fs(const run_arg_type * run_arg) {
+  if (run_arg->result_fs)
+    return run_arg->result_fs;
+  else {
+    util_abort("%s: internal error - tried to access run_arg->result_fs when result_fs == NULL\n",__func__);
+    return NULL;
+  }
+}
+
+
+enkf_fs_type * run_arg_get_update_target_fs(const run_arg_type * run_arg) {
+  if (run_arg->update_target_fs)
+    return run_arg->update_target_fs;
+  else {
+    util_abort("%s: internal error - tried to access run_arg->update_target_fs when update_target_fs == NULL\n",__func__);
+    return NULL;
+  }
 }

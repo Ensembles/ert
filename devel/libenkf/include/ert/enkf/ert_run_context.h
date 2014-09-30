@@ -29,25 +29,39 @@ extern "C" {
 
 #include <ert/enkf/enkf_types.h>
 #include <ert/enkf/run_arg.h>
+#include <ert/enkf/enkf_fs.h>
 
 typedef struct ert_run_context_struct ert_run_context_type;
 
-  ert_run_context_type *   ert_run_context_alloc(const bool_vector_type * iactive , 
-                                                 path_fmt_type * path_fmt , 
-                                                 subst_list_type * subst_list , 
-                                                 run_mode_type run_mode , 
-                                                 int init_step_parameter , 
-                                                 state_enum init_state_parameter,
-                                                 state_enum init_state_dynamic , 
-                                                 int iter , 
-                                                 int step1 , 
-                                                 int step2 );
   
-  ert_run_context_type * ert_run_context_alloc_ENSEMBLE_EXPERIMENT(const bool_vector_type * iactive , 
+  ert_run_context_type * ert_run_context_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , 
+                                                                   const bool_vector_type * iactive , 
                                                                    path_fmt_type * runpath_fmt , 
                                                                    subst_list_type * subst_list ,
                                                                    int iter);
 
+  ert_run_context_type * ert_run_context_alloc_INIT_ONLY(enkf_fs_type * init_fs , const bool_vector_type * iactive , 
+                                                         path_fmt_type * runpath_fmt , 
+                                                         subst_list_type * subst_list ,
+                                                         int iter);
+    
+  ert_run_context_type * ert_run_context_alloc_ENKF_ASSIMILATION(enkf_fs_type * fs , 
+                                                                 const bool_vector_type * iactive , 
+                                                                 path_fmt_type * runpath_fmt , 
+                                                                 subst_list_type * subst_list ,
+                                                                 state_enum init_state_parameter ,
+                                                                 state_enum init_state_dynamic   ,
+                                                                 int step1                       , 
+                                                                 int step2                       ,
+                                                                 int iter);
+
+
+  
+  ert_run_context_type * ert_run_context_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * target_update_fs , 
+                                                            const bool_vector_type * iactive , 
+                                                            path_fmt_type * runpath_fmt , 
+                                                            subst_list_type * subst_list ,
+                                                            int iter);
 
   void                     ert_run_context_free( ert_run_context_type * );
   int                      ert_run_context_get_size( const ert_run_context_type * context );

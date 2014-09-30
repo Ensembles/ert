@@ -17,7 +17,7 @@
 
 import os
 from ert.enkf import RunArg
-from ert.enkf.enums import EnkfRunEnum
+from ert.enkf.enums import EnkfRunType
 from ert.test import ExtendedTestCase
 
 
@@ -26,6 +26,6 @@ class RunArgTest(ExtendedTestCase):
 
     def test_create(self):
         with self.assertRaises(TypeError):
-            run_arg = RunArg(EnkfRunEnum.ENKF_ASSIMILATION, 10 , "/path/to/run")
+            run_arg = RunArg(EnkfRunType.ENKF_ASSIMILATION, 10 , "/path/to/run")
 
-        run_arg = RunArg(EnkfRunEnum.ENSEMBLE_EXPERIMENT , 10 , "/path/to/run")
+        run_arg = RunArg(EnkfRunType.ENSEMBLE_EXPERIMENT , 10 , "/path/to/run")

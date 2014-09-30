@@ -29,9 +29,12 @@ void test_create() {
   bool_vector_iset( iactive , 6 , false );
   bool_vector_iset( iactive , 8 , false );
   {
+    enkf_fs_type * init_fs = NULL;
+    enkf_fs_type * result_fs = NULL;
+    enkf_fs_type * update_target_fs = NULL;
     subst_list_type * subst_list = subst_list_alloc( NULL );
     path_fmt_type * runpath_fmt = path_fmt_alloc_directory_fmt("/tmp/path/%04d");
-    ert_run_context_type * context = ert_run_context_alloc( iactive , runpath_fmt , subst_list , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED ,  13 , 0 , 0 );
+    ert_run_context_type * context = NULL;// = ert_run_context_alloc( init_fs , result_fs , update_target_fs , iactive , runpath_fmt , subst_list , ENSEMBLE_EXPERIMENT , 0 , ANALYZED , ANALYZED ,  13 , 0 , 0 );
     
     test_assert_true( ert_run_context_is_instance( context ));
     test_assert_int_equal( 8 , ert_run_context_get_size( context ));
@@ -58,7 +61,8 @@ void test_create_ENSEMBLE_EXPERIMENT() {
   {
     subst_list_type * subst_list = subst_list_alloc( NULL );
     path_fmt_type * runpath_fmt = path_fmt_alloc_directory_fmt("/tmp/path/%04d/%d");
-    ert_run_context_type * context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( iactive , runpath_fmt , subst_list , 7 );
+    enkf_fs_type * fs = NULL;
+    ert_run_context_type * context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( fs, iactive , runpath_fmt , subst_list , 7 );
     
     test_assert_true( ert_run_context_is_instance( context ));
     test_assert_int_equal( 8 , ert_run_context_get_size( context ));
