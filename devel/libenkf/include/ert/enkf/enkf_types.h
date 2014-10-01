@@ -249,7 +249,7 @@ typedef enum {
     INIT_NONE = 0,
     INIT_CONDITIONAL = 1,
     INIT_FORCE = 2
-  } init_mode_enum;
+  } init_mode_type;
   
 
 

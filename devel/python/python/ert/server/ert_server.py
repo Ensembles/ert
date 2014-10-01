@@ -49,7 +49,8 @@ class ErtServer(object):
         self.cmd_table = {"STATUS" : self.handleSTATUS ,
                           "INIT_SIMULATIONS" : self.handleINIT_SIMULATIONS ,
                           "ADD_SIMULATION" : self.handleADD_SIMULATION ,
-                          "SET_VARIABLE" : self.handleSET_VARIABLE }
+                          "SET_VARIABLE" : self.handleSET_VARIABLE ,
+                          "GET_RESULT" : self.handleGET_RESULT }
 
 
     def open(self , config_file):
@@ -108,18 +109,40 @@ class ErtServer(object):
         else:
             raise ErtCmdError("The INIT_SIMULATIONS command expects two arguments: [ensemble_size , init_case]")
 
+    
+    def handleGET_RESULT(self , args):
+        iens = args[0]
+        report_step = args[1]
+        kw = args[2]
+        if ensembleConfig.hasKey( kw ):
+            state = self.ert_handle[iens]
+            node = state[kw]
+            gen_data = node.asGenData()
+            
+            fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
+            node_id = NodeId(report_step , iens , EnkfStateType.FORECAST )
+            if node.tryLoad( fs , node_id ):
+                data = gen_data.exportData()
+                return jon.dumps( ["OK"] + data.asList() )
+            else:
+                raise ErtCmdError("Loading iens:%d  report:%d   kw:%s   failed" % (iens , report_step , kw))
+        else:
+            raise ErtCmdError("The keyword:%s is not recognized" % kw)
+
+
 
 
     def handleSET_VARIABLE(self , args):
-        iens = args[0]
-        kw = str(args[1])
+        geo_id = args[0]
+        pert_id = args[1]
+        iens = args[2]
+        kw = str(args[3])
         ensembleConfig = self.ert_handle.ensembleConfig()
         if ensembleConfig.hasKey(kw):
             state = self.ert_handle[iens]
             node = state[kw]
             gen_kw = node.asGenKw()
-            print "Arguments: %s" % args[2:]
-            gen_kw.setValues(args[2:])
+            gen_kw.setValues(args[4:])
             
             fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
             node_id = NodeId(0 , iens , EnkfStateType.ANALYZED )

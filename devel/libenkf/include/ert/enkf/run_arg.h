@@ -40,7 +40,7 @@ UTIL_IS_INSTANCE_HEADER( run_arg );
   run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath);
   run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath);
   run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath);
-  run_arg_type * run_arg_alloc_ENKF_ASSIMIILATION(enkf_fs_type * fs , 
+  run_arg_type * run_arg_alloc_ENKF_ASSIMILATION(enkf_fs_type * fs , 
                                                  int iens , 
                                                  state_enum init_state_parameter ,
                                                  state_enum init_state_dynamic   ,

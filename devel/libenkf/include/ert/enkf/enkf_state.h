@@ -63,7 +63,7 @@ typedef struct enkf_state_struct    enkf_state_type;
   keep_runpath_type  member_config_get_keep_runpath(const member_config_type * member_config);
   //void             * enkf_state_complete_forward_model__(void * arg );
   void *             enkf_state_load_from_forward_model_mt( void * arg );
-  void               enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs, const stringlist_type * param_list , init_mode_enum init_mode);
+  void               enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs, const stringlist_type * param_list , init_mode_type init_mode);
   void               enkf_state_fread(enkf_state_type *  , enkf_fs_type * fs , int  , int  , state_enum );
   bool               enkf_state_get_analyzed(const enkf_state_type * );
   void               enkf_state_set_analyzed(enkf_state_type * , bool );

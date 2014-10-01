@@ -38,17 +38,21 @@ typedef struct ert_run_context_struct ert_run_context_type;
                                                                    const bool_vector_type * iactive , 
                                                                    path_fmt_type * runpath_fmt , 
                                                                    subst_list_type * subst_list ,
+                                                                   init_mode_type init_mode , 
                                                                    int iter);
+
 
   ert_run_context_type * ert_run_context_alloc_INIT_ONLY(enkf_fs_type * init_fs , const bool_vector_type * iactive , 
                                                          path_fmt_type * runpath_fmt , 
                                                          subst_list_type * subst_list ,
+                                                         init_mode_type init_mode , 
                                                          int iter);
     
   ert_run_context_type * ert_run_context_alloc_ENKF_ASSIMILATION(enkf_fs_type * fs , 
                                                                  const bool_vector_type * iactive , 
                                                                  path_fmt_type * runpath_fmt , 
                                                                  subst_list_type * subst_list ,
+                                                                 init_mode_type init_mode , 
                                                                  state_enum init_state_parameter ,
                                                                  state_enum init_state_dynamic   ,
                                                                  int step1                       , 
@@ -61,16 +65,24 @@ typedef struct ert_run_context_struct ert_run_context_type;
                                                             const bool_vector_type * iactive , 
                                                             path_fmt_type * runpath_fmt , 
                                                             subst_list_type * subst_list ,
+                                                            init_mode_type init_mode , 
                                                             int iter);
 
   void                     ert_run_context_free( ert_run_context_type * );
   int                      ert_run_context_get_size( const ert_run_context_type * context );
   run_mode_type            ert_run_context_get_mode( const ert_run_context_type * context );
-  const bool_vector_type * ert_run_context_get_iactive( const ert_run_context_type * context );
+  init_mode_type           ert_run_context_get_init_mode( const ert_run_context_type * context );
+  bool_vector_type       * ert_run_context_get_iactive( const ert_run_context_type * context );
+  int                      ert_run_context_get_iter( const ert_run_context_type * context );
   int                      ert_run_context_get_step1( const ert_run_context_type * context );
   int                      ert_run_context_get_step2( const ert_run_context_type * context );
+  int                      ert_run_context_get_load_start( const ert_run_context_type * context );
   run_arg_type           * ert_run_context_iget_arg( const ert_run_context_type * context , int index);
   run_arg_type           * ert_run_context_iens_get_arg( const ert_run_context_type * context , int iens);
+  
+  enkf_fs_type * ert_run_context_get_init_fs(const ert_run_context_type * run_context);
+  enkf_fs_type * ert_run_context_get_result_fs(const ert_run_context_type * run_context);
+  enkf_fs_type * ert_run_context_get_update_target_fs(const ert_run_context_type * run_context);
 
   UTIL_IS_INSTANCE_HEADER( ert_run_context );
   

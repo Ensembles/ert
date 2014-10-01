@@ -158,7 +158,7 @@ static void shared_info_free(shared_info_type * shared_info) {
 /** Helper classes complete - starting on the enkf_state proper object. */
 /*****************************************************************/
 
-void enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs , const stringlist_type * param_list, init_mode_enum init_mode) {
+void enkf_state_initialize(enkf_state_type * enkf_state , enkf_fs_type * fs , const stringlist_type * param_list, init_mode_type init_mode) {
   if (init_mode != INIT_NONE) {
     int iens = enkf_state_get_iens( enkf_state );
     state_map_type * state_map = enkf_fs_get_state_map( fs );

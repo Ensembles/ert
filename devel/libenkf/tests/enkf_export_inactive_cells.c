@@ -127,7 +127,7 @@ void forward_initialize_node(enkf_main_type * enkf_main, const char * init_file,
     int start_report           = 0;
     int init_step_parameters   = 0;
 
-    enkf_main_run_exp(enkf_main , iactive , false , init_step_parameters , start_report , init_state);
+    enkf_main_run_exp(enkf_main , iactive , false);
     bool_vector_free(iactive);
   }
 
