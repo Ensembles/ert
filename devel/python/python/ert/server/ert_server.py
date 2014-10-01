@@ -113,7 +113,8 @@ class ErtServer(object):
     def handleGET_RESULT(self , args):
         iens = args[0]
         report_step = args[1]
-        kw = args[2]
+        kw = str(args[2])
+        ensembleConfig = self.ert_handle.ensembleConfig()
         if ensembleConfig.hasKey( kw ):
             state = self.ert_handle[iens]
             node = state[kw]
@@ -122,8 +123,8 @@ class ErtServer(object):
             fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
             node_id = NodeId(report_step , iens , EnkfStateType.FORECAST )
             if node.tryLoad( fs , node_id ):
-                data = gen_data.exportData()
-                return jon.dumps( ["OK"] + data.asList() )
+                data = gen_data.getData()
+                return json.dumps( ["OK"] + data.asList() )
             else:
                 raise ErtCmdError("Loading iens:%d  report:%d   kw:%s   failed" % (iens , report_step , kw))
         else:
@@ -154,5 +155,4 @@ class ErtServer(object):
 
     def handleADD_SIMULATION(self , args):
         iens = args[0]
-        run_arg = RunArg(EnkfRunType.ENSEMBLE_EXPERIMENT , iens , "simulations/run%s" % iens)
-        self.ert_handle.submitSimulation( run_arg )
+        self.run_context.startSimulation( iens )

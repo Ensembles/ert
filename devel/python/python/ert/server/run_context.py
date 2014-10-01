@@ -15,6 +15,7 @@
 #  for more details. 
 
 from ert.job_queue import JobQueueManager
+from ert.enkf import RunArg
 
 class RunContext(object):
     def __init__(self , ert_handle , size , init_case):
@@ -26,7 +27,8 @@ class RunContext(object):
         site_config = self.ert_handle.siteConfig()
         self.queue_manager = JobQueueManager( site_config.getJobQueue() )
         self.queue_manager.startQueue( size , verbose = True )
-
+        #self.ert_run_context = ErtRunContext.ENSEMBLE_EXPERIMENT( fs , iactive , runpath_fmt , subst_list , init_mode , 0 )
+        self.__arg_list = []
         
         
     def getNumRunning(self):
@@ -37,4 +39,9 @@ class RunContext(object):
         return 0
         
     
+    def startSimulation(self , iens):
+        fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
+        run_arg = RunArg.ENSEMBLE_EXPERIMENT(fs , iens , "simulations/run%s" % iens)
+        self.ert_handle.submitSimulation( run_arg )
+        self.__arg_list.append( run_arg )
     

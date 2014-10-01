@@ -25,7 +25,5 @@ from ert.test import ExtendedTestCase
 class RunArgTest(ExtendedTestCase):
 
     def test_create(self):
-        with self.assertRaises(TypeError):
-            run_arg = RunArg(EnkfRunType.ENKF_ASSIMILATION, 10 , "/path/to/run")
-
-        run_arg = RunArg(EnkfRunType.ENSEMBLE_EXPERIMENT , 10 , "/path/to/run")
+        run_arg = RunArg.ENSEMBLE_EXPERIMENT(fs , 10 , 10 , "/path/to/run")
+        

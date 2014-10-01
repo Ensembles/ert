@@ -1813,12 +1813,9 @@ static bool enkf_state_complete_forward_modelOK(enkf_state_type * enkf_state , r
 
 
 bool enkf_state_complete_forward_modelOK__(void * arg ) {
-  enkf_state_type * enkf_state;
   arg_pack_type * arg_pack = arg_pack_safe_cast( arg );
-  run_arg_type * run_arg;
-
-  enkf_state = arg_pack_iget_ptr( arg_pack , 0 );
-  run_arg    = arg_pack_iget_ptr( arg_pack , 1 );
+  enkf_state_type * enkf_state = enkf_state_safe_cast( arg_pack_iget_ptr( arg_pack , 0 ));
+  run_arg_type * run_arg = run_arg_safe_cast( arg_pack_iget_ptr( arg_pack , 1 ));
   
   return enkf_state_complete_forward_modelOK( enkf_state , run_arg);
 }

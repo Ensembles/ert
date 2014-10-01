@@ -22,20 +22,14 @@ from ert.enkf.enums import EnkfRunType, EnkfStateType
 
 
 class RunArg(BaseCClass):
-    def __init__(self , run_mode , iens , runpath , 
-                 iter = 0 , 
-                 parameters_init_step = 0 , 
-                 parameters_init_state = EnkfStateType.ANALYZED, 
-                 dynamic_init_state = EnkfStateType.ANALYZED, 
-                 step1 = 0,
-                 step2 = 0):
-
-        if run_mode == EnkfRunType.ENSEMBLE_EXPERIMENT:
-            c_ptr = RunArg.cNamespace().alloc_ENSEMBLE_EXPERIMENT(iens , iter , runpath)
-        else:
-            raise TypeError("Currently only run_mode == ENSEMBLE_EXPERIMENT can be instantiated from Python")
-        super(RunArg , self).__init__(c_ptr)
+    def __init__(self , c_ptr):
+        super(RunArg , self).__init__( c_ptr )
         
+    
+    @classmethod
+    def ENSEMBLE_EXPERIMENT(cls , fs , iens , runpath , iter = 0):
+        c_ptr = RunArg.cNamespace().alloc_ENSEMBLE_EXPERIMENT(fs , iens , iter , runpath)
+        return RunArg( c_ptr )
 
 
     def free(self):
@@ -52,5 +46,5 @@ cwrapper.registerType("run_arg_ref", RunArg.createCReference)
 
 
 
-RunArg.cNamespace().alloc_ENSEMBLE_EXPERIMENT = cwrapper.prototype("c_void_p run_arg_alloc_ENSEMBLE_EXPERIMENT(int, int, char*)")
+RunArg.cNamespace().alloc_ENSEMBLE_EXPERIMENT = cwrapper.prototype("c_void_p run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs , int, int, char*)")
 RunArg.cNamespace().free  = cwrapper.prototype("void run_arg_free(run_arg)")
