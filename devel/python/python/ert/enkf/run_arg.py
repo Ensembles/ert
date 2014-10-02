@@ -22,8 +22,8 @@ from ert.enkf.enums import EnkfRunType, EnkfStateType
 
 
 class RunArg(BaseCClass):
-    def __init__(self , c_ptr):
-        super(RunArg , self).__init__( c_ptr )
+    def __init__(self , c_ptr , parent = None , is_reference = False ):
+        super(RunArg , self).__init__( c_ptr , parent = None , is_reference = is_reference )
         
     
     @classmethod
@@ -40,10 +40,7 @@ class RunArg(BaseCClass):
 
 
 cwrapper = CWrapper(ENKF_LIB)
-cwrapper.registerType("run_arg", RunArg)
-cwrapper.registerType("run_arg_obj", RunArg.createPythonObject)
-cwrapper.registerType("run_arg_ref", RunArg.createCReference)
-
+cwrapper.registerObjectType("run_arg", RunArg)
 
 
 RunArg.cNamespace().alloc_ENSEMBLE_EXPERIMENT = cwrapper.prototype("c_void_p run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs , int, int, char*)")

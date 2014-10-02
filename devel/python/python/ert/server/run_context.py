@@ -27,8 +27,11 @@ class RunContext(object):
         site_config = self.ert_handle.siteConfig()
         self.queue_manager = JobQueueManager( site_config.getJobQueue() )
         self.queue_manager.startQueue( size , verbose = True )
-        #self.ert_run_context = ErtRunContext.ENSEMBLE_EXPERIMENT( fs , iactive , runpath_fmt , subst_list , init_mode , 0 )
-        self.__arg_list = []
+
+        fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
+        mask = BoolVector( default_value = True )
+        mask[size - 1] = True
+        self.ert_run_context = self.ert_handle.getRunContextENSEMPLE_EXPERIMENT( fs , mask )
         
         
     def getNumRunning(self):
@@ -40,8 +43,5 @@ class RunContext(object):
         
     
     def startSimulation(self , iens):
-        fs = self.ert_handle.getEnkfFsManager().getCurrentFileSystem()
-        run_arg = RunArg.ENSEMBLE_EXPERIMENT(fs , iens , "simulations/run%s" % iens)
-        self.ert_handle.submitSimulation( run_arg )
-        self.__arg_list.append( run_arg )
+        self.ert_handle.submitSimulation( self.ert_run_context.get(iens) )
     

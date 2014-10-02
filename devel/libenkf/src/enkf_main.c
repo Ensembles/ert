@@ -1812,20 +1812,17 @@ void enkf_main_run_exp(enkf_main_type * enkf_main ,
   int iter = 0;
 
   if (simulate)
-    run_context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( enkf_main_get_fs( enkf_main ) , 
+    run_context = enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(enkf_main , 
+                                                                      enkf_main_get_fs( enkf_main ) , 
+                                                                      iactive , 
+                                                                      init_mode , 
+                                                                      iter );
+  else
+    run_context = enkf_main_alloc_ert_run_context_INIT_ONLY( enkf_main , 
+                                                             enkf_main_get_fs( enkf_main ) , 
                                                              iactive , 
-                                                             model_config_get_runpath_fmt( enkf_main->model_config ) ,
-                                                             enkf_main->subst_list , 
                                                              init_mode , 
                                                              iter );
-                                                             
-  else
-    run_context = ert_run_context_alloc_INIT_ONLY( enkf_main_get_fs( enkf_main ) , 
-                                                   iactive , 
-                                                   model_config_get_runpath_fmt( enkf_main->model_config ) ,
-                                                   enkf_main->subst_list , 
-                                                   init_mode , 
-                                                   iter );
   
   enkf_main_init_run( enkf_main , run_context );
   if (enkf_main_run_step(enkf_main , run_context))
@@ -1902,16 +1899,16 @@ void enkf_main_run_assimilation(enkf_main_type * enkf_main            ,
           load_start = report_step1;
         }
       
-        run_context = ert_run_context_alloc_ENKF_ASSIMILATION( enkf_main_get_fs( enkf_main ) , 
-                                                               iactive , 
-                                                               model_config_get_runpath_fmt( enkf_main->model_config ) , 
-                                                               enkf_main->subst_list , 
-                                                               init_mode , 
-                                                               init_state_parameter, 
-                                                               init_state_dynamic , 
-                                                               report_step1 ,  // init_step parameter
-                                                               report_step2 , 
-                                                               iter );
+        run_context = enkf_main_alloc_ert_run_context_ENKF_ASSIMILATION( enkf_main, 
+                                                                         enkf_main_get_fs( enkf_main ) , 
+                                                                         iactive , 
+                                                                         init_mode , 
+                                                                         init_state_parameter, 
+                                                                         init_state_dynamic , 
+                                                                         report_step1 ,  // init_step parameter
+                                                                         report_step2 , 
+                                                                         iter );
+        
         enkf_main_init_run( enkf_main , run_context );
         enkf_main_run_step(enkf_main , run_context);
         {
@@ -1954,13 +1951,11 @@ void enkf_main_run_assimilation(enkf_main_type * enkf_main            ,
 
 bool enkf_main_run_simple_step(enkf_main_type * enkf_main , bool_vector_type * iactive , init_mode_type init_mode, int iter) {
   bool run_ok;
-  ert_run_context_type * run_context = ert_run_context_alloc_ENSEMBLE_EXPERIMENT( enkf_main_get_fs( enkf_main ) , 
-                                                                                  iactive , 
-                                                                                  model_config_get_runpath_fmt( enkf_main->model_config ),
-                                                                                  enkf_main->subst_list , 
-                                                                                  init_mode , 
-                                                                                  iter );
-  
+  ert_run_context_type * run_context = enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT( enkf_main , 
+                                                                                            enkf_main_get_fs( enkf_main ) , 
+                                                                                            iactive , 
+                                                                                            init_mode , 
+                                                                                            iter );
   enkf_main_init_run( enkf_main , run_context );
   run_ok = enkf_main_run_step( enkf_main , run_context );
   ert_run_context_free( run_context );
@@ -2105,6 +2100,39 @@ void enkf_main_run_iterated_ES(enkf_main_type * enkf_main, int num_iterations_to
     bool_vector_free(iactive);
   } else
     fprintf(stderr,"** ERROR: The current analysis module:%s can not be used for iterations \n", analysis_config_get_active_module_name( analysis_config ));
+}
+
+
+ert_run_context_type * enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(const enkf_main_type * enkf_main , enkf_fs_type * fs , const bool_vector_type * iactive , init_mode_type init_mode , int iter) {
+  return ert_run_context_alloc_ENSEMBLE_EXPERIMENT( fs , iactive , model_config_get_runpath_fmt( enkf_main->model_config ) , enkf_main->subst_list , init_mode , iter );
+}
+
+
+ert_run_context_type * enkf_main_alloc_ert_run_context_INIT_ONLY(const enkf_main_type * enkf_main , enkf_fs_type * fs , const bool_vector_type * iactive , init_mode_type init_mode , int iter) {
+  return ert_run_context_alloc_INIT_ONLY( fs , iactive , model_config_get_runpath_fmt( enkf_main->model_config ) , enkf_main->subst_list , init_mode , iter );
+}
+
+ert_run_context_type * enkf_main_alloc_ert_run_context_ENKF_ASSIMILATION( const enkf_main_type * enkf_main , 
+                                                                      enkf_fs_type * fs , 
+                                                                      const bool_vector_type * iactive ,
+                                                                      init_mode_type init_mode , 
+                                                                      state_enum init_state_parameter ,
+                                                                      state_enum init_state_dynamic   ,
+                                                                      int step1                       , 
+                                                                      int step2                       ,
+                                                                      int iter) {
+
+  return ert_run_context_alloc_ENKF_ASSIMILATION( enkf_main_get_fs( enkf_main ) , 
+                                                  iactive , 
+                                                  model_config_get_runpath_fmt( enkf_main->model_config ) , 
+                                                  enkf_main->subst_list , 
+                                                  init_mode , 
+                                                  init_state_parameter, 
+                                                  init_state_dynamic , 
+                                                  step1 ,  // init_step parameter
+                                                  step2 , 
+                                                  iter );
+
 }
 
 

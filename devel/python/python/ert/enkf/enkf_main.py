@@ -16,6 +16,7 @@
 from ert.cwrap import BaseCClass, CWrapper
 
 from ert.enkf import AnalysisConfig, EclConfig, EnkfObs, EnKFState, LocalConfig, ModelConfig, EnsConfig, PlotConfig, SiteConfig, ENKF_LIB, EnkfSimulationRunner, EnkfFsManager, ErtWorkflowList, PostSimulationHook
+from ert.enkf.enums import EnkfInitModeEnum
 from ert.util import SubstitutionList, Log
 
 
@@ -220,6 +221,10 @@ class EnKFMain(BaseCClass):
         EnKFMain.cNamespace().submit_simulation( self , run_arg)
 
 
+    def getRunContextENSEMPLE_EXPERIMENT(self , fs , iactive , init_mode = EnkfInitModeEnum.INIT_CONDITIONAL , iteration = 0):
+        return EnKFMain.cNamespace().alloc_run_context_ENSEMBLE_EXPERIMENT( self , fs , iactive , init_mode , iteration )
+    
+
 
 ##################################################################
 
@@ -282,3 +287,4 @@ EnKFMain.cNamespace().export_field_with_fs = cwrapper.prototype("bool enkf_main_
 EnKFMain.cNamespace().load_from_forward_model = cwrapper.prototype("void enkf_main_load_from_forward_model_from_gui(enkf_main, int, bool_vector, enkf_fs)")
 
 EnKFMain.cNamespace().submit_simulation = cwrapper.prototype("void enkf_main_isubmit_job(enkf_main , run_arg)")
+EnKFMain.cNamespace().alloc_run_context_ENSEMBLE_EXPERIMENT= cwrapper.prototype("ert_run_context_obj enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT( enkf_main , enkf_fs , bool_vector , enkf_init_mode_enum , int)")
