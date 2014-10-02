@@ -16,7 +16,7 @@
 #  for more details.
 import os
 from random import randint
-from ert.ecl import FortIO, EclTypeEnum, EclKW
+from ert.ecl import FortIO, EclTypeEnum, EclKW , openFortIO
 from ert.test import ExtendedTestCase, TestAreaContext
 
 
@@ -133,10 +133,10 @@ class FortIOTest(ExtendedTestCase):
             for i in range(len(kw1)):
                 kw1[i] = randint(0,1000)
 
-            with FortIO("file" , mode = FortIO.WRITE_MODE) as f:
+            with openFortIO("file" , mode = FortIO.WRITE_MODE) as f:
                 kw1.fwrite( f )
 
-            with FortIO("file") as f:
+            with openFortIO("file") as f:
                 kw2 = EclKW.fread( f )
 
             self.assertTrue( kw1 == kw2 )
