@@ -20,7 +20,6 @@
 #ifndef __ECL_RST_FILE_H__
 #define __ECL_RST_FILE_H__
 
-#include <ert/ecl/fortio.h>
 
 #ifdef __cplusplus
 extern "C" {
