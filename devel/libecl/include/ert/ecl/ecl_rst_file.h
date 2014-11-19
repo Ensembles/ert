@@ -35,7 +35,7 @@ extern "C" {
   
   void                ecl_rst_file_start_solution( ecl_rst_file_type * rst_file );
   void                ecl_rst_file_end_solution( ecl_rst_file_type * rst_file );
-  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum , time_t date , double days , int numwells, int nx , int ny ,int nz , int nactive , int phases);
+  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum , time_t date , double days , int numwells, int niwelz, int nzwelz, int niconz, int nx , int ny ,int nz , int nactive , int phases);
   void                ecl_rst_file_add_kw(ecl_rst_file_type * rst_file , const ecl_kw_type * ecl_kw );
 
 #ifdef __cplusplus
