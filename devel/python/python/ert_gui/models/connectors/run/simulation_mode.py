@@ -5,7 +5,8 @@ from ert_gui.models.mixins import ChoiceModelMixin
 
 
 class SimulationModeModel(ErtConnector, ChoiceModelMixin):
-    __modes = [EnsembleExperiment(), SensitivityStudy(), EnsembleSmoother(), IteratedEnsembleSmoother()]
+    #__modes = [EnsembleExperiment(), SensitivityStudy(), EnsembleSmoother(), IteratedEnsembleSmoother()]
+    __modes = [EnsembleExperiment(), EnsembleSmoother(), IteratedEnsembleSmoother()]
 
     def __init__(self):
         self.__value = SimulationModeModel.__modes[0]
