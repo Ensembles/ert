@@ -6,8 +6,8 @@ if(POLICY CMP0042)
 endif()
 
 set( ERT_VERSION_MAJOR 1 )
-set( ERT_VERSION_MINOR 7 )
-set( ERT_VERSION_MICRO X )
+set( ERT_VERSION_MINOR 8 )
+set( ERT_VERSION_MICRO 0 )
 
 
 option( BUILD_ERT           "Build the full ERT application - Linux only" OFF)
