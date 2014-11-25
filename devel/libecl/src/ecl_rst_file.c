@@ -43,20 +43,6 @@ struct ecl_rst_file_struct {
 };
 
 
-struct intehead_struct{
-  time_t date;
-  int nx;
-  int ny;
-  int nz;
-  int nactive;
-  int phases;
-  int numwells;
-  int niwelz;
-  int nzwelz;
-  int niconz;
-  int ncwmax;
-};
-  
 
 static ecl_rst_file_type * ecl_rst_file_alloc( const char * filename ) {
   bool unified  = ecl_util_unified_file( filename );
@@ -199,6 +185,7 @@ static ecl_kw_type * ecl_rst_file_alloc_DOUBHEAD( ecl_rst_file_type * rst_file ,
   ecl_kw_type * doubhead_kw = ecl_kw_alloc( DOUBHEAD_KW , DOUBHEAD_RESTART_SIZE , ECL_DOUBLE_TYPE );
 
   ecl_kw_scalar_set_double( doubhead_kw , 0);
+  printf(" SETTING DAYS %f\n", days);
   ecl_kw_iset_double( doubhead_kw , DOUBHEAD_DAYS_INDEX , days );
   
   
@@ -209,7 +196,7 @@ static ecl_kw_type * ecl_rst_file_alloc_DOUBHEAD( ecl_rst_file_type * rst_file ,
 
 void ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file ,
                                  int seqnum ,
-                                 int days,
+                                 double days,
                                  intehead_data ih_data ) {
 
   if (rst_file->unified)
