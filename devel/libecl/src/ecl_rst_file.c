@@ -185,7 +185,6 @@ static ecl_kw_type * ecl_rst_file_alloc_DOUBHEAD( ecl_rst_file_type * rst_file ,
   ecl_kw_type * doubhead_kw = ecl_kw_alloc( DOUBHEAD_KW , DOUBHEAD_RESTART_SIZE , ECL_DOUBLE_TYPE );
 
   ecl_kw_scalar_set_double( doubhead_kw , 0);
-  printf(" SETTING DAYS %f\n", days);
   ecl_kw_iset_double( doubhead_kw , DOUBHEAD_DAYS_INDEX , days );
   
   
