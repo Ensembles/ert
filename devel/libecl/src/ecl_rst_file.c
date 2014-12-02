@@ -35,6 +35,7 @@
 #include <ert/ecl/ecl_kw_magic.h>
 #include <ert/ecl/ecl_file_kw.h>
 #include <ert/ecl/ecl_rst_file.h>
+#include <ert/ecl/ecl_rsthead.h>
 
 struct ecl_rst_file_struct {
   fortio_type * fortio;
@@ -114,17 +115,17 @@ void ecl_rst_file_end_solution( ecl_rst_file_type * rst_file ) {
 
 
 static ecl_kw_type * ecl_rst_file_alloc_INTEHEAD( ecl_rst_file_type * rst_file,
-                                                  intehead_data data,
+                                                  ecl_rsthead_type * rsthead,
                                                   int simulator ) {
   ecl_kw_type * intehead_kw = ecl_kw_alloc( INTEHEAD_KW , INTEHEAD_RESTART_SIZE , ECL_INT_TYPE );
   ecl_kw_scalar_set_int( intehead_kw , 0 );
 
   ecl_kw_iset_int( intehead_kw , INTEHEAD_UNIT_INDEX    , INTEHEAD_METRIC_VALUE );
-  ecl_kw_iset_int( intehead_kw , INTEHEAD_NX_INDEX      , data.nx);
-  ecl_kw_iset_int( intehead_kw , INTEHEAD_NY_INDEX      , data.ny);
-  ecl_kw_iset_int( intehead_kw , INTEHEAD_NZ_INDEX      , data.nz);
-  ecl_kw_iset_int( intehead_kw , INTEHEAD_NACTIVE_INDEX , data.nactive);
-  ecl_kw_iset_int( intehead_kw , INTEHEAD_PHASE_INDEX   , data.phases );
+  ecl_kw_iset_int( intehead_kw , INTEHEAD_NX_INDEX      , rsthead->nx);
+  ecl_kw_iset_int( intehead_kw , INTEHEAD_NY_INDEX      , rsthead->ny);
+  ecl_kw_iset_int( intehead_kw , INTEHEAD_NZ_INDEX      , rsthead->nz);
+  ecl_kw_iset_int( intehead_kw , INTEHEAD_NACTIVE_INDEX , rsthead->nactive);
+  ecl_kw_iset_int( intehead_kw , INTEHEAD_PHASE_INDEX   , rsthead->phase_sum );
   
   /* All well properties are hardcoded to zero. */
   {
@@ -135,21 +136,20 @@ static ecl_kw_type * ecl_rst_file_alloc_INTEHEAD( ecl_rst_file_type * rst_file,
     int NSEGMX = 0;
     int NISEGZ = 0;
 
-    ecl_kw_iset_int( intehead_kw , INTEHEAD_NWELLS_INDEX  , data.numwells );
-    ecl_kw_iset_int( intehead_kw , INTEHEAD_NCWMAX_INDEX  , data.ncwmax );
+    ecl_kw_iset_int( intehead_kw , INTEHEAD_NWELLS_INDEX  , rsthead->nwells );
+    ecl_kw_iset_int( intehead_kw , INTEHEAD_NCWMAX_INDEX  , rsthead->ncwmax );
     ecl_kw_iset_int( intehead_kw , INTEHEAD_NWGMAX_INDEX  , NWGMAX );
     ecl_kw_iset_int( intehead_kw , INTEHEAD_NGMAXZ_INDEX  , NGMAXZ );
-    ecl_kw_iset_int( intehead_kw , INTEHEAD_NIWELZ_INDEX  , data.niwelz );
-    ecl_kw_iset_int( intehead_kw , INTEHEAD_NZWELZ_INDEX  , data.nzwelz );
-    ecl_kw_iset_int( intehead_kw , INTEHEAD_NICONZ_INDEX  , data.niconz );
+    ecl_kw_iset_int( intehead_kw , INTEHEAD_NIWELZ_INDEX  , rsthead->niwelz );
+    ecl_kw_iset_int( intehead_kw , INTEHEAD_NZWELZ_INDEX  , rsthead->nzwelz );
+    ecl_kw_iset_int( intehead_kw , INTEHEAD_NICONZ_INDEX  , rsthead->niconz );
     ecl_kw_iset_int( intehead_kw , INTEHEAD_NIGRPZ_INDEX  , NIGRPZ );
     
     {
-      int mday,month,year;
-      util_set_date_values( data.date , &mday , &month , &year );
-      ecl_kw_iset_int( intehead_kw , INTEHEAD_DAY_INDEX    , mday );
-      ecl_kw_iset_int( intehead_kw , INTEHEAD_MONTH_INDEX  , month );
-      ecl_kw_iset_int( intehead_kw , INTEHEAD_YEAR_INDEX   , year );
+      util_set_date_values( rsthead->sim_time , &rsthead->day , &rsthead->month , &rsthead->year );
+      ecl_kw_iset_int( intehead_kw , INTEHEAD_DAY_INDEX    , rsthead->day );
+      ecl_kw_iset_int( intehead_kw , INTEHEAD_MONTH_INDEX  , rsthead->month );
+      ecl_kw_iset_int( intehead_kw , INTEHEAD_YEAR_INDEX   , rsthead->year );
     }
     
     ecl_kw_iset_int( intehead_kw , INTEHEAD_IPROG_INDEX , simulator);   
@@ -196,13 +196,13 @@ static ecl_kw_type * ecl_rst_file_alloc_DOUBHEAD( ecl_rst_file_type * rst_file ,
 void ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file ,
                                  int seqnum ,
                                  double days,
-                                 intehead_data ih_data ) {
+                                 ecl_rsthead_type * rsthead_data ) {
 
   if (rst_file->unified)
     ecl_rst_file_fwrite_SEQNUM( rst_file , seqnum );
 
   {
-    ecl_kw_type * intehead_kw = ecl_rst_file_alloc_INTEHEAD( rst_file , ih_data , INTEHEAD_ECLIPSE100_VALUE);
+    ecl_kw_type * intehead_kw = ecl_rst_file_alloc_INTEHEAD( rst_file , rsthead_data , INTEHEAD_ECLIPSE100_VALUE);
     ecl_kw_fwrite( intehead_kw , rst_file->fortio );
     ecl_kw_free( intehead_kw );
   }

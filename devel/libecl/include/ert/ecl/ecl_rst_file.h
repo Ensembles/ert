@@ -20,6 +20,7 @@
 #ifndef __ECL_RST_FILE_H__
 #define __ECL_RST_FILE_H__
 
+#include <ert/ecl/ecl_rsthead.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,22 +28,6 @@ extern "C" {
 
 
 typedef struct ecl_rst_file_struct ecl_rst_file_type;
-
-typedef struct intehead_struct
-{
-  time_t date;
-  int nx;
-  int ny;
-  int nz;
-  int nactive;
-  int phases;
-  int numwells;
-  int niwelz;
-  int nzwelz;
-  int niconz;
-  int ncwmax;
-} intehead_data;
-
 
 
   ecl_rst_file_type * ecl_rst_file_open_read( const char * filename );
@@ -52,7 +37,7 @@ typedef struct intehead_struct
   
   void                ecl_rst_file_start_solution( ecl_rst_file_type * rst_file );
   void                ecl_rst_file_end_solution( ecl_rst_file_type * rst_file );
-  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum, double days, intehead_data data );
+  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum, double days, ecl_rsthead_type * rsthead_data );
   void                ecl_rst_file_add_kw(ecl_rst_file_type * rst_file , const ecl_kw_type * ecl_kw );
 
 
