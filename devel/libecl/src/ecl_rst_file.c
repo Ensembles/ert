@@ -195,7 +195,6 @@ static ecl_kw_type * ecl_rst_file_alloc_DOUBHEAD( ecl_rst_file_type * rst_file ,
 
 void ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file ,
                                  int seqnum ,
-                                 double days,
                                  ecl_rsthead_type * rsthead_data ) {
 
   if (rst_file->unified)
@@ -215,7 +214,7 @@ void ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file ,
 
 
   {
-    ecl_kw_type * doubhead_kw = ecl_rst_file_alloc_DOUBHEAD( rst_file , days );
+    ecl_kw_type * doubhead_kw = ecl_rst_file_alloc_DOUBHEAD( rst_file , rsthead_data->sim_days );
     ecl_kw_fwrite( doubhead_kw , rst_file->fortio );
     ecl_kw_free( doubhead_kw );
   }

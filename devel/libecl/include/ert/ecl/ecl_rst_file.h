@@ -37,7 +37,7 @@ typedef struct ecl_rst_file_struct ecl_rst_file_type;
   
   void                ecl_rst_file_start_solution( ecl_rst_file_type * rst_file );
   void                ecl_rst_file_end_solution( ecl_rst_file_type * rst_file );
-  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum, double days, ecl_rsthead_type * rsthead_data );
+  void                ecl_rst_file_fwrite_header( ecl_rst_file_type * rst_file , int seqnum, ecl_rsthead_type * rsthead_data );
   void                ecl_rst_file_add_kw(ecl_rst_file_type * rst_file , const ecl_kw_type * ecl_kw );
 
 
