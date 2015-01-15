@@ -20,28 +20,28 @@ class ExportMisfitDataJob(ErtScript):
 
         active_list = self.createActiveList(fs)
 
-        for realization_number in active_list:
-            runpath_node = runpath_list[realization_number]
+        for runpath_node in runpath_list:
+            if runpath_node.realization in active_list:
 
-            if not os.path.exists(runpath_node.runpath):
-                os.makedirs(runpath_node.runpath)
+                if not os.path.exists(runpath_node.runpath):
+                    os.makedirs(runpath_node.runpath)
 
-            target_path = os.path.join(runpath_node.runpath, target_file)
+                target_path = os.path.join(runpath_node.runpath, target_file)
 
-            parameters = self.parseTargetFile(target_path)
+                parameters = self.parseTargetFile(target_path)
 
-            misfit_sum = 0.0
-            for obs_vector in ert.getObservations():
-                misfit = obs_vector.getTotalChi2(fs, realization_number, EnkfStateType.FORECAST)
+                misfit_sum = 0.0
+                for obs_vector in ert.getObservations():
+                    misfit = obs_vector.getTotalChi2(fs, runpath_node.realization, EnkfStateType.FORECAST)
 
-                key = "MISFIT:%s" % obs_vector.getObservationKey()
-                parameters[key] = misfit
+                    key = "MISFIT:%s" % obs_vector.getObservationKey()
+                    parameters[key] = misfit
 
-                misfit_sum += misfit
+                    misfit_sum += misfit
 
-            parameters["MISFIT:TOTAL"] = misfit_sum
+                parameters["MISFIT:TOTAL"] = misfit_sum
 
-            self.dumpParametersToTargetFile(parameters, target_path)
+                self.dumpParametersToTargetFile(parameters, target_path)
 
 
 
