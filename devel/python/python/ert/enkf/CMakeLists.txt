@@ -24,6 +24,7 @@ set(PYTHON_SOURCES
     obs_data.py
     plot_config.py
     post_simulation_hook.py
+    runpath_list.py
     site_config.py
     state_map.py
     run_arg.py
@@ -38,3 +39,4 @@ add_subdirectory(observations)
 add_subdirectory(plot)
 add_subdirectory(plot_data)
 add_subdirectory(util)
+add_subdirectory(export)
