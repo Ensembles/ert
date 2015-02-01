@@ -52,6 +52,7 @@ from .local_config import LocalConfig
 from .model_config import ModelConfig
 from .plot_config import PlotConfig
 from .site_config import SiteConfig
+from .runpath_list import RunpathList, RunpathNode
 from .post_simulation_hook import PostSimulationHook
 
 from .enkf_simulation_runner import EnkfSimulationRunner
@@ -63,3 +64,4 @@ from .ert_log import ErtLog
 
 
 from ert.job_queue import ErtScript as ErtScript
+from ert.job_queue import ErtPlugin as ErtPlugin, CancelPluginException as CancelPluginException
