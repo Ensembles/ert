@@ -178,6 +178,15 @@ endif()
 
 add_python_package("python.tests" "${PYTHON_INSTALL_PREFIX}/test" "${TEST_SOURCES}" False)
 
+function (addPythonTest TEST_NAME TEST_CLASS)
+    add_test( NAME ${TEST_NAME}
+              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ${TEST_CLASS}
+            )
+
+
+endfunction(addPythonTest)
+
 # The test data is located in the current source directory; that is
 # the reason we set that as the working directory for the test
 # run. The module to import should then be in the default python
@@ -198,573 +207,197 @@ if (ERT_BUILD_GUI)
 endif()
 
 #TESTCASE
-
-add_test( NAME python.tests.ert.testcase.testcase
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.testcase.test_testcase.TestTestCase )
+addPythonTest(python.tests.ert.testcase.testcase ert_tests.testcase.test_testcase.TestTestCase)
 
 #UTIL
-
-add_test( NAME python.tests.ert.util.stringlist
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_string_list.StringListTest )
-          
-add_test( NAME python.tests.ert.util.ui_return
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_ui_return.UIReturnTest )
-
-add_test( NAME python.tests.ert.util.tvector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_vectors.UtilTest )
-
-add_test( NAME python.tests.ert.util.ctime
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_ctime.CTimeTest)
-
-
-add_test( NAME python.tests.ert.util.hash
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_hash.HashTest)
-
-add_test( NAME python.tests.ert.util.work_area
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_work_area.WorkAreaTest)
+addPythonTest(python.tests.ert.util.stringlist ert_tests.util.test_string_list.StringListTest)
+addPythonTest(python.tests.ert.util.ui_return ert_tests.util.test_ui_return.UIReturnTest)
+addPythonTest(python.tests.ert.util.tvector ert_tests.util.test_vectors.UtilTest)
+addPythonTest(python.tests.ert.util.ctime ert_tests.util.test_ctime.CTimeTest)
+addPythonTest(python.tests.ert.util.hash ert_tests.util.test_hash.HashTest)
+addPythonTest(python.tests.ert.util.work_area ert_tests.util.test_work_area.WorkAreaTest)
+addPythonTest(python.tests.ert.util.lookup_table ert_tests.util.test_lookup_table.LookupTableTest )
+addPythonTest(python.tests.ert.util.matrix ert_tests.util.test_matrix.MatrixTest )
+addPythonTest(python.tests.ert.util.stat ert_tests.util.test_stat.StatTest )
+addPythonTest(python.tests.ert.util.rng ert_tests.util.test_rng.RngTest )
 
 #add_test( NAME python.tests.ert.util.latex
 #          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 #          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_latex.LatexTest )
 
-add_test( NAME python.tests.ert.util.lookup_table
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_lookup_table.LookupTableTest )
-
-add_test( NAME python.tests.ert.util.matrix
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_matrix.MatrixTest )
-
-add_test( NAME python.tests.ert.util.stat
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_stat.StatTest )
-
-add_test( NAME python.tests.ert.util.rng
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.util.test_rng.RngTest )
-
 
 #ENKF
-add_test( NAME python.tests.ert.enkf.enkf
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf.EnKFTest)
-
-add_test( NAME python.tests.ert.enkf.enkf_obs
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_obs.EnKFObsTest)
-
-add_test( NAME python.tests.ert.enkf.meas_block
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_meas_block.MeasBlockTest)
-
-add_test( NAME python.tests.ert.enkf.meas_data
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_meas_data.MeasDataTest)
-
-add_test( NAME python.tests.ert.enkf.obs_data
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_obs_data.ObsDataTest)
-
-add_test( NAME python.tests.ert.enkf.obs_block
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_obs_block.ObsBlockTest)
-
-add_test( NAME python.tests.ert.enkf.enkf_load_results_manually
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_load_results_manually.LoadResultsManuallyTest)
-
-add_test( NAME python.tests.ert.enkf.enkf_fs
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_fs.EnKFFSTest)
-
-add_test( NAME python.tests.ert.enkf.ert_log
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_ert_log.ErtLogTest)
+addPythonTest(python.tests.ert.enkf.enkf ert_tests.enkf.test_enkf.EnKFTest)
+addPythonTest(python.tests.ert.enkf.enkf_obs ert_tests.enkf.test_enkf_obs.EnKFObsTest)
+addPythonTest(python.tests.ert.enkf.meas_block ert_tests.enkf.test_meas_block.MeasBlockTest)
+addPythonTest(python.tests.ert.enkf.meas_data ert_tests.enkf.test_meas_data.MeasDataTest)
+addPythonTest(python.tests.ert.enkf.obs_data ert_tests.enkf.test_obs_data.ObsDataTest)
+addPythonTest(python.tests.ert.enkf.obs_block ert_tests.enkf.test_obs_block.ObsBlockTest)
+addPythonTest(python.tests.ert.enkf.enkf_load_results_manually ert_tests.enkf.test_enkf_load_results_manually.LoadResultsManuallyTest)
+addPythonTest(python.tests.ert.enkf.enkf_fs ert_tests.enkf.test_enkf_fs.EnKFFSTest)
+addPythonTest(python.tests.ert.enkf.ert_log ert_tests.enkf.test_ert_log.ErtLogTest)
 
 
-add_test( NAME python.tests.ert.enkf.enkf_fs_manager1
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_fs_manager1.EnKFFSManagerTest1)
-
-add_test( NAME python.tests.ert.enkf.enkf_fs_manager2
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_fs_manager2.EnKFFSManagerTest2)
-
-add_test( NAME python.tests.ert.enkf.enkf_library
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_enkf_library.EnKFLibraryTest)
-
-add_test( NAME python.tests.ert.enkf.analysis_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_analysis_config.AnalysisConfigTest)
-
-add_test( NAME python.tests.ert.enkf.analysis_iter_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_analysis_iter_config.AnalysisIterConfigTest)
-
-add_test( NAME python.tests.ert.enkf.state_map
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_state_map.StateMapTest)
-
-add_test( NAME python.tests.ert.enkf.summary_key_set
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_summary_key_set.SummaryKeySetTest)
-
-add_test( NAME python.tests.ert.enkf.custom_kw_config_set
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_custom_kw_config_set.CustomKWConfigSetTest)
-
-add_test( NAME python.tests.ert.enkf.summary_key_matcher
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_summary_key_matcher.SummaryKeyMatcherTest)
-
-add_test( NAME python.tests.ert.enkf.time_map
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_time_map.TimeMapTest)
-
-add_test( NAME python.tests.ert.enkf.ecl_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_ecl_config.EclConfigTest)
-
-add_test( NAME python.tests.ert.enkf.plot.plot_block_data
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.plot.test_plot_data.PlotDataTest)
-
-add_test( NAME python.tests.ert.enkf.ert_test_context
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_ert_context.ErtTestContextTest)
-
-add_test( NAME python.tests.ert.enkf.run_arg
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_run_arg.RunArg)
-
-add_test( NAME python.tests.ert.enkf.runpath_list
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_runpath_list.RunpathListTest)
+addPythonTest(python.tests.ert.enkf.enkf_fs_manager1 ert_tests.enkf.test_enkf_fs_manager1.EnKFFSManagerTest1)
+addPythonTest(python.tests.ert.enkf.enkf_fs_manager2 ert_tests.enkf.test_enkf_fs_manager2.EnKFFSManagerTest2)
+addPythonTest(python.tests.ert.enkf.enkf_library ert_tests.enkf.test_enkf_library.EnKFLibraryTest)
+addPythonTest(python.tests.ert.enkf.analysis_config ert_tests.enkf.test_analysis_config.AnalysisConfigTest)
+addPythonTest(python.tests.ert.enkf.analysis_iter_config ert_tests.enkf.test_analysis_iter_config.AnalysisIterConfigTest)
+addPythonTest(python.tests.ert.enkf.state_map ert_tests.enkf.test_state_map.StateMapTest)
+addPythonTest(python.tests.ert.enkf.summary_key_set ert_tests.enkf.test_summary_key_set.SummaryKeySetTest)
+addPythonTest(python.tests.ert.enkf.custom_kw_config_set ert_tests.enkf.test_custom_kw_config_set.CustomKWConfigSetTest)
+addPythonTest(python.tests.ert.enkf.summary_key_matcher ert_tests.enkf.test_summary_key_matcher.SummaryKeyMatcherTest)
+addPythonTest(python.tests.ert.enkf.time_map ert_tests.enkf.test_time_map.TimeMapTest)
+addPythonTest(python.tests.ert.enkf.ecl_config ert_tests.enkf.test_ecl_config.EclConfigTest)
+addPythonTest(python.tests.ert.enkf.plot.plot_block_data ert_tests.enkf.plot.test_plot_data.PlotDataTest)
+addPythonTest(python.tests.ert.enkf.ert_test_context ert_tests.enkf.test_ert_context.ErtTestContextTest)
+addPythonTest(python.tests.ert.enkf.run_arg ert_tests.enkf.test_run_arg.RunArg)
+addPythonTest(python.tests.ert.enkf.runpath_list ert_tests.enkf.test_runpath_list.RunpathListTest)
 
 
 #enkf.data
-add_test( NAME python.tests.ert.enkf.data.custom_kw
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_custom_kw.CustomKWTest)
-
-add_test( NAME python.tests.ert.enkf.data.custom_kw_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_custom_kw_config.CustomKWConfigTest)
-
-
-add_test( NAME python.tests.ert.enkf.data.gen_data
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_gen_data.GenDataTest)
-
-add_test( NAME python.tests.ert.enkf.data.gen_data_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_gen_data_config.GenDataConfigTest)
-
-add_test( NAME python.tests.ert.enkf.data.gen_kw
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_gen_kw.GenKwTest)
-
-add_test( NAME python.tests.ert.enkf.data.gen_kw_config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.data.test_gen_kw_config.GenKwConfigTest)
+addPythonTest(python.tests.ert.enkf.data.custom_kw ert_tests.enkf.data.test_custom_kw.CustomKWTest)
+addPythonTest(python.tests.ert.enkf.data.custom_kw_config ert_tests.enkf.data.test_custom_kw_config.CustomKWConfigTest)
+addPythonTest(python.tests.ert.enkf.data.gen_data ert_tests.enkf.data.test_gen_data.GenDataTest)
+addPythonTest(python.tests.ert.enkf.data.gen_data_config ert_tests.enkf.data.test_gen_data_config.GenDataConfigTest)
+addPythonTest(python.tests.ert.enkf.data.gen_kw ert_tests.enkf.data.test_gen_kw.GenKwTest)
+addPythonTest(python.tests.ert.enkf.data.gen_kw_config ert_tests.enkf.data.test_gen_kw_config.GenKwConfigTest)
 
 
 #enkf.export
-add_test( NAME python.tests.ert.enkf.export.numpy_and_pandas
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_numpy_and_pandas.NumpyAndPandasTest)
-
-add_test( NAME python.tests.ert.enkf.export.design_matrix
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_design_matrix.DesignMatrixTest)
-
-add_test( NAME python.tests.ert.enkf.export.export_join
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_export_join.ExportJoinTest)
-
-add_test( NAME python.tests.ert.enkf.export.gen_kw_collector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_gen_kw_collector.GenKwCollectorTest)
-
-add_test( NAME python.tests.ert.enkf.export.gen_data_collector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_gen_data_collector.GenDataCollectorTest)
-
-add_test( NAME python.tests.ert.enkf.export.arg_loader
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_arg_loader.ArgLoaderTest)
-
-add_test( NAME python.tests.ert.enkf.export.misfit_collector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_misfit_collector.MisfitCollectorTest)
-
-add_test( NAME python.tests.ert.enkf.export.summary_collector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_summary_collector.SummaryCollectorTest)
-
-add_test( NAME python.tests.ert.enkf.export.summary_observation_collector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.export.test_summary_observation_collector.SummaryObservationCollectorTest)
-
-
-add_test( NAME python.tests.ert.enkf.update
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_update.UpdateTest)
+addPythonTest(python.tests.ert.enkf.export.numpy_and_pandas ert_tests.enkf.export.test_numpy_and_pandas.NumpyAndPandasTest)
+addPythonTest(python.tests.ert.enkf.export.design_matrix ert_tests.enkf.export.test_design_matrix.DesignMatrixTest)
+addPythonTest(python.tests.ert.enkf.export.export_join ert_tests.enkf.export.test_export_join.ExportJoinTest)
+addPythonTest(python.tests.ert.enkf.export.gen_kw_collector ert_tests.enkf.export.test_gen_kw_collector.GenKwCollectorTest)
+addPythonTest(python.tests.ert.enkf.export.gen_data_collector ert_tests.enkf.export.test_gen_data_collector.GenDataCollectorTest)
+addPythonTest(python.tests.ert.enkf.export.arg_loader ert_tests.enkf.export.test_arg_loader.ArgLoaderTest)
+addPythonTest(python.tests.ert.enkf.export.misfit_collector ert_tests.enkf.export.test_misfit_collector.MisfitCollectorTest)
+addPythonTest(python.tests.ert.enkf.export.summary_collector ert_tests.enkf.export.test_summary_collector.SummaryCollectorTest)
+addPythonTest(python.tests.ert.enkf.export.summary_observation_collector ert_tests.enkf.export.test_summary_observation_collector.SummaryObservationCollectorTest)
+addPythonTest(python.tests.ert.enkf.update ert_tests.enkf.test_update.UpdateTest)
 
 
 
 #GUI
 if (ERT_BUILD_GUI) 
-   add_test( NAME python.tests.ert_gui.models
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.test_model.ModelTest)
-
-   add_test( NAME python.tests.ert_gui.models.observable
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.test_observable.ObservableTest)
-
-   add_test( NAME python.tests.ert_gui.plot.plot_metrics_tracker
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.plot.test_plot_metrics_tracker.PlotMetricTrackerTest)
-
-   add_test( NAME python.tests.ert_gui.ide.bool_argument
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_bool_argument.BoolArgumentTest)
-
-   add_test( NAME python.tests.ert_gui.ide.integer_argument
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_integer_argument.IntegerArgumentTest)
-
-    add_test( NAME python.tests.ert_gui.ide.float_argument
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_float_argument.FloatArgumentTest)
-
-    add_test( NAME python.tests.ert_gui.ide.path_argument
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_path_argument.PathArgumentTest)
-
-    add_test( NAME python.tests.ert_gui.ide.proper_name_argument
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_proper_name_argument.ProperNameArgumentTest)
-
-   add_test( NAME python.tests.ert_gui.ide.proper_name_format_argument
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_proper_name_format_argument.ProperNameFormatArgumentTest)
-
-   add_test( NAME python.tests.ert_gui.ide.proper_name_format_string_argument
-             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-             COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_proper_name_format_string_argument.ProperNameFormatStringArgumentTest)
-
-    add_test( NAME python.tests.ert_gui.ide.range_string_argument
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_range_string_argument.RangeStringArgumentTest)
-
-
-    add_test( NAME python.tests.ert_gui.ide.test_configuration_line
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_configuration_line.ConfigurationLineTest)
-
-    add_test( NAME python.tests.ert_gui.ide.test_configuration_line_builder
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_configuration_line_builder.ConfigurationLineBuilderTest)
-
-    add_test( NAME python.tests.ert_gui.ide.test_configuration_line_definition
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_configuration_line_definition.ConfigurationLineDefinitionTest)
-
-    add_test( NAME python.tests.ert_gui.ide.test_configuration_line_parser
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_configuration_line_parser.ConfigurationLineParserTest)
-
-
-
-    add_test( NAME python.tests.ert_gui.ide.ert_keywords
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_ert_keywords.ErtKeywordTest)
-
-    add_test( NAME python.tests.ert_gui.ide.tokens
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.test_tokens.TokenTest)
-
-    add_test( NAME python.tests.ert_gui.ide.wizards.tree_structure
-              WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-              COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.gui.ide.wizards.test_tree_structure.TreeStructureTest)
-
+   addPythonTest(python.tests.ert_gui.models ert_tests.gui.test_model.ModelTest)
+   addPythonTest(python.tests.ert_gui.models.observable ert_tests.gui.test_observable.ObservableTest)
+   addPythonTest(python.tests.ert_gui.plot.plot_metrics_tracker ert_tests.gui.plot.test_plot_metrics_tracker.PlotMetricTrackerTest)
+   addPythonTest(python.tests.ert_gui.ide.bool_argument ert_tests.gui.ide.test_bool_argument.BoolArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.integer_argument ert_tests.gui.ide.test_integer_argument.IntegerArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.float_argument ert_tests.gui.ide.test_float_argument.FloatArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.path_argument ert_tests.gui.ide.test_path_argument.PathArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.proper_name_argument ert_tests.gui.ide.test_proper_name_argument.ProperNameArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.proper_name_format_argument ert_tests.gui.ide.test_proper_name_format_argument.ProperNameFormatArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.proper_name_format_string_argument ert_tests.gui.ide.test_proper_name_format_string_argument.ProperNameFormatStringArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.range_string_argument ert_tests.gui.ide.test_range_string_argument.RangeStringArgumentTest)
+   addPythonTest(python.tests.ert_gui.ide.test_configuration_line ert_tests.gui.ide.test_configuration_line.ConfigurationLineTest)
+   addPythonTest(python.tests.ert_gui.ide.test_configuration_line_builder ert_tests.gui.ide.test_configuration_line_builder.ConfigurationLineBuilderTest)
+   addPythonTest(python.tests.ert_gui.ide.test_configuration_line_definition ert_tests.gui.ide.test_configuration_line_definition.ConfigurationLineDefinitionTest)
+   addPythonTest(python.tests.ert_gui.ide.test_configuration_line_parser ert_tests.gui.ide.test_configuration_line_parser.ConfigurationLineParserTest)
+   addPythonTest(python.tests.ert_gui.ide.ert_keywords ert_tests.gui.ide.test_ert_keywords.ErtKeywordTest)
+   addPythonTest(python.tests.ert_gui.ide.tokens ert_tests.gui.ide.test_tokens.TokenTest)
+   addPythonTest(python.tests.ert_gui.ide.wizards.tree_structure ert_tests.gui.ide.wizards.test_tree_structure.TreeStructureTest)
 endif()
 
 #ECL
 
 
-add_test( NAME python.tests.ert.ecl.ecl_default
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_default.EclDefaultTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_file
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_file.EclFileTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_queue_LOCAL
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_submit.LocalSubmitTest  )
+addPythonTest(python.tests.ert.ecl.ecl_default ert_tests.ecl.test_ecl_default.EclDefaultTest )
+addPythonTest(python.tests.ert.ecl.ecl_file ert_tests.ecl.test_ecl_file.EclFileTest)
+addPythonTest(python.tests.ert.ecl.ecl_queue_LOCAL ert_tests.ecl.test_ecl_submit.LocalSubmitTest  )
 
 if (NOT ${NFS_RUNPATH} STREQUAL "")
    if (ERT_LSF_SUBMIT_TEST)
-      add_test( NAME python.tests.ert.ecl.ecl_queue_LSF
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_submit.LSFSubmitTest ${NFS_RUNPATH} )
-
+      addPythonTest(python.tests.ert.ecl.ecl_queue_LSF ert_tests.ecl.test_ecl_submit.LSFSubmitTest ${NFS_RUNPATH} )
       set_property( TEST python.tests.ert.ecl.ecl_queue_LSF     PROPERTY LABELS Python:StatoilData:Slow )
    endif()
 
    if (NOT ${RSH_SERVERS} STREQUAL "")
-      add_test( NAME python.tests.ert.ecl.ecl_queue_RSH
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_submit.RSHSubmitTest ${NFS_RUNPATH} ${RSH_SERVERS})
+      addPythonTest(python.tests.ert.ecl.ecl_queue_RSH ert_tests.ecl.test_ecl_submit.RSHSubmitTest ${NFS_RUNPATH} ${RSH_SERVERS})
       set_property( TEST python.tests.ert.ecl.ecl_queue_RSH     PROPERTY LABELS Python:StatoilData:Slow )
    endif()
 endif()
 
 
-add_test( NAME python.tests.ert.ecl.fortio
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_fortio.FortIOTest)
-
-
-add_test( NAME python.tests.ert.ecl.ecl_grdecl
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_grdecl.GRDECLTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_grid_statoil
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_grid_statoil.GridTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_grid
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_grid.GridTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_kw
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_kw.KWTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_3dkw
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_3dkw.Ecl3DKWTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_init_file
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_init_file.InitFileTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_restart_file
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_restart_file.RestartFileTest )
-
-add_test( NAME python.tests.ert.ecl.legacy_ecl
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_legacy_ecl.LegacyEclTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_restart
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_restart.RestartTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_region
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_region.RegionTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_rft
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_rft.RFTTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_rft_cell
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_rft_cell.RFTCellTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_sum
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_sum.SumTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_sum_vector
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_sum_vector.EclSumVectorTest)
-
-add_test( NAME python.tests.ert.ecl.ecl_sum_time_range
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_ecl_sum.EclSumTest)
-
-add_test( NAME python.tests.ert.ecl.layer
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_layer.LayerTest )
-
-add_test( NAME python.tests.ert.ecl.faults
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_faults.FaultTest )
-
-add_test( NAME python.tests.ert.ecl.fault_blocks
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_fault_blocks.FaultBlockTest )
-
-add_test( NAME python.tests.ert.ecl.region_definition_statoil
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_region_definition_statoil.RegionDefinitionTest )
-
-add_test( NAME python.tests.ert.ecl.region_definition
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_region_definition.RegionDefinitionTest )
-
-add_test( NAME python.tests.ert.ecl.fault_blocks_statoil
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_fault_blocks_statoil.FaultBlockTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_npv
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_npv.NPVTest)
-
-add_test( NAME python.tests.ert.ecl.statoil_faults
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_statoil_faults.StatoilFaultTest )
-
-add_test( NAME python.tests.ert.ecl.ecl_deprecation
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_deprecation.DeprecationTest )
-
-add_test( NAME python.tests.ert.ecl.indexed_read
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.ecl.test_indexed_read.EclIndexedReadTest )
+addPythonTest(python.tests.ert.ecl.fortio ert_tests.ecl.test_fortio.FortIOTest)
+addPythonTest(python.tests.ert.ecl.ecl_grdecl ert_tests.ecl.test_grdecl.GRDECLTest )
+addPythonTest(python.tests.ert.ecl.ecl_grid_statoil ert_tests.ecl.test_grid_statoil.GridTest )
+addPythonTest(python.tests.ert.ecl.ecl_grid ert_tests.ecl.test_grid.GridTest )
+addPythonTest(python.tests.ert.ecl.ecl_kw ert_tests.ecl.test_kw.KWTest )
+addPythonTest(python.tests.ert.ecl.ecl_3dkw ert_tests.ecl.test_ecl_3dkw.Ecl3DKWTest )
+addPythonTest(python.tests.ert.ecl.ecl_init_file ert_tests.ecl.test_ecl_init_file.InitFileTest )
+addPythonTest(python.tests.ert.ecl.ecl_restart_file ert_tests.ecl.test_ecl_restart_file.RestartFileTest )
+addPythonTest(python.tests.ert.ecl.legacy_ecl ert_tests.ecl.test_legacy_ecl.LegacyEclTest)
+addPythonTest(python.tests.ert.ecl.ecl_restart ert_tests.ecl.test_restart.RestartTest)
+addPythonTest(python.tests.ert.ecl.ecl_region ert_tests.ecl.test_region.RegionTest)
+addPythonTest(python.tests.ert.ecl.ecl_rft ert_tests.ecl.test_rft.RFTTest)
+addPythonTest(python.tests.ert.ecl.ecl_rft_cell ert_tests.ecl.test_rft_cell.RFTCellTest)
+addPythonTest(python.tests.ert.ecl.ecl_sum ert_tests.ecl.test_sum.SumTest)
+addPythonTest(python.tests.ert.ecl.ecl_sum_vector ert_tests.ecl.test_ecl_sum_vector.EclSumVectorTest)
+addPythonTest(python.tests.ert.ecl.ecl_sum_time_range ert_tests.ecl.test_ecl_sum.EclSumTest)
+addPythonTest(python.tests.ert.ecl.layer ert_tests.ecl.test_layer.LayerTest )
+addPythonTest(python.tests.ert.ecl.faults ert_tests.ecl.test_faults.FaultTest )
+addPythonTest(python.tests.ert.ecl.fault_blocks ert_tests.ecl.test_fault_blocks.FaultBlockTest )
+addPythonTest(python.tests.ert.ecl.region_definition_statoil ert_tests.ecl.test_region_definition_statoil.RegionDefinitionTest )
+addPythonTest(python.tests.ert.ecl.region_definition ert_tests.ecl.test_region_definition.RegionDefinitionTest )
+addPythonTest(python.tests.ert.ecl.fault_blocks_statoil ert_tests.ecl.test_fault_blocks_statoil.FaultBlockTest )
+addPythonTest(python.tests.ert.ecl.ecl_npv ert_tests.ecl.test_npv.NPVTest)
+addPythonTest(python.tests.ert.ecl.statoil_faults ert_tests.ecl.test_statoil_faults.StatoilFaultTest )
+addPythonTest(python.tests.ert.ecl.ecl_deprecation ert_tests.ecl.test_deprecation.DeprecationTest )
+addPythonTest(python.tests.ert.ecl.indexed_read ert_tests.ecl.test_indexed_read.EclIndexedReadTest )
 
 #SCHED
-add_test( NAME python.tests.ert.sched.sched
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.sched.test_sched.SchedFileTest)
+addPythonTest(python.tests.ert.sched.sched ert_tests.sched.test_sched.SchedFileTest)
 
 #JOB QUEUE
-add_test( NAME python.tests.ert.job_queue.job_status_type_enum
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_job_queue.JobQueueTest)
-
-add_test( NAME python.tests.ert.job_queue.workflow_job
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_workflow_job.WorkflowJobTest)
-
-add_test( NAME python.tests.ert.job_queue.workflow
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_workflow.WorkflowTest)
-
-add_test( NAME python.tests.ert.job_queue.workflow_joblist
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_workflow_joblist.WorkflowJoblistTest)
-
-add_test( NAME python.tests.ert.job_queue.ert_plugin
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_ert_plugin.ErtPluginTest)
-
-add_test( NAME python.tests.ert.job_queue.ert_script
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_ert_script.ErtScriptTest)
-
-add_test( NAME python.tests.ert.job_queue.function_ert_script
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_function_ert_script.FunctionErtScriptTest)
-
-add_test( NAME python.tests.ert.job_queue.workflow_runner
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.job_queue.test_workflow_runner.WorkflowRunnerTest)
-
+addPythonTest(python.tests.ert.job_queue.job_status_type_enum ert_tests.job_queue.test_job_queue.JobQueueTest)
+addPythonTest(python.tests.ert.job_queue.workflow_job ert_tests.job_queue.test_workflow_job.WorkflowJobTest)
+addPythonTest(python.tests.ert.job_queue.workflow ert_tests.job_queue.test_workflow.WorkflowTest)
+addPythonTest(python.tests.ert.job_queue.workflow_joblist ert_tests.job_queue.test_workflow_joblist.WorkflowJoblistTest)
+addPythonTest(python.tests.ert.job_queue.ert_plugin ert_tests.job_queue.test_ert_plugin.ErtPluginTest)
+addPythonTest(python.tests.ert.job_queue.ert_script ert_tests.job_queue.test_ert_script.ErtScriptTest)
+addPythonTest(python.tests.ert.job_queue.function_ert_script ert_tests.job_queue.test_function_ert_script.FunctionErtScriptTest)
+addPythonTest(python.tests.ert.job_queue.workflow_runner ert_tests.job_queue.test_workflow_runner.WorkflowRunnerTest)
 
 
 #CONFIG
-add_test( NAME python.tests.ert.config
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.config.test_config.ConfigTest)
+addPythonTest(python.tests.ert.config ert_tests.config.test_config.ConfigTest)
 
 
 #CWRAP
-add_test( NAME python.tests.ert.cwrap
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.cwrap.test_cwrap.CWRapTest)
-
-add_test( NAME python.tests.ert.cwrap.basecclass
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.cwrap.test_basecclass.BaseCClassTest)
-
-add_test( NAME python.tests.ert.cwrap.basecenum
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.cwrap.test_basecenum.BaseCEnumTest)
-
-add_test( NAME python.tests.ert.cwrap.basecvalue
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.cwrap.test_basecvalue.BaseCValueTest)
+addPythonTest(python.tests.ert.cwrap ert_tests.cwrap.test_cwrap.CWRapTest)
+addPythonTest(python.tests.ert.cwrap.basecclass ert_tests.cwrap.test_basecclass.BaseCClassTest)
+addPythonTest(python.tests.ert.cwrap.basecenum ert_tests.cwrap.test_basecenum.BaseCEnumTest)
+addPythonTest(python.tests.ert.cwrap.basecvalue ert_tests.cwrap.test_basecvalue.BaseCValueTest)
 
 
 #TESTRUN
-add_test( NAME python.tests.ert.test_run
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.run.test_run.RunTest )
+addPythonTest(python.tests.ert.test_run ert_tests.run.test_run.RunTest )
 
 #ANALYSIS
-add_test( NAME python.tests.ert.analysis.enums
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.analysis.test_options_enum.AnalysisOptionsEnumTest)
-
-add_test( NAME python.tests.ert.analysis.analysis_module
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.analysis.test_analysis_module.AnalysisModuleTest)
-
-add_test( NAME python.tests.ert.analysis.rml
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.analysis.test_rml.RMLTest)
+addPythonTest(python.tests.ert.analysis.enums ert_tests.analysis.test_options_enum.AnalysisOptionsEnumTest)
+addPythonTest(python.tests.ert.analysis.analysis_module ert_tests.analysis.test_analysis_module.AnalysisModuleTest)
+addPythonTest(python.tests.ert.analysis.rml ert_tests.analysis.test_rml.RMLTest)
 
 
 
 #GEOMETRY
-
-add_test( NAME python.tests.ert.geometry.polyline
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.geometry.test_polyline.PolylineTest)
-
-add_test( NAME python.tests.ert.geometry.intersection
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.geometry.test_intersection.IntersectionTest)
-
-add_test( NAME python.tests.ert.geometry.convex_hull
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.geometry.test_convex_hull.ConvexHullTest)
-
-add_test( NAME python.tests.ert.geometry.point_in_polygon
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.geometry.test_point_in_polygon.PointInPolygonTest)
-
-add_test( NAME python.tests.ert.geometry.polygon_slicing
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.geometry.test_polygon_slicing.PolygonSlicingTest)
+addPythonTest(python.tests.ert.geometry.polyline ert_tests.geometry.test_polyline.PolylineTest)
+addPythonTest(python.tests.ert.geometry.intersection ert_tests.geometry.test_intersection.IntersectionTest)
+addPythonTest(python.tests.ert.geometry.convex_hull ert_tests.geometry.test_convex_hull.ConvexHullTest)
+addPythonTest(python.tests.ert.geometry.point_in_polygon ert_tests.geometry.test_point_in_polygon.PointInPolygonTest)
+addPythonTest(python.tests.ert.geometry.polygon_slicing ert_tests.geometry.test_polygon_slicing.PolygonSlicingTest)
 
 
 #SERVER
-
-add_test( NAME python.tests.ert.server.socket
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.server.test_socket.SocketTest)
-
-add_test( NAME python.tests.ert.server.server
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.server.test_server.ServerTest)
+addPythonTest(python.tests.ert.server.socket ert_tests.server.test_socket.SocketTest)
+addPythonTest(python.tests.ert.server.server ert_tests.server.test_server.ServerTest)
 
 
 # ECL_WELL
-add_test( NAME python.tests.ert.well.ecl_well
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.well.test_ecl_well.EclWellTest)
-
-
-add_test( NAME python.tests.ert.well.ecl_well2
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.well.test_ecl_well2.EclWellTest2)
+addPythonTest(python.tests.ert.well.ecl_well ert_tests.well.test_ecl_well.EclWellTest)
+addPythonTest(python.tests.ert.well.ecl_well2 ert_tests.well.test_ecl_well2.EclWellTest2)
 
 
 set_property( TEST python.tests.ert.sched.sched           PROPERTY LABELS Python:StatoilData )
