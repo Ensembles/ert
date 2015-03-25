@@ -83,8 +83,8 @@ class CustomKWTest(ExtendedTestCase):
 
     def test_simulated_custom_kw(self):
         config = self.createTestPath("local/custom_kw/mini_config")
-        site_config = os.environ.get("ERT_SITE_CONFIG", None)
-        with ErtTestContext("python/enkf/data/custom_kw_simulated", config, site_config) as context:
+        site_config = os.getenv("ERT_SITE_CONFIG")
+        with ErtTestContext("python/enkf/data/custom_kw_simulated", config, site_config=site_config) as context:
             ert = context.getErt()
 
             ensemble_config = ert.ensembleConfig()
