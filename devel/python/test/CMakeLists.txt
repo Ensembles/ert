@@ -43,6 +43,7 @@ set(TEST_SOURCES
     ert_tests/ecl/test_indexed_read.py
 
     ert_tests/enkf/__init__.py
+    ert_tests/enkf/test_labscale.py
     ert_tests/enkf/test_ert_context.py
     ert_tests/enkf/test_enkf.py
     ert_tests/enkf/test_enkf_fs.py
@@ -332,6 +333,10 @@ add_test( NAME python.tests.ert.enkf.plot.plot_block_data
 add_test( NAME python.tests.ert.enkf.ert_test_context
           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
           COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_ert_context.ErtTestContextTest)
+
+add_test( NAME python.tests.ert.enkf.labscale
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+          COMMAND ctest_run.py ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX} ert_tests.enkf.test_labscale.LabScaleTest)
 
 add_test( NAME python.tests.ert.enkf.run_arg
           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -792,6 +797,7 @@ set_property( TEST python.tests.ert.enkf.ert_test_context     PROPERTY LABELS Py
 set_property( TEST python.tests.ert.enkf.plot.plot_block_data PROPERTY LABELS Python:StatoilData )
 set_property( TEST python.tests.ert.enkf.data.gen_data_config PROPERTY LABELS Python:StatoilData )
 set_property( TEST python.tests.ert.enkf.data.gen_data        PROPERTY LABELS Python:StatoilData )
+set_property( TEST python.tests.ert.enkf.labscale             PROPERTY LABELS Python:StatoilData )
 set_property( TEST python.tests.ert.enkf.update               PROPERTY LABELS Python:StatoilData )
 set_property( TEST python.tests.ert.enkf.summary_key_set      PROPERTY LABELS Python:StatoilData )
 set_property( TEST python.tests.ert.enkf.data.gen_kw_config   PROPERTY LABELS Python:StatoilData )
