@@ -43,6 +43,7 @@ set(TEST_SOURCES
     ert_tests/ecl/test_indexed_read.py
 
     ert_tests/enkf/__init__.py
+    ert_tests/enkf/test_labscale.py
     ert_tests/enkf/test_custom_kw_config_set.py
     ert_tests/enkf/test_ert_context.py
     ert_tests/enkf/test_enkf.py
