@@ -65,11 +65,11 @@ struct local_ministep_struct {
 UTIL_SAFE_CAST_FUNCTION(local_ministep , LOCAL_MINISTEP_TYPE_ID)
 UTIL_IS_INSTANCE_FUNCTION(local_ministep , LOCAL_MINISTEP_TYPE_ID)
 
-local_ministep_type * local_ministep_alloc(const char * name , local_obsdata_type * observations) {
+local_ministep_type * local_ministep_alloc(const char * name) {
   local_ministep_type * ministep = util_malloc( sizeof * ministep );
 
   ministep->name         = util_alloc_string_copy( name );
-  ministep->observations = observations;
+  ministep->observations = NULL;
   ministep->datasets     = hash_alloc();
   UTIL_TYPE_ID_INIT( ministep , LOCAL_MINISTEP_TYPE_ID);
 
@@ -135,6 +135,10 @@ void local_ministep_add_dataset( local_ministep_type * ministep , const local_da
   hash_insert_ref( ministep->datasets , local_dataset_get_name( dataset ) , dataset );
 }
 
+void local_ministep_add_obsdata( local_ministep_type * ministep , local_obsdata_type * obsdata) {
+  //hash_insert_ref( ministep->observations , local_obsdata_get_name( obsdata ) , obsdata );
+  ministep->observations = obsdata;
+}
 
 
 local_dataset_type * local_ministep_get_dataset( const local_ministep_type * ministep, const char * dataset_name) {

@@ -2182,7 +2182,7 @@ void enkf_main_create_all_active_config( const enkf_main_type * enkf_main ,
 
   fprintf(stream , "%-32s %s\n", local_config_get_cmd_string( CREATE_UPDATESTEP ) , update_step_name);
   fprintf(stream , "%-32s %s \n", local_config_get_cmd_string( CREATE_OBSSET ) , obsset_name);
-  fprintf(stream , "%-32s %s %s \n", local_config_get_cmd_string( CREATE_MINISTEP ) , ministep_name , obsset_name);
+  fprintf(stream , "%-32s %s \n", local_config_get_cmd_string( CREATE_MINISTEP ) , ministep_name);
   fprintf(stream , "%-32s %s %s \n" , local_config_get_cmd_string( ATTACH_MINISTEP ), update_step_name , ministep_name);
 
   fprintf(stream , "%-32s %s \n", local_config_get_cmd_string( CREATE_DATASET ) , dataset_name);
