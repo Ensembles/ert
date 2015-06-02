@@ -60,11 +60,10 @@ ministep to the updatestep, otherwise it will not be able to do
 anything.
 
 
-CREATE_MINISTEP [NAME_OF_MINISTEP  OBSSET_NAME]
+CREATE_MINISTEP [NAME_OF_MINISTEP]
 -----------------------------------------------
 This function will create a new ministep with the name
-'NAME_OF_MINISTEP'. The ministep will be based on the observation
-set given by OBSSET_NAME (which must be created first).The ministep
+'NAME_OF_MINISTEP'. A given OBSSET can be attached to a given ministep.The ministep
 is then ready for adding data. Before the ministep can be used you
 must attach it to an updatestep with the ATTACH_MINISTEP command
 
@@ -594,9 +593,8 @@ local_updatestep_type * local_config_alloc_updatestep( local_config_type * local
 }
 
 
-local_ministep_type * local_config_alloc_ministep( local_config_type * local_config , const char * key , const char * obsset_name) {
-  local_obsdata_type * obsdata = hash_get( local_config->obsdata_storage , obsset_name );
-  local_ministep_type * ministep = local_ministep_alloc( key , obsdata );
+local_ministep_type * local_config_alloc_ministep( local_config_type * local_config , const char * key) {
+  local_ministep_type * ministep = local_ministep_alloc( key );
   hash_insert_hash_owned_ref( local_config->ministep_storage , key , ministep , local_ministep_free__);
   return ministep;
 }
@@ -738,6 +736,9 @@ const char * local_config_get_cmd_string( local_config_instruction_type cmd ) {
     break;
   case(CREATE_OBSSET):
     return CREATE_OBSSET_STRING;
+    break;
+  case(ATTACH_OBSSET):
+    return ATTACH_OBSSET_STRING;
     break;
   case(ADD_DATA):
     return ADD_DATA_STRING;
@@ -947,6 +948,7 @@ static void local_config_init_cmd_table( hash_type * cmd_table ) {
   hash_insert_int(cmd_table , CREATE_OBSSET_STRING                   , CREATE_OBSSET);
   hash_insert_int(cmd_table , ADD_DATA_STRING                        , ADD_DATA);
   hash_insert_int(cmd_table , ADD_OBS_STRING                         , ADD_OBS );
+  hash_insert_int(cmd_table , ATTACH_OBSSET_STRING                   , ATTACH_OBSSET);
   hash_insert_int(cmd_table , ACTIVE_LIST_ADD_OBS_INDEX_STRING       , ACTIVE_LIST_ADD_OBS_INDEX);
   hash_insert_int(cmd_table , ACTIVE_LIST_ADD_DATA_INDEX_STRING      , ACTIVE_LIST_ADD_DATA_INDEX);
   hash_insert_int(cmd_table , ACTIVE_LIST_ADD_MANY_OBS_INDEX_STRING  , ACTIVE_LIST_ADD_MANY_OBS_INDEX);
@@ -990,10 +992,8 @@ static void local_config_CREATE_UPDATESTEP( local_config_type * config , local_c
 
 static void local_config_CREATE_MINISTEP( local_config_type * config , local_context_type * context , FILE * stream , bool binary) {
   char * mini_name = read_alloc_string( stream , binary );
-  char * obs_name  = read_alloc_string( stream , binary );
-  local_config_alloc_ministep( config , mini_name , obs_name );
+  local_config_alloc_ministep( config , mini_name );
   free( mini_name );
-  free( obs_name );
 }
 
 
@@ -1052,6 +1052,18 @@ static void local_config_ATTACH_DATASET( local_config_type * config , local_cont
   }
   free( mini_name );
   free( dataset_name );
+}
+
+static void local_config_ATTACH_OBSSET( local_config_type * config , local_context_type * context , FILE * stream , bool binary) {
+  char * mini_name = read_alloc_string( stream , binary );
+  char * obsset_name = read_alloc_string( stream , binary );
+  {
+    local_ministep_type * ministep = local_config_get_ministep( config , mini_name );
+    local_obsdata_type * obsdata = hash_get( config->obsdata_storage , obsset_name );
+    local_ministep_add_obsdata(ministep, obsdata);
+  }
+  free( mini_name );
+  free( obsset_name );
 }
 
 static void local_config_ADD_DATA( local_config_type * config , local_context_type * context , FILE * stream , bool binary) {
@@ -1605,6 +1617,9 @@ static void local_config_load_file( local_config_type * local_config ,
       break;
     case(ATTACH_DATASET):
       local_config_ATTACH_DATASET( local_config , context , stream , binary );
+      break;
+    case(ATTACH_OBSSET):
+      local_config_ATTACH_OBSSET( local_config , context , stream , binary );
       break;
     case(ADD_DATA):
       local_config_ADD_DATA( local_config , context , stream , binary );
