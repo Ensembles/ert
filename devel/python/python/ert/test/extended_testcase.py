@@ -10,6 +10,10 @@ except ImportError:
 
 from .source_enumerator import SourceEnumerator
 from ert.util import installAbortSignals
+from ert.util import Version
+
+
+
 
 """
 This class provides some extra functionality for testing values that are almost equal.
@@ -176,6 +180,7 @@ class ExtendedTestCase(TestCase):
             self.fail()
 
 
+            
     @staticmethod
     def slowTestShouldNotRun():
         """
@@ -183,3 +188,15 @@ class ExtendedTestCase(TestCase):
         """
 
         return os.environ.get("SKIP_SLOW_TESTS", "False") == "True"
+
+
+    @staticmethod
+    def requireVersion(major , minor , micro = "git"):
+        required_version = Version(major, minor , micro)
+        current_version = Version.currentVersion()
+
+        if required_version < current_version:
+            return True
+        else:
+            return False
+    
