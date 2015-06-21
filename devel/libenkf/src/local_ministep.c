@@ -28,6 +28,7 @@
 #include <ert/enkf/local_ministep.h>
 #include <ert/enkf/local_dataset.h>
 #include <ert/enkf/local_obsdata.h>
+#include <ert/enkf/local_obsdata_node.h>
 
 /**
    This file implements a 'ministep' configuration for active /
@@ -136,8 +137,12 @@ void local_ministep_add_dataset( local_ministep_type * ministep , const local_da
 }
 
 void local_ministep_add_obsdata( local_ministep_type * ministep , local_obsdata_type * obsdata) {
-  //hash_insert_ref( ministep->observations , local_obsdata_get_name( obsdata ) , obsdata );
   ministep->observations = obsdata;
+}
+
+void local_ministep_add_obsdata_node( local_ministep_type * ministep , local_obsdata_node_type * obsdatanode) {
+  local_obsdata_type * obsdata = local_ministep_get_obsdata(ministep);
+  local_obsdata_add_node(obsdata, obsdatanode);
 }
 
 
@@ -149,12 +154,9 @@ local_obsdata_type * local_ministep_get_obsdata( const local_ministep_type * min
   return ministep->observations;
 }
 
-
-
 const char * local_ministep_get_name( const local_ministep_type * ministep ) {
   return ministep->name;
 }
-
 
 /*****************************************************************/
 
