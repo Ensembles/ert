@@ -47,6 +47,7 @@ from .data import *
 from .local_obsdata_node import LocalObsdataNode
 from .local_obsdata import LocalObsdata
 from .local_ministep import LocalMinistep
+from .local_updatestep import LocalUpdateStep
 from .observations import *
 
 from .obs_block import ObsBlock

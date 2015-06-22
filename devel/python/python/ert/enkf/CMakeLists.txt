@@ -22,6 +22,7 @@ set(PYTHON_SOURCES
     local_obsdata.py
     local_obsdata_node.py
     local_ministep.py
+    local_updatestep.py
     meas_block.py
     meas_data.py
     model_config.py

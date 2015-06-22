@@ -32,6 +32,9 @@ class LocalConfig(BaseCClass):
 
     def add_config_file(self, filename):
         LocalConfig.cNamespace().add_config_file(self, filename)
+        
+    def write_local_config_file(self, filename):
+        LocalConfig.cNamespace().write_local_config_file(self, filename)
 
     def free(self):
         LocalConfig.cNamespace().free(self)
@@ -42,8 +45,13 @@ cwrapper.registerType("local_config", LocalConfig)
 cwrapper.registerType("local_config_obj", LocalConfig.createPythonObject)
 cwrapper.registerType("local_config_ref", LocalConfig.createCReference)
 
-LocalConfig.cNamespace().free = cwrapper.prototype("void local_config_free( local_config )")
-LocalConfig.cNamespace().get_config_files = cwrapper.prototype("stringlist_ref local_config_get_config_files( local_config )")
-LocalConfig.cNamespace().clear_config_files = cwrapper.prototype("void local_config_clear_config_files( local_config )")
-LocalConfig.cNamespace().add_config_file = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
+LocalConfig.cNamespace().free                    = cwrapper.prototype("void local_config_free( local_config )")
+LocalConfig.cNamespace().get_config_files        = cwrapper.prototype("stringlist_ref local_config_get_config_files( local_config )")
+LocalConfig.cNamespace().clear_config_files      = cwrapper.prototype("void local_config_clear_config_files( local_config )")
+LocalConfig.cNamespace().add_config_file         = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
+LocalConfig.cNamespace().write_local_config_file = cwrapper.prototype("void local_config_fprintf( local_config, char*)")
+
+
+
+
 
