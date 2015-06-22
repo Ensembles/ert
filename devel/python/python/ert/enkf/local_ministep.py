@@ -27,8 +27,8 @@ class LocalMinistep(BaseCClass):
 
 cwrapper = CWrapper(ENKF_LIB)
 cwrapper.registerType("local_ministep", LocalMinistep)
-cwrapper.registerType("local_ministep_obj", LocalObsdata.createPythonObject)
-cwrapper.registerType("local_ministep_ref", LocalObsdata.createCReference)
+cwrapper.registerType("local_ministep_obj", LocalMinistep.createPythonObject)
+cwrapper.registerType("local_ministep_ref", LocalMinistep.createCReference)
 
 LocalMinistep.cNamespace().alloc               = cwrapper.prototype("c_void_p local_ministep_alloc(char*)")
 LocalMinistep.cNamespace().add_node            = cwrapper.prototype("void local_ministep_add_obsdata_node(local_ministep,local_obsdata_node)")
