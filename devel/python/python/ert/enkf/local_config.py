@@ -14,7 +14,7 @@
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html> 
 #  for more details.
 from ert.cwrap import BaseCClass, CWrapper
-from ert.enkf import ENKF_LIB
+from ert.enkf import ENKF_LIB, LocalUpdateStep
 
 from ert.util import StringList
 
@@ -23,19 +23,27 @@ class LocalConfig(BaseCClass):
     def __init__(self):
         raise NotImplementedError("Class can not be instantiated directly!")
 
-    def get_config_files(self):
+    def getConfigFiles(self):
         """ @rtype: StringList """
         return LocalConfig.cNamespace().get_config_files(self).setParent(self)
 
-    def clear_config_files(self):
+    def clearConfigFiles(self):
         LocalConfig.cNamespace().clear_config_files(self)
 
-    def add_config_file(self, filename):
+    def addConfigFile(self, filename):
         LocalConfig.cNamespace().add_config_file(self, filename)
         
-    def write_local_config_file(self, filename):
+    def writeLocalConfigFile(self, filename):
         LocalConfig.cNamespace().write_local_config_file(self, filename)
-
+            
+    def createUpdateStep(self, update_step):
+        assert isinstance(update_step, LocalUpdateStep)
+        LocalConfig.cNamespace().create_updatestep(self, update_step.getName())   
+                
+    def installUpdateStep(self, update_step, step1, step2):
+        assert isinstance(update_step, LocalUpdateStep)
+        LocalConfig.cNamespace().set_updatestep(self, step1, step2, update_step.getName())        
+        
     def free(self):
         LocalConfig.cNamespace().free(self)
 
@@ -50,6 +58,10 @@ LocalConfig.cNamespace().get_config_files        = cwrapper.prototype("stringlis
 LocalConfig.cNamespace().clear_config_files      = cwrapper.prototype("void local_config_clear_config_files( local_config )")
 LocalConfig.cNamespace().add_config_file         = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
 LocalConfig.cNamespace().write_local_config_file = cwrapper.prototype("void local_config_fprintf( local_config, char*)")
+LocalConfig.cNamespace().set_updatestep          = cwrapper.prototype("void local_config_set_updatestep( local_config, int, int, char*)")
+LocalConfig.cNamespace().create_updatestep       = cwrapper.prototype("void local_config_alloc_updatestep( local_config, char*)")
+
+
 
 
 
