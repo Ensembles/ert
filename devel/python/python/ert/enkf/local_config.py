@@ -24,6 +24,9 @@ class LocalConfig(BaseCClass):
     
     def __init__(self):
         raise NotImplementedError("Class can not be instantiated directly!")
+        
+    def free(self):
+        LocalConfig.cNamespace().free(self)
 
     def getConfigFiles(self):
         """ @rtype: StringList """
@@ -37,12 +40,13 @@ class LocalConfig(BaseCClass):
         
     def writeLocalConfigFile(self, filename):
         LocalConfig.cNamespace().write_local_config_file(self, filename)
-             
- #=============================================================================
            
     def createUpdatestep(self, update_step_key):
         LocalConfig.cNamespace().create_updatestep(self, update_step_key)  
         return LocalConfig.cNamespace().get_updatestep(self, update_step_key)  
+    
+    def getUpdatestep(self, update_step_key):
+        return LocalConfig.cNamespace().get_updatestep(self, update_step_key) 
                 
     def installUpdatestep(self, update_step, step1, step2):
         assert isinstance(update_step, LocalUpdateStep)
@@ -57,11 +61,7 @@ class LocalConfig(BaseCClass):
         assert isinstance(update_step, LocalUpdateStep)
         LocalConfig.cNamespace().attach_ministep(update_step, mini_step)           
         
-    def alloc(self):
-        LocalConfig.cNamespace().alloc(self)
-        
-    def free(self):
-        LocalConfig.cNamespace().free(self)
+
 
 
 cwrapper = CWrapper(ENKF_LIB)
@@ -74,7 +74,6 @@ LocalConfig.cNamespace().get_config_files        = cwrapper.prototype("stringlis
 LocalConfig.cNamespace().clear_config_files      = cwrapper.prototype("void local_config_clear_config_files( local_config )")
 LocalConfig.cNamespace().add_config_file         = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
 LocalConfig.cNamespace().write_local_config_file = cwrapper.prototype("void local_config_fprintf( local_config, char*)")
-LocalConfig.cNamespace().alloc                   = cwrapper.prototype("void local_config_alloc( local_config )")
 
 LocalConfig.cNamespace().get_updatestep          = cwrapper.prototype("local_updatestep_ref local_config_get_updatestep( local_config, char*)")
 LocalConfig.cNamespace().create_updatestep       = cwrapper.prototype("void local_config_alloc_updatestep( local_config, char*)")
