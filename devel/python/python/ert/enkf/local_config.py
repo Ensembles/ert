@@ -57,6 +57,9 @@ class LocalConfig(BaseCClass):
         assert isinstance(update_step, LocalUpdateStep)
         LocalConfig.cNamespace().attach_ministep(update_step, mini_step)           
         
+    def alloc(self):
+        LocalConfig.cNamespace().alloc(self)
+        
     def free(self):
         LocalConfig.cNamespace().free(self)
 
@@ -71,6 +74,7 @@ LocalConfig.cNamespace().get_config_files        = cwrapper.prototype("stringlis
 LocalConfig.cNamespace().clear_config_files      = cwrapper.prototype("void local_config_clear_config_files( local_config )")
 LocalConfig.cNamespace().add_config_file         = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
 LocalConfig.cNamespace().write_local_config_file = cwrapper.prototype("void local_config_fprintf( local_config, char*)")
+LocalConfig.cNamespace().alloc                   = cwrapper.prototype("void local_config_alloc( local_config )")
 
 LocalConfig.cNamespace().get_updatestep          = cwrapper.prototype("local_updatestep_ref local_config_get_updatestep( local_config, char*)")
 LocalConfig.cNamespace().create_updatestep       = cwrapper.prototype("void local_config_alloc_updatestep( local_config, char*)")
