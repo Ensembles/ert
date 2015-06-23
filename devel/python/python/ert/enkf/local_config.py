@@ -17,9 +17,11 @@ from ert.cwrap import BaseCClass, CWrapper
 from ert.enkf import ENKF_LIB, LocalUpdateStep
 
 from ert.util import StringList
+from ert.enkf.local_ministep import LocalMinistep
 
 
 class LocalConfig(BaseCClass):
+    
     def __init__(self):
         raise NotImplementedError("Class can not be instantiated directly!")
 
@@ -35,14 +37,25 @@ class LocalConfig(BaseCClass):
         
     def writeLocalConfigFile(self, filename):
         LocalConfig.cNamespace().write_local_config_file(self, filename)
-            
-    def createUpdateStep(self, update_step):
-        assert isinstance(update_step, LocalUpdateStep)
-        LocalConfig.cNamespace().create_updatestep(self, update_step.getName())   
+             
+ #=============================================================================
+           
+    def createUpdatestep(self, update_step_key):
+        LocalConfig.cNamespace().create_updatestep(self, update_step_key)  
+        return LocalConfig.cNamespace().get_updatestep(self, update_step_key)  
                 
-    def installUpdateStep(self, update_step, step1, step2):
+    def installUpdatestep(self, update_step, step1, step2):
         assert isinstance(update_step, LocalUpdateStep)
-        LocalConfig.cNamespace().set_updatestep(self, step1, step2, update_step.getName())        
+        LocalConfig.cNamespace().set_updatestep(self, step1, step2, update_step.getName())     
+                
+    def createMinistep(self, mini_step_key):
+        LocalConfig.cNamespace().create_ministep(self, mini_step_key)         
+        return LocalConfig.cNamespace().get_ministep(self, mini_step_key)  
+        
+    def attachMinistep(self, update_step, mini_step):
+        assert isinstance(mini_step, LocalMinistep)
+        assert isinstance(update_step, LocalUpdateStep)
+        LocalConfig.cNamespace().attach_ministep(update_step, mini_step)           
         
     def free(self):
         LocalConfig.cNamespace().free(self)
@@ -58,8 +71,18 @@ LocalConfig.cNamespace().get_config_files        = cwrapper.prototype("stringlis
 LocalConfig.cNamespace().clear_config_files      = cwrapper.prototype("void local_config_clear_config_files( local_config )")
 LocalConfig.cNamespace().add_config_file         = cwrapper.prototype("void local_config_add_config_file( local_config , char*)")
 LocalConfig.cNamespace().write_local_config_file = cwrapper.prototype("void local_config_fprintf( local_config, char*)")
-LocalConfig.cNamespace().set_updatestep          = cwrapper.prototype("void local_config_set_updatestep( local_config, int, int, char*)")
+
+LocalConfig.cNamespace().get_updatestep          = cwrapper.prototype("local_updatestep_ref local_config_get_updatestep( local_config, char*)")
 LocalConfig.cNamespace().create_updatestep       = cwrapper.prototype("void local_config_alloc_updatestep( local_config, char*)")
+LocalConfig.cNamespace().set_updatestep          = cwrapper.prototype("void local_config_set_updatestep( local_config, int, int, char*)")
+
+LocalConfig.cNamespace().get_ministep            = cwrapper.prototype("local_ministep_ref local_config_get_ministep( local_config, char*)")
+LocalConfig.cNamespace().create_ministep         = cwrapper.prototype("void local_config_alloc_ministep( local_config, char*)")
+LocalConfig.cNamespace().attach_ministep         = cwrapper.prototype("void local_updatestep_add_ministep( local_updatestep, local_ministep)")
+
+
+
+
 
 
 
