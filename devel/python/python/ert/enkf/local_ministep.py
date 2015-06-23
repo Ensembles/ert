@@ -19,7 +19,11 @@ class LocalMinistep(BaseCClass):
         
         
     def getLocalObsData(self):
-        return LocalMinistep.cNamespace().get_local_obs_data(self) 
+        return LocalMinistep.cNamespace().get_local_obs_data(self)
+    
+    def getName(self):
+        """ @rtype: str """
+        return LocalMinistep.cNamespace().name(self) 
         
         
     def free(self):
@@ -35,6 +39,6 @@ LocalMinistep.cNamespace().add_node            = cwrapper.prototype("void local_
 LocalMinistep.cNamespace().get_local_obs_data  = cwrapper.prototype("local_obsdata_ref local_ministep_get_obsdata(local_ministep)")
 LocalMinistep.cNamespace().free                = cwrapper.prototype("void local_ministep_free(local_ministep)")
 LocalMinistep.cNamespace().attach_obsset       = cwrapper.prototype("void local_ministep_add_obsdata(local_ministep,local_obsdata)")
-
+LocalMinistep.cNamespace().name                = cwrapper.prototype("char* local_ministep_get_name(local_ministep)")
 
 
