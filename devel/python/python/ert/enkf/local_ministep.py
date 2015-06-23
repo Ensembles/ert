@@ -16,7 +16,10 @@ class LocalMinistep(BaseCClass):
     def attachObsset(self, obs_set):
         assert isinstance(obs_set, LocalObsdata)
         LocalMinistep.cNamespace().attach_obsset(self,obs_set)
-        
+     
+#     def createObsData(self, obs_data_key):
+#         LocalMinistep.cNamespace().create_updatestep(self, obs_data_key)  
+#         return LocalMinistep.cNamespace().get_updatestep(self, obs_data_key)     
         
     def getLocalObsData(self):
         return LocalMinistep.cNamespace().get_local_obs_data(self)
