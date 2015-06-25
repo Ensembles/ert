@@ -168,13 +168,19 @@ hash_iter_type * local_ministep_alloc_dataset_iter( const local_ministep_type * 
 void local_ministep_fprintf( const local_ministep_type * ministep , FILE * stream ) {
   fprintf(stream , "%s %s\n", local_config_get_cmd_string( CREATE_MINISTEP ), ministep->name);
   {
-    hash_iter_type * dataset_iter = hash_iter_alloc( ministep->datasets );
-    while (!hash_iter_is_complete( dataset_iter )) {
-      const char * dataset_key          = hash_iter_get_next_key( dataset_iter );
 
-      fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ATTACH_DATASET ) , ministep->name , dataset_key );
+  /* Dumping all the dataset instances. */
+    {
+     hash_iter_type * dataset_iter = hash_iter_alloc( ministep->datasets );
+     while (!hash_iter_is_complete( dataset_iter )) {
+       const local_dataset_type * dataset = hash_iter_get_next_value( dataset_iter );
+       local_dataset_fprintf( dataset , stream );
+       fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ATTACH_DATASET ) , ministep->name , local_dataset_get_name( dataset ) );
+     }
+     hash_iter_free( dataset_iter );
     }
-    hash_iter_free( dataset_iter );
+
+
 
     local_obsdata_type * obsdata = local_ministep_get_obsdata(ministep);
     fprintf(stream , "%s %s\n", local_config_get_cmd_string( CREATE_OBSSET ) , local_obsdata_get_name(obsdata));
@@ -186,6 +192,8 @@ void local_ministep_fprintf( const local_ministep_type * ministep , FILE * strea
 
      fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ADD_OBS ) , local_obsdata_get_name(obsdata) , obs_key );
     }
+
+    fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ATTACH_OBSSET ) , ministep->name, local_obsdata_get_name(obsdata));
 
   }
 }

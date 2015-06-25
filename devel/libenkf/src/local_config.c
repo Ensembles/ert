@@ -1756,17 +1756,6 @@ void local_config_fprintf( const local_config_type * local_config , const char *
     hash_iter_free( hash_iter );
   }
 
-  /* Dumping all the dataset instances. */
-  {
-    hash_iter_type * hash_iter = hash_iter_alloc( local_config->dataset_storage );
-
-    while (!hash_iter_is_complete( hash_iter )) {
-      const local_dataset_type * dataset = hash_iter_get_next_value( hash_iter );
-      local_dataset_fprintf( dataset , stream );
-    }
-
-    hash_iter_free( hash_iter );
-  }
 
   /* Dumping all the reportstep instances as ATTACH_MINISTEP commands. */
   {
