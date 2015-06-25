@@ -70,7 +70,7 @@ local_ministep_type * local_ministep_alloc(const char * name) {
   local_ministep_type * ministep = util_malloc( sizeof * ministep );
 
   ministep->name         = util_alloc_string_copy( name );
-  ministep->observations = local_obsdata_alloc("ALL_OBS");
+  ministep->observations = NULL; //local_obsdata_alloc("ALL_OBS");
   ministep->datasets     = hash_alloc();
   UTIL_TYPE_ID_INIT( ministep , LOCAL_MINISTEP_TYPE_ID);
 
