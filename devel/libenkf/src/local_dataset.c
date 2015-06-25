@@ -122,7 +122,7 @@ void local_dataset_fprintf( const local_dataset_type * dataset , FILE * stream) 
     active_list_type * active_list = hash_get( dataset->nodes , data_key );
 
     fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ADD_DATA ) , dataset->name , data_key );
-    active_list_fprintf( active_list , false , data_key , stream );
+    active_list_fprintf( active_list , local_dataset_get_name(dataset) , data_key , stream );
   }
   hash_iter_free( data_iter );
  }

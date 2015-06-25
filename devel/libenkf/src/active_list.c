@@ -207,10 +207,10 @@ bool active_list_iget( const active_list_type * active_list , int index ) {
 
 /*****************************************************************/
 
-void active_list_fprintf( const active_list_type * active_list , bool obs , const char *key , FILE * stream ) {
+void active_list_fprintf( const active_list_type * active_list , const char *dataset_key, const char *key , FILE * stream ) {
   if (active_list->mode == PARTLY_ACTIVE) {
     int i;
-    fprintf(stream , "%s  %s  %d" , local_config_get_cmd_string( ACTIVE_LIST_ADD_MANY_OBS_INDEX ) , key , int_vector_size( active_list->index_list ));
+    fprintf(stream , "%s  %s  %s " , local_config_get_cmd_string( ACTIVE_LIST_ADD_DATA_INDEX ) , dataset_key, key);
 
     for (i = 0; i < int_vector_size( active_list->index_list ); i++) {
       fprintf(stream , "  %6d " , int_vector_iget( active_list->index_list , i));
