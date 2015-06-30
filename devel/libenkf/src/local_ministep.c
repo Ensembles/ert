@@ -140,11 +140,11 @@ void local_ministep_add_obsdata( local_ministep_type * ministep , local_obsdata_
   if (ministep->observations == NULL)
     ministep->observations = obsdata;
   else { // Add nodes from input observations to existing observations
-    local_obsdata_type * existing_obsdata = local_ministep_get_obsdata(ministep);
     int iobs;
     for (iobs = 0; iobs < local_obsdata_get_size( obsdata ); iobs++) {
       local_obsdata_node_type * obs_node = local_obsdata_iget( obsdata , iobs );
-      local_ministep_add_obsdata_node(ministep, obs_node);
+      local_obsdata_node_type * new_node = local_obsdata_node_alloc_copy(obs_node);
+      local_ministep_add_obsdata_node(ministep, new_node);
     }
   }
 }
