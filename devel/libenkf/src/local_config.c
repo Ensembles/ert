@@ -606,7 +606,6 @@ local_obsdata_type * local_config_alloc_obsset( local_config_type * local_config
 }
 
 
-
 local_dataset_type * local_config_alloc_dataset( local_config_type * local_config , const char * key ) {
   local_dataset_type * dataset = local_dataset_alloc( key );
   hash_insert_hash_owned_ref( local_config->dataset_storage , key , dataset , local_dataset_free__);
