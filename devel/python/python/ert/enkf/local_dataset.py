@@ -1,5 +1,5 @@
 from ert.cwrap import BaseCClass, CWrapper
-from ert.enkf import ENKF_LIB
+from ert.enkf import ENKF_LIB, ActiveList
 
 
 class LocalDataset(BaseCClass):
@@ -15,6 +15,14 @@ class LocalDataset(BaseCClass):
 
     def addNode(self, key):
         return LocalDataset.cNamespace().add_node(self, key)
+
+    def addNodeWithIndex(self, key, index):
+        assert isinstance(key, str)
+        assert isinstance(index, int)
+        
+        LocalDataset.cNamespace().add_node(self, key)              
+        active_list = self.getActiveList(key)
+        active_list.addActiveIndex(index)
     
     def free(self):
         LocalDataset.cNamespace().free(self)
