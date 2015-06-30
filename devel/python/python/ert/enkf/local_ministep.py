@@ -4,10 +4,7 @@ from ert.enkf import ENKF_LIB, LocalObsdata, LocalObsdataNode, LocalDataset
 class LocalMinistep(BaseCClass):
 
     def __init__(self, ministep_key):
-        assert isinstance(ministep_key, str)
-
-        c_pointer = LocalMinistep.cNamespace().alloc(ministep_key)
-        super(LocalMinistep, self).__init__(c_pointer)
+        raise NotImplementedError("Class can not be instantiated directly!")
    
     def addNode(self, node):
         assert isinstance(node, LocalObsdataNode)

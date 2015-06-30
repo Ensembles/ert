@@ -5,10 +5,7 @@ from ert.enkf import ENKF_LIB
 class LocalDataset(BaseCClass):
 
     def __init__(self, name):
-        assert isinstance(name, str)
-
-        c_pointer = LocalDataset.cNamespace().alloc(name)
-        super(LocalDataset, self).__init__(c_pointer)
+        raise NotImplementedError("Class can not be instantiated directly!")
                  
     def getName(self):
         return LocalDataset.cNamespace().name(self)

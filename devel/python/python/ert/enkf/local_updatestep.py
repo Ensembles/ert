@@ -4,10 +4,7 @@ from ert.enkf import ENKF_LIB, LocalMinistep
 class LocalUpdateStep(BaseCClass):
 
     def __init__(self, updatestep_key):
-        assert isinstance(updatestep_key, str)
-
-        c_pointer = LocalUpdateStep.cNamespace().alloc(updatestep_key)
-        super(LocalUpdateStep, self).__init__(c_pointer)
+        raise NotImplementedError("Class can not be instantiated directly!")
           
     def attachMinistep(self, ministep):
         assert isinstance(ministep, LocalMinistep)

@@ -14,7 +14,7 @@
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html> 
 #  for more details.
 from ert.cwrap import BaseCClass, CWrapper
-from ert.enkf import ENKF_LIB, LocalUpdateStep
+from ert.enkf import ENKF_LIB, LocalUpdateStep, LocalObsdata, LocalDataset
 
 from ert.util import StringList
 from ert.enkf.local_ministep import LocalMinistep
@@ -44,25 +44,28 @@ class LocalConfig(BaseCClass):
     def createUpdatestep(self, update_step_key):
         LocalConfig.cNamespace().create_updatestep(self, update_step_key)  
         return LocalConfig.cNamespace().get_updatestep(self, update_step_key)  
-    
-    def getUpdatestep(self, update_step_key):
-        return LocalConfig.cNamespace().get_updatestep(self, update_step_key) 
-                
-    def installUpdatestep(self, update_step, step1, step2):
-        assert isinstance(update_step, LocalUpdateStep)
-        LocalConfig.cNamespace().set_updatestep(self, step1, step2, update_step.getName())     
-                
+                 
     def createMinistep(self, mini_step_key):
         LocalConfig.cNamespace().create_ministep(self, mini_step_key)         
         return LocalConfig.cNamespace().get_ministep(self, mini_step_key)  
+    
+    def createObsdata(self, obsset_key):
+        LocalConfig.cNamespace().create_obsdata(self, obsset_key)  
+        return LocalConfig.cNamespace().get_obsdata(self, obsset_key)    
+    
+    def createDataset(self, dataset_key):
+        LocalConfig.cNamespace().create_dataset(self, dataset_key)  
+        return LocalConfig.cNamespace().get_dataset(self, dataset_key)
+    
+    def installUpdatestep(self, update_step, step1, step2):
+        assert isinstance(update_step, LocalUpdateStep)
+        LocalConfig.cNamespace().set_updatestep(self, step1, step2, update_step.getName())       
         
     def attachMinistep(self, update_step, mini_step):
         assert isinstance(mini_step, LocalMinistep)
         assert isinstance(update_step, LocalUpdateStep)
         LocalConfig.cNamespace().attach_ministep(update_step, mini_step)           
         
-
-
 
 cwrapper = CWrapper(ENKF_LIB)
 cwrapper.registerType("local_config", LocalConfig)
@@ -83,11 +86,11 @@ LocalConfig.cNamespace().get_ministep            = cwrapper.prototype("local_min
 LocalConfig.cNamespace().create_ministep         = cwrapper.prototype("void local_config_alloc_ministep( local_config, char*)")
 LocalConfig.cNamespace().attach_ministep         = cwrapper.prototype("void local_updatestep_add_ministep( local_updatestep, local_ministep)")
 
+LocalConfig.cNamespace().get_obsdata             = cwrapper.prototype("local_obsdata_ref local_config_get_obsdata( local_config, char*)")
+LocalConfig.cNamespace().create_obsdata          = cwrapper.prototype("void local_config_alloc_obsset( local_config, char*)")
 
-
-
-
-
+LocalConfig.cNamespace().get_dataset             = cwrapper.prototype("local_dataset_ref local_config_get_dataset( local_config, char*)")
+LocalConfig.cNamespace().create_dataset          = cwrapper.prototype("void local_config_alloc_dataset( local_config, char*)")
 
 
 

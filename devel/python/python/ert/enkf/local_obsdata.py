@@ -5,10 +5,7 @@ from ert.enkf import ENKF_LIB, LocalObsdataNode
 class LocalObsdata(BaseCClass):
 
     def __init__(self, name):
-        assert isinstance(name, str)
-
-        c_pointer = LocalObsdata.cNamespace().alloc(name)
-        super(LocalObsdata, self).__init__(c_pointer)
+        raise NotImplementedError("Class can not be instantiated directly!")
 
     def __len__(self):
        """ @rtype: int """
