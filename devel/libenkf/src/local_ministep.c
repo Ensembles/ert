@@ -137,7 +137,16 @@ void local_ministep_add_dataset( local_ministep_type * ministep , const local_da
 }
 
 void local_ministep_add_obsdata( local_ministep_type * ministep , local_obsdata_type * obsdata) {
-  ministep->observations = obsdata;
+  if (ministep->observations == NULL)
+    ministep->observations = obsdata;
+  else { // Add nodes from input observations to existing observations
+    local_obsdata_type * existing_obsdata = local_ministep_get_obsdata(ministep);
+    int iobs;
+    for (iobs = 0; iobs < local_obsdata_get_size( obsdata ); iobs++) {
+      local_obsdata_node_type * obs_node = local_obsdata_iget( obsdata , iobs );
+      local_ministep_add_obsdata_node(ministep, obs_node);
+    }
+  }
 }
 
 void local_ministep_add_obsdata_node( local_ministep_type * ministep , local_obsdata_node_type * obsdatanode) {
@@ -166,7 +175,7 @@ hash_iter_type * local_ministep_alloc_dataset_iter( const local_ministep_type * 
 
 
 void local_ministep_fprintf( const local_ministep_type * ministep , FILE * stream ) {
-  fprintf(stream , "%s %s\n", local_config_get_cmd_string( CREATE_MINISTEP ), ministep->name);
+  fprintf(stream , "\n%s %s\n", local_config_get_cmd_string( CREATE_MINISTEP ), ministep->name);
   {
 
   /* Dumping all the dataset instances. */
@@ -180,18 +189,8 @@ void local_ministep_fprintf( const local_ministep_type * ministep , FILE * strea
      hash_iter_free( dataset_iter );
     }
 
-
-
     local_obsdata_type * obsdata = local_ministep_get_obsdata(ministep);
-    fprintf(stream , "%s %s\n", local_config_get_cmd_string( CREATE_OBSSET ) , local_obsdata_get_name(obsdata));
-
-    int i;
-    for (i=0; i < local_obsdata_get_size( obsdata ); i++ ) {
-     local_obsdata_node_type * node = local_obsdata_iget( obsdata  , i );
-     const char * obs_key =  local_obsdata_node_get_key(node);
-
-     fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ADD_OBS ) , local_obsdata_get_name(obsdata) , obs_key );
-    }
+    local_obsdata_fprintf(obsdata, stream);
 
     fprintf(stream , "%s %s %s\n", local_config_get_cmd_string( ATTACH_OBSSET ) , ministep->name, local_obsdata_get_name(obsdata));
 

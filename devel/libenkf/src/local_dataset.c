@@ -114,7 +114,7 @@ stringlist_type * local_dataset_alloc_keys( const local_dataset_type * dataset )
 
 
 void local_dataset_fprintf( const local_dataset_type * dataset , FILE * stream) {
-  fprintf(stream , "%s %s\n", local_config_get_cmd_string( CREATE_DATASET ), local_dataset_get_name(dataset));
+  fprintf(stream , "\n%s %s\n", local_config_get_cmd_string( CREATE_DATASET ), local_dataset_get_name(dataset));
  {
   hash_iter_type * data_iter = hash_iter_alloc( dataset->nodes );
   while (!hash_iter_is_complete( data_iter )) {
