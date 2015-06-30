@@ -48,6 +48,18 @@ class LocalObsdata(BaseCClass):
         node.convertToCReference(self)
         already_exists_node_for_key = LocalObsdata.cNamespace().add_node(self, node)
         return already_exists_node_for_key
+    
+    def addNodeAndRange(self, key, step_1, step_2):
+        """ @rtype: bool """
+        assert isinstance(key, str)
+        assert isinstance(step_1, int)
+        assert isinstance(step_2, int)
+        
+        node = LocalObsdataNode(key)  
+        node.addRange(step_1, step_2)      
+        node.convertToCReference(self)
+        already_exists_node_for_key = LocalObsdata.cNamespace().add_node(self, node)
+        return already_exists_node_for_key
 
     def getName(self):
         """ @rtype: str """
