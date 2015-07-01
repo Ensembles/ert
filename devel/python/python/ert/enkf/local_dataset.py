@@ -1,5 +1,5 @@
 from ert.cwrap import BaseCClass, CWrapper
-from ert.enkf import ENKF_LIB, ActiveList
+from ert.enkf import ENKF_LIB
 
 
 class LocalDataset(BaseCClass):
