@@ -5,8 +5,7 @@ from ert.test import TestAreaContext
 from ert.enkf.enkf_main import EnKFMain
 
 class LocalConfigTest(ExtendedTestCase):
-
-       
+    
     def setUp(self):
         self.case_directory = self.createTestPath("local/simple_config/")
 
@@ -18,7 +17,7 @@ class LocalConfigTest(ExtendedTestCase):
             self.assertTrue(main, "Load failed")           
             local_config = main.local_config()        
             
-            # Update step
+        # Update step
         updatestep_ts_000_001 = local_config.createUpdatestep("UPDATESTEP-TS_000-001")
         
         # Ministep                                      
@@ -32,7 +31,7 @@ class LocalConfigTest(ExtendedTestCase):
         data_flt_2 = local_config.createDataset("DATA_FLT_2")
         data_flt_2.addNodeWithIndex("FAULT_TRANSLATE_REL", 1)
                 
-         # ObsData
+        # ObsData
         local_obs_data_1 = local_config.createObsdata("OBS_FLT_1-TS_000-001")                                            
         local_obs_data_1.addNodeAndRange("WBHP:PRO-1", 0, 1)
         local_obs_data_1.addNodeAndRange("WGOR:PRO-1", 0, 1)
