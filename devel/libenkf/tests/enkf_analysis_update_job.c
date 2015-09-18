@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <ert/util/util.h>
 #include <ert/util/test_util.h>
 #include <ert/util/test_work_area.h>
 #include <ert/util/ui_return.h>
@@ -89,6 +90,7 @@ int main(int argc , char ** argv) {
   const char * config_file = argv[1];
   const char * job_file = argv[2];
 
+  util_install_signals();
   test_update_default( config_file , job_file);
   test_update_new_case( config_file , job_file );
   test_update_new_case_step( config_file , job_file );
