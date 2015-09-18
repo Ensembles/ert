@@ -528,6 +528,9 @@ struct local_config_struct {
   hash_type             * dataset_storage;
   hash_type             * obsdata_storage;
   stringlist_type       * config_files;
+
+  const ensemble_config_type * ensemble_config;
+  const enkf_obs_type        * obs;
 };
 
 
@@ -542,8 +545,17 @@ static void local_config_clear( local_config_type * local_config ) {
 
 
 
+const enkf_obs_type * local_config_get_obs( const local_config_type * local_config ) {
+  return local_config->obs;
+}
 
-local_config_type * local_config_alloc( ) {
+
+const ensemble_config_type * local_config_get_ensemble_config( const local_config_type * local_config ) {
+  return local_config->ensemble_config;
+}
+
+
+local_config_type * local_config_alloc( const ensemble_config_type * ensemble_config , const enkf_obs_type * enkf_obs) {
   local_config_type * local_config = util_malloc( sizeof * local_config );
 
   local_config->default_updatestep  = NULL;
@@ -553,6 +565,8 @@ local_config_type * local_config_alloc( ) {
   local_config->obsdata_storage      = hash_alloc();
   local_config->updatestep          = vector_alloc_new();
   local_config->config_files = stringlist_alloc_new();
+  local_config->ensemble_config = ensemble_config;
+  local_config->obs = enkf_obs;
 
   local_config_clear( local_config );
   return local_config;
@@ -1572,15 +1586,8 @@ static void local_config_ADD_DATA_SURFACE( local_config_type * config , local_co
   free( region_name );
 }
 
-/**
-   CURRENTLYy the ensemble_config and enkf_obs objects are not used for
-   anything. These should be used for input validation.
-*/
-
 static void local_config_load_file( local_config_type * local_config ,
                                     const ecl_grid_type * ecl_grid ,
-                                    const ensemble_config_type * ensemble_config ,
-                                    const enkf_obs_type * enkf_obs  ,
                                     const char * config_file) {
   bool binary = false;
   local_config_instruction_type cmd;
@@ -1724,17 +1731,15 @@ static void local_config_load_file( local_config_type * local_config ,
 
 void local_config_reload( local_config_type * local_config ,
                           const ecl_grid_type * ecl_grid ,
-                          const ensemble_config_type * ensemble_config ,
-                          const enkf_obs_type * enkf_obs  ,
                           const char * all_active_config_file ) {
 
   local_config_clear( local_config );
   if (all_active_config_file != NULL)
-    local_config_load_file( local_config , ecl_grid , ensemble_config , enkf_obs , all_active_config_file );
+    local_config_load_file( local_config , ecl_grid , all_active_config_file );
   {
     int i;
     for (i = 0; i < stringlist_get_size( local_config->config_files ); i++)
-      local_config_load_file( local_config , ecl_grid , ensemble_config , enkf_obs , stringlist_iget( local_config->config_files , i ) );
+      local_config_load_file( local_config , ecl_grid , stringlist_iget( local_config->config_files , i ) );
   }
 }
 

@@ -351,6 +351,14 @@ void enkf_main_load_obs( enkf_main_type * enkf_main , const char * obs_config_fi
       fprintf(stderr,"** Warning: failed to load observation data from: %s \n",obs_config_file);
 }
 
+static void enkf_main_alloc_local_config( enkf_main_type * enkf_main ) {
+  if (enkf_main->obs == NULL || enkf_main->ensemble_config == NULL)
+    util_abort("%s: internal error - creating local config prematurely\n",__func__);
+
+  enkf_main->local_config = local_config_alloc( enkf_main->ensemble_config , enkf_main->obs );
+}
+
+
 
 /**
    This function should be called when a new data_file has been set.
@@ -417,7 +425,8 @@ void enkf_main_free(enkf_main_type * enkf_main){
   site_config_free( enkf_main->site_config);
   ensemble_config_free( enkf_main->ensemble_config );
 
-  local_config_free( enkf_main->local_config );
+  if (enkf_main->local_config)
+    local_config_free( enkf_main->local_config );
 
   ert_report_list_free( enkf_main->report_list );
   ert_workflow_list_free( enkf_main->workflow_list );
@@ -1383,7 +1392,7 @@ bool enkf_main_UPDATE(enkf_main_type * enkf_main , const int_vector_type * step_
       if (target_state_map != source_state_map) {
         state_map_set_from_inverted_mask( target_state_map , ens_mask , STATE_PARENT_FAILURE);
         state_map_set_from_mask( target_state_map , ens_mask , STATE_INITIALIZED );
-      enkf_fs_fsync( target_fs );
+        enkf_fs_fsync( target_fs );
     }
     }
     bool_vector_free( ens_mask );
@@ -2504,7 +2513,7 @@ enkf_main_type * enkf_main_alloc_empty( ) {
   enkf_main->ranking_table      = ranking_table_alloc( 0 );
   enkf_main->obs                = NULL;
   enkf_main->model_config       = model_config_alloc( );
-  enkf_main->local_config       = local_config_alloc( );
+  enkf_main->local_config       = NULL;
 
   enkf_main_rng_init( enkf_main );
   enkf_main->subst_func_pool    = subst_func_pool_alloc(  );
@@ -2782,8 +2791,6 @@ void enkf_main_update_local_updates( enkf_main_type * enkf_main) {
       */
       local_config_reload( enkf_main->local_config ,
                            ecl_config_get_grid( enkf_main->ecl_config ),
-                           enkf_main->ensemble_config ,
-                           enkf_main->obs ,
                            all_active_config_file );
 
       unlink( all_active_config_file );
@@ -3089,7 +3096,19 @@ enkf_main_type * enkf_main_bootstrap(const char * _model_config, bool strict , b
 	/* Adding ensemble members */
 	enkf_main_resize_ensemble( enkf_main  , config_content_iget_as_int(content , NUM_REALIZATIONS_KEY , 0 , 0) );
 
-	/*****************************************************************/
+        /* Loading observations */
+        enkf_main_alloc_obs(enkf_main);
+
+        /* Creating the local_config object. */
+        enkf_main_alloc_local_config( enkf_main );
+
+        if (config_content_has_item(content , OBS_CONFIG_KEY)) {
+          const char * obs_config_file = config_content_iget(content  , OBS_CONFIG_KEY , 0,0);
+          enkf_main_load_obs( enkf_main , obs_config_file , true );
+        }
+
+
+        /*****************************************************************/
 	/*
 	  Installing the local_config object. Observe that the
 	  ALL_ACTIVE local_config configuration is ALWAYS loaded. But
@@ -3105,14 +3124,6 @@ enkf_main_type * enkf_main_bootstrap(const char * _model_config, bool strict , b
               local_config_add_config_file( enkf_main->local_config , stringlist_iget( files , j) );
           }
         }
-
-        /* Loading observations */
-        enkf_main_alloc_obs(enkf_main);
-        if (config_content_has_item(content , OBS_CONFIG_KEY)) {
-          const char * obs_config_file = config_content_iget(content  , OBS_CONFIG_KEY , 0,0);
-          enkf_main_load_obs( enkf_main , obs_config_file , true );
-        }
-
       }
       config_content_free( content );
       config_free(config);
