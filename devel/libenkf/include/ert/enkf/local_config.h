@@ -125,7 +125,7 @@ typedef enum {
 
 typedef struct local_config_struct local_config_type;
 
-local_config_type           * local_config_alloc( );
+local_config_type           * local_config_alloc( const ensemble_config_type * ensemble_config , const enkf_obs_type * enkf_obs);
 void                          local_config_free( local_config_type * local_config );
 local_updatestep_type       * local_config_alloc_updatestep( local_config_type * local_config , const char * key );
 local_ministep_type         * local_config_alloc_ministep( local_config_type * local_config , const char * key );
@@ -135,8 +135,7 @@ const local_updatestep_type * local_config_iget_updatestep( const local_config_t
 local_updatestep_type       * local_config_get_updatestep( const local_config_type * local_config , const char * key);
 local_ministep_type         * local_config_get_ministep( const local_config_type * local_config , const char * key);
 void                          local_config_set_updatestep(local_config_type * local_config, int step1 , int step2 , const char * key);
-void                          local_config_reload( local_config_type * local_config , const ecl_grid_type * ecl_grid , const ensemble_config_type * ensemble_config , const enkf_obs_type * enkf_obs ,
-                                                   const char * all_active_config_file);
+void                          local_config_reload( local_config_type * local_config , const ecl_grid_type * ecl_grid ,  const char * all_active_config_file);
 const char                  * local_config_get_cmd_string( local_config_instruction_type cmd );
 
 stringlist_type             * local_config_get_config_files( const local_config_type * local_config );
@@ -144,6 +143,9 @@ void                          local_config_clear_config_files( local_config_type
 void                          local_config_add_config_file( local_config_type * local_config , const char * config_file );
 void                          local_config_fprintf( const local_config_type * local_config , const char * config_file);
 void                          local_config_fprintf_config( const local_config_type * local_config , FILE * stream);
+
+const enkf_obs_type         * local_config_get_obs( const local_config_type * local_config );
+const ensemble_config_type  * local_config_get_ensemble_config( const local_config_type * local_config );
 
 #ifdef __cplusplus
 }
