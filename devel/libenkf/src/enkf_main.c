@@ -1114,7 +1114,6 @@ static void enkf_main_analysis_update( enkf_main_type * enkf_main ,
                                        const local_ministep_type * ministep ,
                                        const meas_data_type * forecast ,
                                        obs_data_type * obs_data) {
-
   const int cpu_threads       = 4;
   const int matrix_start_size = 250000;
   thread_pool_type * tp       = thread_pool_alloc( cpu_threads , false );
@@ -1156,8 +1155,10 @@ static void enkf_main_analysis_update( enkf_main_type * enkf_main ,
   analysis_module_init_update( module , ens_mask , S , R , dObs , E , D );
   {
     hash_iter_type * dataset_iter = local_ministep_alloc_dataset_iter( ministep );
-    enkf_fs_type * src_fs = enkf_main_get_fs( enkf_main );
-    serialize_info_type * serialize_info = serialize_info_alloc( src_fs ,
+
+    // enkf_fs_type * src_fs = enkf_main_get_fs( enkf_main );
+
+    serialize_info_type * serialize_info = serialize_info_alloc( target_fs ,
                                                                  target_fs ,
                                                                  iens_active_index,
                                                                  target_step ,
@@ -1234,6 +1235,8 @@ static void enkf_main_analysis_update( enkf_main_type * enkf_main ,
   analysis_module_complete_update( module );
 
 
+
+
   /*****************************************************************/
 
   int_vector_free(iens_active_index);
@@ -1296,13 +1299,24 @@ bool enkf_main_UPDATE(enkf_main_type * enkf_main , const int_vector_type * step_
       hash_type                   * use_count     = hash_alloc();
       const char                  * log_path      = analysis_config_get_log_path( enkf_main->analysis_config );
       FILE                        * log_stream;
+      int                           number_of_ministeps = local_updatestep_get_num_ministep( updatestep );
 
+      if (number_of_ministeps > 1) {
+        if ((analysis_config_get_module_option( analysis_config , ANALYSIS_ITERABLE))){
+         util_exit("** ERROR: Can not combine iterable modules with multi step updates - sorry\n");
+        }
+      }
 
-      if ((local_updatestep_get_num_ministep( updatestep ) > 1) &&
-          (analysis_config_get_module_option( analysis_config , ANALYSIS_ITERABLE))) {
-            util_exit("** ERROR: Can not combine iterable modules with multi step updates - sorry\n");
-          }
+       enkf_fs_type * src_fs = enkf_main_get_fs( enkf_main );
+       if (target_fs == src_fs){
+        util_exit("** ERROR: Cannot combine one file system with multi step updates- sorry\n");
+       }
 
+       enkf_main_init_case_from_existing( enkf_main ,
+                                          src_fs ,
+                                          0 ,
+                                          ANALYZED ,
+                                          target_fs );
 
       {
         char * log_file;
@@ -1350,7 +1364,10 @@ bool enkf_main_UPDATE(enkf_main_type * enkf_main , const int_vector_type * step_
           enkf_analysis_fprintf_obs_summary( obs_data , meas_forecast  , step_list , local_ministep_get_name( ministep ) , stdout );
         enkf_analysis_fprintf_obs_summary( obs_data , meas_forecast  , step_list , local_ministep_get_name( ministep ) , log_stream );
 
-        if (obs_data_get_active_size(obs_data) > 0)
+
+        if (obs_data_get_active_size(obs_data) > 0){
+
+
           enkf_main_analysis_update( enkf_main ,
                                      target_fs ,
                                      ens_mask ,
@@ -1361,7 +1378,8 @@ bool enkf_main_UPDATE(enkf_main_type * enkf_main , const int_vector_type * step_
                                      current_step ,
                                      ministep ,
                                      meas_forecast ,
-                                     obs_data );
+                                     obs_data);
+        }
         else if (target_fs != source_fs) {
           ert_log_add_fmt_message( 1 , stderr , "No active observations. Parameters copied directly: %s -> %s" , enkf_fs_get_case_name( enkf_main_get_fs( enkf_main )) , enkf_fs_get_case_name( target_fs));
           enkf_main_init_case_from_existing( enkf_main ,
