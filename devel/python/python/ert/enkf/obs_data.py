@@ -52,6 +52,12 @@ class ObsData(BaseCClass):
         assert isinstance(R, (Matrix, NoneType))
         assert isinstance(D_obs, (Matrix, NoneType))
         ObsData.cNamespace().scale(self, S, E, D, R, D_obs)
+        
+    def getStd(self, block_index, obs_index):
+        assert isinstance(block_index, int)
+        assert isinstance(obs_index, int)
+        block = ObsData.cNamespace().get_block(self, block_index)
+        return ObsData.cNamespace().get_block_std(block, obs_index)
 
 
     def free(self):
@@ -75,5 +81,7 @@ ObsData.cNamespace().scale       = cwrapper.prototype("void obs_data_scale(obs_d
 ObsData.cNamespace().scale_matrix = cwrapper.prototype("void obs_data_scale_matrix(obs_data, matrix)")
 ObsData.cNamespace().scale_Rmatrix = cwrapper.prototype("void obs_data_scale_Rmatrix(obs_data, matrix)")
 
+ObsData.cNamespace().get_block_std = cwrapper.prototype("double obs_block_iget_std(obs_block , int)")
+ObsData.cNamespace().get_block     = cwrapper.prototype("obs_block_ref obs_data_iget_block(obs_data, int)")
 
 

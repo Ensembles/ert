@@ -65,14 +65,34 @@ class UpdateTest(ExtendedTestCase):
             fs = ert.getEnkfFsManager().getCurrentFileSystem()
             state = EnkfStateType.FORECAST
 
-
             mask = BoolVector( initial_size = ert.getEnsembleSize() , default_value = True)
+
+            # Plain update
             meas_data = MeasData(mask)
-            obs_data = ObsData()
+            obs_data = ObsData()        
+             
             obs.getObservationAndMeasureData( fs , local_obsdata , state , mask.createActiveList() , meas_data , obs_data )
             update( self.rng , mask , analysis , ert , meas_data , obs_data , state_size)
             
             
+            # Test std scaling
+            old_std = obs_data.getStd(0, 0)
+            
+            meas_data = MeasData(mask)
+            obs_data = ObsData()        
+            
+            # Scale local_obsdata
+            scale = 2.0
+            obs.localScaleStd(local_obsdata, scale)  
+            
+            obs.getObservationAndMeasureData( fs , local_obsdata , state , mask.createActiveList() , meas_data , obs_data )
+            new_std = obs_data.getStd(0, 0)
+            
+            self.assertEqual( new_std , old_std * scale )
+            
+                      
+
+            # Update with mask            
             mask[0] = False
             mask[4] = False
             meas_data = MeasData(mask)
