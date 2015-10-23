@@ -2,7 +2,7 @@
 # spec file for package ert.ecl
 #
 
-%define tag final2
+%define tag rc1
 
 Name:           ert.ecl
 Version:        2015.10
@@ -11,7 +11,7 @@ Summary:        ERT - Ensemble based Reservoir Tool - ECL library
 License:        GPL-3+
 Group:          Development/Libraries/C and C++
 Url:            http://ert.nr.no
-Source0:        https://github.com/OPM/%{name}/archive/release/%{version}/%{tag}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/Ensembles/ert/archive/release/%{version}/%{tag}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  lapack-devel zlib-devel iputils
 BuildRequires:  gcc
 %{?!el6:BuildRequires: python-devel}
