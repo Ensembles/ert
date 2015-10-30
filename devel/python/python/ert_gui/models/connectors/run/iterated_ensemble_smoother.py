@@ -66,7 +66,12 @@ class IteratedEnsembleSmoother(BaseRunModel):
             self.ert().getEnkfFsManager().switchFileSystem(initial_fs)
             self.ert().getEnkfFsManager().initializeCurrentCaseFromExisting(source_fs, 0, EnkfStateType.ANALYZED)
 
+        print "Before iter0:"
+        active_realization_mask.printf( fmt = "%02d " , name = "Iactive" )
         self.runAndPostProcess(active_realization_mask, 0, phase_count, EnkfInitModeEnum.INIT_CONDITIONAL)
+        print "After iter0:"
+        active_realization_mask.printf( fmt = "%02d " , name = "Iactive" )
+
         target_case_format = TargetCaseFormatModel().getValue()
         self.ert().analysisConfig().getAnalysisIterConfig().setCaseFormat( target_case_format )
 
@@ -87,6 +92,9 @@ class IteratedEnsembleSmoother(BaseRunModel):
             if  post_analysis_iter_num > pre_analysis_iter_num:
                 analysis_success = True
 
+            print "Before iter%d:" % current_iteration            
+            active_realizaton_mask.printf( fmt = "%02d " , name = "Iactive" )
+
             if analysis_success:
                 self.ert().getEnkfFsManager().switchFileSystem(target_fs)
                 self.runAndPostProcess(active_realization_mask, current_iteration, phase_count, EnkfInitModeEnum.INIT_NONE)
@@ -96,6 +104,9 @@ class IteratedEnsembleSmoother(BaseRunModel):
                 self.ert().getEnkfFsManager().initializeCurrentCaseFromExisting(target_fs, 0, EnkfStateType.ANALYZED)
                 self.runAndPostProcess(active_realization_mask, current_iteration - 1 , phase_count, EnkfInitModeEnum.INIT_NONE)
                 num_tries += 1
+
+            print "After iter%d:" % current_iteration            
+            active_realizaton_mask.printf( fmt = "%02d " , name = "Iactive" )
 
 
 

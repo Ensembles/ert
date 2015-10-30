@@ -1606,8 +1606,11 @@ void enkf_main_submit_jobs__( enkf_main_type * enkf_main ,
         arg_pack_append_ptr( arg_pack , enkf_main );
         arg_pack_append_ptr( arg_pack , run_arg);
 
+        printf("Trying to submit iens:%d \n",iens);
         thread_pool_add_job(submit_threads , enkf_main_isubmit_job__ , arg_pack);
       }
+      else
+        printf("Skipping submit of iens:%d \n",iens);
     }
   }
   runpath_list_fprintf( runpath_list );
@@ -2000,6 +2003,7 @@ bool enkf_main_run_simple_step(enkf_main_type * enkf_main , bool_vector_type * i
                                                                                             iactive ,
                                                                                             init_mode ,
                                                                                             iter );
+  bool_vector_fprintf(iactive , stdout , "iactive" , "%02d ");
   enkf_main_init_run( enkf_main , run_context );
   run_ok = enkf_main_run_step( enkf_main , run_context );
   ert_run_context_free( run_context );
