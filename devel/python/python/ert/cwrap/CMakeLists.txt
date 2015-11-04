@@ -1,3 +1,5 @@
+configure_file(clib.py.in clib.py)
+
 set(PYTHON_SOURCES
     __init__.py
     basecclass.py
@@ -6,7 +8,7 @@ set(PYTHON_SOURCES
     cclass.py
     cenum.py
     cfile.py
-    clib.py
+    ${CMAKE_CURRENT_BINARY_DIR}/clib.py
     cnamespace.py
     cwrap.py
 )
