@@ -1,3 +1,5 @@
+[Feature] Added PYTHONPATH property to root ert/__init__.py file.
+
 [1.10.0] -----------------------------------------------------------------
 
 [Feature] Set the the verbose flag from the environment variable ERT_VERBOSE.
