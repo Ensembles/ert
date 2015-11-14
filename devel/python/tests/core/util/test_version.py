@@ -93,7 +93,7 @@ class VersionTest(ExtendedTestCase):
         
 
     def test_import(self):
-        from ert import Version as globalVersion
+        from ert.util import Version as globalVersion
         v1 = globalVersion(1,1,2)
         v2 = Version(1,1,2)
 

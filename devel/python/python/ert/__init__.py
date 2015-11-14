@@ -117,7 +117,3 @@ if sys.hexversion < required_version_hex:
 
 
 
-from ert.util import Version
-from ert.util import updateAbortSignals
-
-updateAbortSignals( )
