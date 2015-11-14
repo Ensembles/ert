@@ -116,6 +116,18 @@ if sys.hexversion < required_version_hex:
     raise Exception("ERT Python requires at least version 2.6 of Python")
 
 
+# The PYTHONPATH attribute is the path to the root ert package of the
+# current distribution. To check which ert distribution is used you
+# can do:
+#
+#   import ert
+#   print("Loading ert from: %s" % ert.PYTHONPATH)
+#
+# This is purely a read-only property, and assigning to this property
+# will not in any way affect the import behaviour of the current
+# Python process.
+PYTHONPATH = os.path.dirname(os.path.dirname( __file__ ))
+
 
 from ert.util import Version
 from ert.util import updateAbortSignals
