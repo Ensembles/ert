@@ -17,6 +17,7 @@
 import os.path 
 from ert.test import ExtendedTestCase , TestAreaContext
 from ert.util import Version
+import ert
 
 class VersionTest(ExtendedTestCase):
     def setUp(self):
@@ -93,8 +94,14 @@ class VersionTest(ExtendedTestCase):
         
 
     def test_import(self):
-        from ert import Version as globalVersion
+        from ert.util import Version as globalVersion
         v1 = globalVersion(1,1,2)
         v2 = Version(1,1,2)
 
         self.assertTrue( v1 == v2 )
+        
+        v1 = globalVersion.currentVersion( )
+        self.assertEqual( v1.major , ert.major_version )
+        self.assertEqual( v1.minor , ert.minor_version )
+        self.assertEqual( v1.micro , ert.micro_version )
+        

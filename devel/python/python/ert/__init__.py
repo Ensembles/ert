@@ -105,7 +105,22 @@ if env_lib_path:
 if ert_lib_path:
     if not os.path.exists( ert_lib_path ):
         ert_lib_path = None
-        
+
+
+
+# The version tuple should preferably be fethced from
+# ert.util.version;: the purpose with the current hoops is to to be
+# able to determine version information without import loading shared
+# libraries.
+try:
+    import __ert_version
+    major_version = __ert_version.major_version
+    minor_version = __ert_version.minor_version
+    micro_version = __ert_version.micro_version
+except ImportError:
+    major_version = None
+    minor_version = None
+    micro_version = None
 
 
 # Set the module variable ert_lib_path of the ert.cwrap.clib module;
@@ -117,7 +132,3 @@ if sys.hexversion < required_version_hex:
 
 
 
-from ert.util import Version
-from ert.util import updateAbortSignals
-
-updateAbortSignals( )
