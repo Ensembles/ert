@@ -1,3 +1,9 @@
+[Bug] Fixed crash when stopping running simulations from gui.
+
+[Feature] Ertshell refactored. Implementing shell functionality has been simplified.
+
+[Feature] Ertshell. Added dumping of entries in block mount files.
+
 [1.10.0] -----------------------------------------------------------------
 
 [Feature] Set the the verbose flag from the environment variable ERT_VERBOSE.
