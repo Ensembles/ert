@@ -18,12 +18,12 @@ from ert.job_queue import JOB_QUEUE_LIB
 
 
 class ExtJob(BaseCClass):
-    def __init__(self, name, root_path, private, config_file = None):
+    def __init__(self, name, root_path, private, config_file = None , search_PATH = True):
         if config_file is None:
             c_ptr = ExtJob.cNamespace().alloc(name, root_path, private)
             super(ExtJob, self).__init__(c_ptr)
         else:
-            c_ptr = ExtJob.cNamespace().fscanf_alloc(name, root_path, private, config_file)
+            c_ptr = ExtJob.cNamespace().fscanf_alloc(name, root_path, private, config_file , search_PATH)
             super(ExtJob, self).__init__(c_ptr)
 
 
@@ -111,7 +111,7 @@ cwrapper.registerType("ext_job_ref", ExtJob.createCReference)
 
 
 ExtJob.cNamespace().alloc                      = cwrapper.prototype("c_void_p ext_job_alloc(char*, char*, int)")
-ExtJob.cNamespace().fscanf_alloc               = cwrapper.prototype("c_void_p ext_job_fscanf_alloc(char*, char*, int, char*)")
+ExtJob.cNamespace().fscanf_alloc               = cwrapper.prototype("c_void_p ext_job_fscanf_alloc(char*, char*, bool, char* , bool)")
 
 ExtJob.cNamespace().free                       = cwrapper.prototype("void ext_job_free( ext_job )")
 ExtJob.cNamespace().get_help_text              = cwrapper.prototype("char* ext_job_get_help_text(ext_job)")
