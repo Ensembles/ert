@@ -40,6 +40,7 @@ extern "C" {
                                                     int num_fs , 
                                                     const char * ens_path_fmt, 
                                                     const char * filename );
+  void                 * block_fs_driver_alloc_new( fs_driver_enum driver_type , bool read_only , int num_fs , const char * mountfile_fmt, bool block_level_lock );
 
 #ifdef __cplusplus
 }

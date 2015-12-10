@@ -439,33 +439,58 @@ static void enkf_fs_assign_driver( enkf_fs_type * fs , fs_driver_type * driver ,
 }
 
 
-static enkf_fs_type *  enkf_fs_mount_block_fs( FILE * fstab_stream , const char * mount_point  ) {
+static enkf_fs_type *  enkf_fs_mount_block_fs( FILE * fstab_stream , const char * mount_point , int file_fs_version) {
   enkf_fs_type * fs = enkf_fs_alloc_empty( mount_point );
 
   {
-    int driver_nr;
-    for (driver_nr = 0; driver_nr < 5; driver_nr++) {
-      fs_driver_enum driver_type = util_fread_int( fstab_stream );
+    while (true) {
+      fs_driver_enum driver_type;
+      if (fread( &driver_type , sizeof driver_type , 1 , fstab_stream) == 1) {
+        fs_driver_type * driver = block_fs_driver_open( fstab_stream , mount_point , driver_type , fs->read_only);
+        enkf_fs_assign_driver( fs , driver , driver_type );
+      } else
+        break;
+    }
 
-      fs_driver_type * driver = block_fs_driver_open( fstab_stream , mount_point , driver_type , fs->read_only);
+    /*
+      The current mount map is of version 106 - which does not have
+      any information for the STATIC driver; we add a default STATIC driver.
+    */
+    if ((CURRENT_FS_VERSION == 105) && (file_fs_version == 6)) {
+      int num_fs = 32;
+      const char * mountfile_fmt = "Ensemble/mod_%d/STATIC.mnt";
+      fs_driver_type * driver;
+      bool block_level_lock = false;
 
-      enkf_fs_assign_driver( fs , driver , driver_type );
+      fprintf(stderr, "Warning: the current filesystem is created with a newer version of ERT - missing STATIC storage; creating default\n");
+      block_fs_driver_create_fs( NULL , mount_point , DRIVER_STATIC , num_fs , "Ensemble/mod_%d" , "STATIC");
+      driver = block_fs_driver_alloc_new( DRIVER_STATIC , fs->read_only , num_fs , mountfile_fmt , block_level_lock );
+      enkf_fs_assign_driver( fs , driver , DRIVER_STATIC );
     }
   }
   return fs;
 }
 
 
-static enkf_fs_type *  enkf_fs_mount_plain( FILE * fstab_stream , const char * mount_point ) {
+static enkf_fs_type *  enkf_fs_mount_plain( FILE * fstab_stream , const char * mount_point , int file_fs_version) {
   enkf_fs_type * fs = enkf_fs_alloc_empty( mount_point );
   {
-    int driver_nr;
-    for (driver_nr = 0; driver_nr < 5; driver_nr++) {
-      fs_driver_enum driver_type = util_fread_int( fstab_stream );
-      fs_driver_type * driver = plain_driver_open( fstab_stream , mount_point );
-
-      enkf_fs_assign_driver( fs , driver , driver_type );
+    while (true) {
+      fs_driver_enum driver_type;
+      if (fread( &driver_type , sizeof driver_type , 1 , fstab_stream) == 1) {
+        fs_driver_type * driver = plain_driver_open( fstab_stream , mount_point );
+        enkf_fs_assign_driver( fs , driver , driver_type );
+      } else
+        break;
     }
+
+    /*
+      The current mount map is of version 106 - which does not have
+      any information for the STATIC driver; we add a default STATIC driver.
+    */
+    if ((CURRENT_FS_VERSION == 105) && (file_fs_version == 106))
+      util_exit("Warning: the current filesystem is created with a newer version of ERT - please use a newer version of ERT\n");
+
   }
   return fs;
 }
@@ -625,17 +650,19 @@ enkf_fs_type * enkf_fs_mount( const char * mount_point ) {
 
   if (stream != NULL) {
     enkf_fs_type * fs = NULL;
+    int file_fs_version;
+
     fs_driver_assert_magic( stream );
-    fs_driver_assert_version( stream , mount_point );
+    file_fs_version = fs_driver_assert_version( stream , mount_point );
     {
       fs_driver_impl driver_id = util_fread_int( stream );
 
       switch( driver_id ) {
       case( BLOCK_FS_DRIVER_ID ):
-        fs = enkf_fs_mount_block_fs( stream , mount_point);
+        fs = enkf_fs_mount_block_fs( stream , mount_point , file_fs_version);
         break;
       case( PLAIN_DRIVER_ID ):
-        fs = enkf_fs_mount_plain( stream , mount_point );
+        fs = enkf_fs_mount_plain( stream , mount_point , file_fs_version);
         break;
       default:
         util_abort("%s: unrecognized driver_id:%d \n",__func__ , driver_id );
