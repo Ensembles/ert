@@ -433,7 +433,7 @@ static block_fs_driver_type * block_fs_driver_alloc(int num_fs) {
 
 
 
-static void * block_fs_driver_alloc_new( fs_driver_enum driver_type , bool read_only , int num_fs , const char * mountfile_fmt, bool block_level_lock ) {
+void * block_fs_driver_alloc_new( fs_driver_enum driver_type , bool read_only , int num_fs , const char * mountfile_fmt, bool block_level_lock ) {
   block_fs_driver_type * driver = block_fs_driver_alloc( num_fs);
   driver->config = bfs_config_alloc( driver_type , read_only, block_level_lock );
   {
@@ -466,13 +466,15 @@ void block_fs_driver_create_fs( FILE * stream ,
                                 int num_fs , 
                                 const char * ens_path_fmt, 
                                 const char * filename ) {
-  
-  util_fwrite_int(driver_type , stream );
-  util_fwrite_int(num_fs , stream );
-  {
-    char * mountfile_fmt = util_alloc_sprintf("%s%c%s.mnt" , ens_path_fmt , UTIL_PATH_SEP_CHAR , filename );
-    util_fwrite_string( mountfile_fmt , stream );
-    free( mountfile_fmt );
+
+  if (stream) {
+    util_fwrite_int(driver_type , stream );
+    util_fwrite_int(num_fs , stream );
+    {
+      char * mountfile_fmt = util_alloc_sprintf("%s%c%s.mnt" , ens_path_fmt , UTIL_PATH_SEP_CHAR , filename );
+      util_fwrite_string( mountfile_fmt , stream );
+      free( mountfile_fmt );
+    }
   }
   
   for (int ifs = 0; ifs < num_fs; ifs++) {

@@ -192,17 +192,16 @@ static void upgrade104B(FILE * stream , const char * mount_point) {
 
 
 
-void fs_driver_assert_version( FILE * stream , const char * mount_point) {
+int fs_driver_assert_version( FILE * stream , const char * mount_point) {
   int file_version = util_fread_int( stream );
 
-  if (file_version  > CURRENT_FS_VERSION)
+  if (file_version <= 104)
+    util_exit("%s: The file system you are trying to access is created with a old version of ert - upgrade it?\n",__func__);
+
+  if (file_version > 106)
     util_exit("%s: The file system you are trying to access is created with a newer version of ert - sorry.\n",__func__);
-  else if (file_version < CURRENT_FS_VERSION) {
-    if ((file_version == 104) && (CURRENT_FS_VERSION == 105))
-      upgrade104B( stream , mount_point );
-    else
-      util_exit("%s: The file system you are trying to access is created with a old version of ert - upgrade it?\n",__func__);
-  }
+
+  return file_version;
 }
 
 
