@@ -21,11 +21,11 @@ from ert_gui.shell.storage import Storage
 from ert_gui.shell.summary_keys import SummaryKeys
 from ert_gui.shell.workflows import Workflows
 from ert_gui.shell.observations import Observations
+from ert_gui.shell.server import Server
 from ert_gui.shell.libshell import extractFullArgument, getPossibleFilenameCompletions
 from ert_gui.shell import ErtShellContext
 
 import matplotlib
-
 
 class ErtShell(Cmd):
     prompt = "--> "
@@ -52,6 +52,8 @@ class ErtShell(Cmd):
     def __init__(self, forget_history=False):
         Cmd.__init__(self)
 
+        self.__children = []
+
         shell_context = ErtShellContext(self)
         self.__shell_context = shell_context
 
@@ -61,12 +63,10 @@ class ErtShell(Cmd):
         else:
             self.__history_file = None
 
-        matplotlib.rcParams["backend"] = "Qt4Agg"
         matplotlib.rcParams["interactive"] = True
         matplotlib.rcParams["mathtext.default"] = "regular"
         matplotlib.rcParams["verbose.level"] = "helpful"
         matplotlib.rcParams["verbose.fileo"] = "sys.stderr"
-
 
         try:
             matplotlib.style.use("ggplot") # available from version 1.4
@@ -89,9 +89,11 @@ class ErtShell(Cmd):
         Observations(self)
         Export(self)
         Storage(self)
+        Server(self)
 
         self.__last_command_failed = False
 
+        atexit.register(self._cleanup)
 
     def __init_history(self):
         try:
@@ -107,6 +109,19 @@ class ErtShell(Cmd):
                 os.makedirs(os.path.dirname(self.__history_file))
 
             readline.write_history_file(self.__history_file)
+
+    def _cleanup(self):
+        print("Performing cleanup...")
+
+        for child in self.__children:
+            child.cleanup()
+
+        if self.shellContext().ert() is not None:
+            self.shellContext().setErt(None)
+
+
+    def addChild(self, child):
+        self.__children.append(child)
 
     def emptyline(self):
         pass
@@ -134,8 +149,6 @@ class ErtShell(Cmd):
         print("Show the current directory.")
 
     def do_exit(self, line):
-        if self.shellContext().ert() is not None:
-            self.shellContext().ert().free()
         return True
 
     def help_exit(self):
