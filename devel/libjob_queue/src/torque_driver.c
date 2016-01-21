@@ -359,7 +359,7 @@ static int torque_driver_submit_shell_job(torque_driver_type * driver,
       {
         stringlist_type * remote_argv = torque_driver_alloc_cmd(driver, job_name, script_filename);
         char ** argv = stringlist_alloc_char_ref(remote_argv);
-        util_fork_exec(driver->qsub_cmd , stringlist_get_size(remote_argv), (const char **) argv, true, NULL, NULL, NULL, tmp_file, NULL);
+        util_spawn(driver->qsub_cmd, stringlist_get_size(remote_argv), (const char **) argv, tmp_file, NULL, NULL);
 
         free(argv);
         stringlist_free(remote_argv);
@@ -432,7 +432,7 @@ static char* torque_driver_get_qstat_status(torque_driver_type * driver, char * 
     char ** argv = util_calloc(1, sizeof * argv);
     argv[0] = jobnr_char;
 
-    util_fork_exec(driver->qstat_cmd, 1, (const char **) argv, true, NULL, NULL, NULL, tmp_file, NULL);
+    util_spawn(driver->qstat_cmd, 1, (const char **) argv, tmp_file, NULL, NULL);
     free(argv);
   }
 
@@ -489,7 +489,7 @@ void torque_driver_kill_job(void * __driver, void * __job) {
 
   torque_driver_type * driver = torque_driver_safe_cast(__driver);
   torque_job_type * job = torque_job_safe_cast(__job);
-  util_fork_exec(driver->qdel_cmd, 1, (const char **) &job->torque_jobnr_char, true, NULL, NULL, NULL, NULL, NULL);
+  util_spawn(driver->qdel_cmd, 1, (const char **) &job->torque_jobnr_char, NULL, NULL, NULL);
 }
 
 void torque_driver_free(torque_driver_type * driver) {

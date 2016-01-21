@@ -1,7 +1,6 @@
 import time
 import os.path
 import sys
-
 from ert.enkf import EnkfVarType
 from ert.enkf.enums import RealizationStateEnum
 from ert.server import SimulationContext
