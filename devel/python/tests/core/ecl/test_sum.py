@@ -53,7 +53,7 @@ class SumTest(ExtendedTestCase):
         with TestAreaContext("ecl/csv"):
             case.exportCSV( "file.csv" )
             self.assertTrue( os.path.isfile( "file.csv" ) )
-            input_file = csv.DictReader( open("file.csv"))
+            input_file = csv.DictReader( open("file.csv"),delimiter=";")
             for row in input_file:
                 self.assertIn("DAYS", row)
                 self.assertIn("DATE", row)
