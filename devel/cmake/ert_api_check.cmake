@@ -8,6 +8,11 @@
 # have a ERT_ prefix. The generated header is part of the api and can be
 # included by other header files in the ert source.
 
+find_library( BLAS_LIBRARY NAMES blas)
+if (BLAS_LIBRARY)
+   set(ERT_HAVE_BLAS ON)
+endif()
+
 find_library( LAPACK_LIBRARY NAMES lapack)
 if (LAPACK_LIBRARY)
    set(ERT_HAVE_LAPACK ON)
@@ -29,7 +34,7 @@ try_compile( ERT_HAVE_ISFINITE ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/T
 find_path( ERT_HAVE_GETOPT getopt.h /usr/include )
 find_path( ERT_HAVE_UNISTD unistd.h /usr/include )
 
-check_function_exists( fork ERT_HAVE_FORK )
+check_function_exists( posix_spawn ERT_HAVE_SPAWN )
 check_function_exists( opendir ERT_HAVE_OPENDIR )
 check_function_exists( symlink ERT_HAVE_SYMLINK )
 check_function_exists( readlinkat ERT_HAVE_READLINKAT )
@@ -60,4 +65,11 @@ endif()
 
 if (HAVE_PTHREAD)
    set( ERT_HAVE_THREAD_POOL ON )
+endif()
+
+
+find_program(PING_PATH NAMES ping)
+if (PING_PATH)
+   set( ERT_HAVE_PING ON )
+   add_definitions( -DPING_CMD="${PING_PATH}" )
 endif()

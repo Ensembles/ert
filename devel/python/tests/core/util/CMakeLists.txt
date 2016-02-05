@@ -1,6 +1,7 @@
 set(TEST_SOURCES
     __init__.py
     test_ctime.py
+    test_cstring.py
     test_hash.py
     test_lookup_table.py
     test_matrix.py
@@ -16,11 +17,13 @@ set(TEST_SOURCES
     test_work_area.py
     test_path_context.py
     test_arg_pack.py
+    test_spawn.py
 )
 
 add_python_package("python.tests.core.util"  ${PYTHON_INSTALL_PREFIX}/tests/core/util "${TEST_SOURCES}" False)
 
 addPythonTest(core.util.ctime core.util.test_ctime.CTimeTest)
+addPythonTest(core.util.cstring core.util.test_cstring.CStringTest)
 addPythonTest(core.util.hash core.util.test_hash.HashTest)
 addPythonTest(core.util.lookup_table core.util.test_lookup_table.LookupTableTest )
 addPythonTest(core.util.matrix core.util.test_matrix.MatrixTest )
@@ -35,3 +38,4 @@ addPythonTest(core.util.path_context core.util.test_path_context.PathContextTest
 addPythonTest(core.util.thread_pool core.util.test_thread_pool.ThreadPoolTest)
 addPythonTest(core.util.cthread_pool core.util.test_cthread_pool.CThreadPoolTest)
 addPythonTest(core.util.arg_pack core.util.test_arg_pack.ArgPackTest)
+addPythonTest(core.util.spawn core.util.test_spawn.SpawnTest)

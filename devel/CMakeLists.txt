@@ -18,7 +18,6 @@ set( ERT_VERSION_MICRO git )
 
 
 option( BUILD_ERT           "Build the full ERT application - Linux only" OFF)
-option( BUILD_ENS_PLOT      "Build small Eclipse plotting program - no" OFF)
 option( BUILD_TESTS         "Should the tests be built" OFF)
 option( BUILD_APPLICATIONS  "Should we build small utility applications" OFF)
 option( BUILD_ECL_SUMMARY   "Build the commandline application ecl_summary" OFF)
@@ -28,6 +27,7 @@ option( INSTALL_ERT         "Should anything be installed when issuing make inst
 option( ERT_BUILD_GUI       "Should the pyQt based gui be compiled and installed" OFF )
 option( ERT_USE_OPENMP      "Use OpenMP - currently only in EclGrid" OFF)
 option( ERT_DOC             "Build ERT documantation" OFF)
+option( ERT_BUILD_CXX       "Build some CXX wrappers" ON)
 
 include( CheckFunctionExists )
 include( CheckTypeSize )
@@ -127,7 +127,6 @@ if (MSVC)
    add_definitions( -D__func__="\\"????\\"")
 endif()
 
-
 if (ERT_LINUX)
    set( NEED_LIBM TRUE )
    set( LINK_STATIC FALSE )
@@ -148,16 +147,14 @@ add_subdirectory( libert_util )
 include_directories( ${PROJECT_SOURCE_DIR}/libgeometry/include )
 add_subdirectory( libgeometry )
 
-if (BUILD_ERT OR BUILD_ENS_PLOT)
-   include_directories( ${PROJECT_SOURCE_DIR}/libplot/include )
-   add_subdirectory( libplot )
-endif()
-
 include_directories( ${PROJECT_SOURCE_DIR}/libecl/include )
 add_subdirectory( libecl )
 
-if (BUILD_CXX)
+if (ERT_BUILD_CXX)
+   include_directories( ${PROJECT_SOURCE_DIR}/libert_utilxx/include )
    include_directories( ${PROJECT_SOURCE_DIR}/libeclxx/include )
+
+   add_subdirectory( libert_utilxx )
    add_subdirectory( libeclxx )
 endif()
 
