@@ -76,6 +76,7 @@ Keyword name                                                        	Required by
 :ref:`GEN_PARAM <gen_param>`                                        	NO                                          				Add a general parameter. 
 :ref:`GRID <grid>`                                                  	YES                                         				Provide an ECLIPSE grid for the reservoir model. 
 :ref:`HISTORY_SOURCE <history_source>`                              	NO                    			REFCASE_HISTORY     	  	Source used for historical values.
+:ref:`HOOK_WORKFLOW <hook_workflow>` 					NO 									Install a workflow to be run automatically.
 :ref:`HOST_TYPE <host_type>`                                        	NO                                          
 :ref:`IGNORE_SCHEDULE <ignore_schedule>`                            	NO                                          
 :ref:`IMAGE_TYPE <image_type>`                                      	NO                    			png                   		The type of the images created when plotting.
@@ -118,7 +119,6 @@ Keyword name                                                        	Required by
 :ref:`PLOT_WIDTH <plot_width>` 						NO 					1024 				Pixel width of the plots. 
 :ref:`PRE_CLEAR_RUNPATH <pre_clear_runpath>` 				NO 					FALSE 				Should the runpath be cleared before initializing? 
 :ref:`QC_PATH <qc_path>` 						NO 					QC 				... 
-:ref:`QC_WORKFLOW <qc_workflow>` 					NO 									Name of existing workflow to do QC work. 
 :ref:`QUEUE_SYSTEM <queue_system>` 					NO 									System used for running simulation jobs. 
 :ref:`REFCASE <refcase>` 						NO (see HISTORY_SOURCE and SUMMARY) 					Reference case used for observations and plotting. 
 :ref:`REFCASE_LIST <refcase_list>` 					NO 									Full path to Eclipse .DATA files containing completed runs (which you can add to plots) 
@@ -133,7 +133,6 @@ Keyword name                                                        	Required by
 :ref:`STD_SCALE_CORRELATED_OBS <std_scale_correlated_obs>`              NO                                      FALSE                           Try to estimate the correlations in the data to inflate the observation std.     
 :ref:`SCHEDULE_FILE <schedule_file>`  					YES 									Provide an ECLIPSE schedule file for the problem. 
 :ref:`SCHEDULE_PREDICTION_FILE <schedule_prediction_file>`  		NO 									Schedule prediction file. 
-:ref:`SELECT_CASE <select_case>`  					NO 									The current case / default 	You can tell ert to select a particular case on bootup. 
 :ref:`SETENV <setenv>`  						NO 									You can modify the UNIX environment with SETENV calls. 
 :ref:`SINGLE_NODE_UPDATE <single_node_update>`  			NO 					FALSE 				... 
 :ref:`STD_CUTOFF <std_cutoff>`  					NO 					1e-6 				... 
@@ -390,16 +389,6 @@ These keywords are optional. However, they serve many useful purposes, and it is
 
 	The ENSPATH keyword is optional.
 
-.. _select_case:
-.. topic:: SELECT_CASE
-
-	By default ert will remember the selected case from the
-	previous run, or select the case "default" if this is the
-	first time you start a project. By using the SELECT_CASE
-	keyword you can tell ert to start up with a particular
-	case. If the requested case does not exist ert will ignore the
-	SELECT_CASE command, the case will not be created
-	automagically.
 
 .. _history_source:
 .. topic:: HISTORY_SOURCE
@@ -1987,23 +1976,33 @@ The name and location of this file is available as the magical string <RUNPATH_F
 
 
 
-QC keywords
------------
-.. _qc_keywords:
+.. _hook_workflow:
+.. topic:: HOOK_WORKFLOW
 
-The QC system is mainly based on workflows.
+With the keyword :code:`HOOK_WORKFLOW` you can configure workflow
+'hooks'; meaning workflows which will be run automatically at certain
+points during ERTs execution. Currently there are two points in ERTs
+flow of execution where you can hook in a workflow, either just before
+the simulations start, :code:`PRE_SIMULATION` - or after all the
+simulations have completed :code:`POST_SIMULATION`. The
+:code:`POST_SIMULATION` hook is typically used to trigger QC
+workflows:
 
-.. _qc_workflow:
-.. topic:: QC_WORKFLOW
+::
 
-	Name of an existing workflow to do QC work. Will be invoked automatically when a ensemble simulation has been completed, can alternatively be invoked from the QC menu.
+   HOOK_WORKFLOW initWFLOW  PRE_SIMULATION
+   HOOK_WORKFLOW QC_WFLOW1  POST_SIMULATION
+   HOOK_WORKFLOW QC_WFLOW2  POST_SIMULATION
 
+In this example the the workflow :code:`initWFLOW` will run after all
+the simulation directiories have been created, just before the forward
+model is submitted to the queue. When all the simulations are complete
+the two workflows :code:`QC_WFLOW1` and :code:`QC_WFLOW2` will be
+run. Observe that the workflows being 'hooked in' with the
+:code:`HOOK_WORKFLOW` must be loaded with the :code:`LOAD_WORKFLOW`
+keyword.
 
-.. _qc_path:
-.. topic:: QC_PATH 
-
-	No information on this keyword yet
-
+NB: Currently the :code:`PRE_SIMULATION` workflow is never called.
 
 Manipulating the Unix environment
 ---------------------------------

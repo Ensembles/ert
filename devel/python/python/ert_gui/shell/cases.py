@@ -1,10 +1,14 @@
+from ert.enkf import EnkfVarType
+
 from ert_gui.shell import assertConfigLoaded, ErtShellCollection
 from ert_gui.shell.libshell import autoCompleteList, splitArguments
+from ert_gui.shell.libshell.shell_tools import boolValidator
 
 
 class Cases(ErtShellCollection):
     def __init__(self, parent):
         super(Cases, self).__init__("case", parent)
+        self._show_hidden = False
 
         self.addShellFunction(name="list",
                               function=Cases.list,
@@ -27,17 +31,40 @@ class Cases(ErtShellCollection):
 
         self.addShellFunction(name="state",
                               function=Cases.state,
-                              completer=Cases.completeState,
+                              completer=Cases.completeFilesystem,
                               help_arguments="[case_name]",
                               help_message="Shows a list of the states of the individual realizations. "
                                            "Uses the current case if no case name is provided.")
 
         self.addShellFunction(name="time_map",
                               function=Cases.timemap,
-                              completer=Cases.completeTimemap,
+                              completer=Cases.completeFilesystem,
                               help_arguments="[case_name]",
                               help_message="Shows a list of the time/report steps of the case. "
                                            "Uses the current case if no case name is provided.")
+
+        self.addShellFunction(name="initialize",
+                              function=Cases.initialize,
+                              completer=Cases.completeFilesystem,
+                              help_arguments="[case_name]",
+                              help_message="Initialize the selected case from scratch. "
+                                           "Uses the current if no case name is provided")
+
+        self.addShellProperty(name="show_hidden",
+                              getter=Cases.showHidden,
+                              setter=Cases.setShowHidden,
+                              validator=boolValidator,
+                              completer=["true", "false"],
+                              help_arguments="[true|false]",
+                              help_message="Show or set the visibility of hidden cases",
+                              pretty_attribute="Hidden case visibility")
+
+
+    def showHidden(self):
+        return self._show_hidden
+
+    def setShowHidden(self, show_hidden):
+        self._show_hidden = show_hidden
 
     @assertConfigLoaded
     def list(self, line):
@@ -57,7 +84,11 @@ class Cases(ErtShellCollection):
             print(case_format % (current, fs, state))
 
     def getFileSystemNames(self):
-        return sorted([fs for fs in self.ert().getEnkfFsManager().getCaseList()])
+        fsm = self.ert().getEnkfFsManager()
+        if self._show_hidden:
+            return [case for case in fsm.getCaseList()]
+        else:
+            return [case for case in fsm.getCaseList() if not fsm.isCaseHidden(case)]
 
     @assertConfigLoaded
     def select(self, case_name):
@@ -107,7 +138,7 @@ class Cases(ErtShellCollection):
         self.columnize(states)
 
     @assertConfigLoaded
-    def completeState(self, text, line, begidx, endidx):
+    def completeFilesystem(self, text, line, begidx, endidx):
         return autoCompleteList(text, self.getFileSystemNames())
 
     @assertConfigLoaded
@@ -124,6 +155,20 @@ class Cases(ErtShellCollection):
 
         self.columnize(report_steps)
 
+
     @assertConfigLoaded
-    def completeTimemap(self, text, line, begidx, endidx):
-        return autoCompleteList(text, self.getFileSystemNames())
+    def initialize(self, case_name):
+        case_name = case_name.strip()
+        if not case_name:
+            case_name = self.ert().getEnkfFsManager().getCurrentFileSystem().getCaseName()
+        elif not case_name in self.getFileSystemNames():
+            self.lastCommandFailed("Unknown case name '%s'" % case_name)
+            return False
+
+        ert = self.ert()
+        fs = ert.getEnkfFsManager().getFileSystem(case_name)
+        size = self.ert().getEnsembleSize()
+        parameters = ert.ensembleConfig().getKeylistFromVarType(EnkfVarType.PARAMETER)
+        ert.getEnkfFsManager().initializeCaseFromScratch(fs , parameters, 0, size - 1)
+        
+        print("Case: '%s' initialized")

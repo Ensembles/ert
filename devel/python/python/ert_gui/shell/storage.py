@@ -1,13 +1,16 @@
 from ert_gui.shell import ErtShellCollection
 from ert_gui.shell.libshell import splitArguments, getPossibleFilenameCompletions, extractFullArgument
 
-from ert.util import UTIL_LIB
+
 import ctypes
 import os
 
 NO_SORT = 0
 STRING_SORT = 1
 OFFSET_SORT = 2
+
+import ert.cwrap.clib as clib
+UTIL_LIB = clib.ert_load("libert_util")
 
 UTIL_LIB.block_fs_is_mount.restype = ctypes.c_bool
 UTIL_LIB.block_fs_mount.restype = ctypes.c_void_p
@@ -73,7 +76,11 @@ class Storage(ErtShellCollection):
         last_argument = extractFullArgument(line, endidx)
 
         if len(arguments) == 1 and len(text) == 0:
-            return getPossibleFilenameCompletions("")
+            ert = self.ert()
+            if ert is not None:
+                return [ert.getModelConfig().getEnspath() + os.path.sep]
+            else:
+                return getPossibleFilenameCompletions("")
         elif len(arguments) == 2 and len(last_argument) > 0:
             return getPossibleFilenameCompletions(last_argument)
         elif len(arguments) == 3 and len(text) > 0:

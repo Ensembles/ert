@@ -1,11 +1,12 @@
 import numpy
 from scipy.stats import gaussian_kde
 from .plot_tools import PlotTools
+import pandas as pd
 
 
 def plotGaussianKDE(plot_context):
     """
-    @type plot_context: PlotContext
+    @type plot_context: ert_gui.plottery.PlotContext
     """
     ert = plot_context.ert()
     key = plot_context.key()
@@ -13,7 +14,9 @@ def plotGaussianKDE(plot_context):
     axes = plot_context.figure().add_subplot(111)
     """:type: matplotlib.axes.Axes """
 
-    config.deactivateDateSupport()
+    plot_context.deactivateDateSupport()
+    plot_context.x_axis = plot_context.VALUE_AXIS
+    plot_context.y_axis = plot_context.DENSITY_AXIS
 
     if key.startswith("LOG10_"):
         key = key[6:]
@@ -41,7 +44,10 @@ def _plotGaussianKDE(axes, plot_config, data, label):
     style = plot_config.histogramStyle()
 
     if data.dtype == "object":
-        data = data.convert_objects(convert_numeric=True)
+        try:
+            data = pd.to_numeric(data, errors='coerce')
+        except AttributeError:
+            data = data.convert_objects(convert_numeric=True)
 
     if data.dtype == "object":
         pass

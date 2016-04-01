@@ -3,6 +3,7 @@ set(PYTHON_SOURCES
     bool_vector.py
     buffer.py
     ctime.py
+    cstring.py
     double_vector.py
     hash.py
     int_vector.py
@@ -23,6 +24,7 @@ set(PYTHON_SOURCES
     vector_template.py
     version.py
     arg_pack.py
+    path_format.py
 )
 
 add_python_package("python.ert.util"  ${PYTHON_INSTALL_PREFIX}/ert/util "${PYTHON_SOURCES}" True)

@@ -117,7 +117,7 @@ class EclSum(BaseCClass):
 
 
     def addVariable(self , variable , wgname = None , num = 0 , unit = "None" , default_value = 0):
-        EclSum.cNamespace().add_variable(self , variable , wgname , num , unit , default_value)
+        return EclSum.cNamespace().add_variable(self , variable , wgname , num , unit , default_value)
         
 
     def addTStep(self , report_step , sim_days):
@@ -413,18 +413,29 @@ class EclSum(BaseCClass):
 
         if start is None:
             start = self.getDataStartTime( )
-        if isinstance(start , datetime.date):
-            start = datetime.datetime( start.year , start.month , start.day , 0 , 0 , 0 )
-                
+        else:
+            if isinstance(start , datetime.date):
+                start = datetime.datetime( start.year , start.month , start.day , 0 , 0 , 0 )
+
+            if start < self.getDataStartTime( ):
+                start = self.getDataStartTime( )
+
+            
         if end is None:
-            end = self.end_time
-        if isinstance(end , datetime.date):
-            end = datetime.datetime( end.year , end.month , end.day , 0 , 0 , 0 )
+            end = self.getEndTime( )
+        else:
+            if isinstance(end , datetime.date):
+                end = datetime.datetime( end.year , end.month , end.day , 0 , 0 , 0 )
+
+            if end > self.getEndTime( ):
+                end = self.getEndTime( )
         
         if end < start:
             raise ValueError("Invalid time interval start after end")
 
 
+        range_start = start
+        range_end = end
         if not timeUnit == "d":
             year1 = start.year
             year2 = end.year
@@ -447,16 +458,26 @@ class EclSum(BaseCClass):
             day1 = 1
             day2 = 1
 
-            start = datetime.date( year1, month1 , day1)
-            end =  datetime.date(year2 , month2 , day2)
-                
-        trange = TimeVector.createRegular(start , end , interval)
+            range_start = datetime.date( year1, month1 , day1)
+            range_end =  datetime.date(year2 , month2 , day2)
+
+        trange = TimeVector.createRegular(range_start , range_end , interval)
+
+        # If the simulation does not start at the first of the month
+        # the start value will be before the simulation start; we
+        # manually shift the first element in the trange to the start
+        # value; the same for the end of list.
+
         if trange[-1] < end:
             if extend_end:
                 trange.appendTime( num , timeUnit )
             else:
                 trange.append( end )
 
+        data_start = self.getDataStartTime( )
+        if trange[0] < data_start: 
+            trange[0] = CTime(data_start)
+                
         return trange
         
 
@@ -925,7 +946,7 @@ ime_index.
 
     def keys( self , pattern = None):
         """
-        Return a list of summary keys matching @pattern.
+        Return a StringList of summary keys matching @pattern.
         
         The matching algorithm is ultimately based on the fnmatch()
         function, i.e. normal shell-character syntax is used. With
@@ -937,9 +958,11 @@ ime_index.
         """
         s = StringList()
         EclSum.cNamespace().select_matching_keys( self , pattern , s )
-        return s.strings
+        return s
+        
 
-
+    
+    
     def fwrite(self , ecl_case = None):
         if ecl_case:
             EclSum.cNamespace().set_case( self , ecl_case )
@@ -967,6 +990,16 @@ ime_index.
         cfile = CFILE(pfile ) 
         ctime = CTime( time )
         EclSum.cNamespace().dump_csv_line(self, ctime, keywords, cfile)
+
+
+    def exportCSV(self , filename , keys = None , date_format = "%d/%m/%Y" , sep = ";"):
+        if keys is None:
+            var_list = self.keys( )
+        else:
+            var_list = StringList( )
+            for key in keys:
+                var_list |= self.keys( pattern = key )
+        EclSum.cNamespace().export_csv(self, filename , var_list , date_format , sep)
         
 
     @classmethod
@@ -1045,9 +1078,10 @@ EclSum.cNamespace().create_well_list              = cwrapper.prototype("stringli
 EclSum.cNamespace().create_group_list             = cwrapper.prototype("stringlist_obj ecl_sum_alloc_group_list( ecl_sum , char* )")
 
 EclSum.cNamespace().create_writer                 = cwrapper.prototype("ecl_sum_obj       ecl_sum_alloc_writer( char* , bool , bool , char* , time_t , bool , int , int , int)")
-EclSum.cNamespace().add_variable                  = cwrapper.prototype("void              ecl_sum_add_var(ecl_sum , char* , char* , int , char*, double)")
+EclSum.cNamespace().add_variable                  = cwrapper.prototype("smspec_node_ref   ecl_sum_add_var(ecl_sum , char* , char* , int , char*, double)")
 EclSum.cNamespace().add_tstep                     = cwrapper.prototype("ecl_sum_tstep_ref ecl_sum_add_tstep(ecl_sum , int , double)")
 
 import ert.ecl.ecl_sum_keyword_vector
-EclSum.cNamespace().dump_csv_line                = cwrapper.prototype("void  ecl_sum_dump_line_to_csv_file(ecl_sum , time_t , ecl_sum_vector, FILE)")
+EclSum.cNamespace().dump_csv_line                = cwrapper.prototype("void  ecl_sum_fwrite_interp_csv_line(ecl_sum, time_t , ecl_sum_vector, FILE)")
 EclSum.cNamespace().get_smspec                   = cwrapper.prototype("void* ecl_sum_get_smspec(ecl_sum)")
+EclSum.cNamespace().export_csv                   = cwrapper.prototype("void ecl_sum_export_csv( ecl_sum , char* , stringlist , char* , char*)")
