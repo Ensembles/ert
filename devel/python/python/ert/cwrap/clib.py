@@ -80,7 +80,6 @@ def lib_name(lib , path = None , so_version = ""):
         else:
             so_name = "%s.%s%s" % (lib, so_extension[ platform_key ], so_version)
 
-        print(so_name)
         if path:
             return os.path.join( path , so_name )
         else:
