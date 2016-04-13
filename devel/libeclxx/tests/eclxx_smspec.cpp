@@ -22,7 +22,14 @@
 
 #include <ert/ecl/Smspec.hpp>
 
-void test_smspec() {
+void test_smspec_copy() {
+    std::string kw( "FOPT" );
+    ERT::smspec_node field( kw );
+
+    ERT::smspec_node copy( field );
+}
+
+void test_smspec_wg() {
     std::string kw( "WWCT" );
     std::string wg( "OP1" );
     std::string gr( "WG1" );
@@ -34,6 +41,46 @@ void test_smspec() {
     test_assert_true(group.wgname() == gr);
 }
 
+void test_smspec_field() {
+    std::string kw( "FOPT" );
+    ERT::smspec_node field( kw );
+
+    test_assert_true( field.keyword() == kw );
+}
+
+void test_smspec_block() {
+    std::string kw( "BPR" );
+    int dims[ 3 ] = { 10, 10, 10 };
+    int ijk[ 3 ] = { 5, 5, 5 };
+
+    ERT::smspec_node block( kw, dims, ijk );
+
+    test_assert_true( block.keyword() == kw );
+}
+
+void test_smspec_region() {
+    std::string kw( "ROIP" );
+    int dims[ 3 ] = { 10, 10, 10 };
+    ERT::smspec_node region( kw, dims, 0 );
+
+    test_assert_true( region.keyword() == kw );
+}
+
+void test_smspec_completion() {
+    std::string kw( "CWIT" );
+    std::string wg( "WELL1" );
+    int dims[ 3 ] = { 10, 10, 10 };
+    int ijk[ 3 ] = { 1, 1, 1 };
+    ERT::smspec_node completion( kw, wg, dims, ijk );
+
+    test_assert_true( completion.keyword() == kw );
+}
+
 int main (int argc, char **argv) {
-    test_smspec();
+    test_smspec_copy();
+    test_smspec_wg();
+    test_smspec_field();
+    test_smspec_block();
+    test_smspec_region();
+    test_smspec_completion();
 }

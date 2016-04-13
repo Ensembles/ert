@@ -59,8 +59,8 @@ class EnKFMain(BaseCClass):
 
 
     @staticmethod
-    def createNewConfig(config_file, storage_path, case_name, dbase_type, num_realizations):
-        EnKFMain.cNamespace().create_new_config(config_file, storage_path, case_name, dbase_type, num_realizations)
+    def createNewConfig(config_file, storage_path, dbase_type, num_realizations):
+        EnKFMain.cNamespace().create_new_config(config_file, storage_path, dbase_type, num_realizations)
 
     def getRealisation(self , iens):
         """ @rtype: EnKFState """
@@ -252,6 +252,9 @@ class EnKFMain(BaseCClass):
 
     def getRunpathList(self):
         return EnKFMain.cNamespace().get_runpath_list( self )
+
+    def addNode(self, enkf_config_node):
+        EnKFMain.cNamespace().add_node(self, enkf_config_node)
     
 
 ##################################################################
@@ -301,7 +304,7 @@ EnKFMain.cNamespace().get_hook_manager = cwrapper.prototype("hook_manager_ref en
 
 
 EnKFMain.cNamespace().fprintf_config = cwrapper.prototype("void enkf_main_fprintf_config(enkf_main)")
-EnKFMain.cNamespace().create_new_config = cwrapper.prototype("void enkf_main_create_new_config(char* , char*, char* , char* , int)")
+EnKFMain.cNamespace().create_new_config = cwrapper.prototype("void enkf_main_create_new_config(char* , char*, char* , int)")
 
 EnKFMain.cNamespace().get_user_config_file = cwrapper.prototype("char* enkf_main_get_user_config_file(enkf_main)")
 EnKFMain.cNamespace().get_mount_point = cwrapper.prototype("char* enkf_main_get_mount_root( enkf_main )")
@@ -315,3 +318,5 @@ EnKFMain.cNamespace().submit_simulation = cwrapper.prototype("void enkf_main_isu
 EnKFMain.cNamespace().alloc_run_context_ENSEMBLE_EXPERIMENT= cwrapper.prototype("ert_run_context_obj enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT( enkf_main , enkf_fs , bool_vector , enkf_init_mode_enum , int)")
 EnKFMain.cNamespace().alloc_field_init_file = cwrapper.prototype("cstring_obj enkf_main_alloc_abs_path_to_init_file(enkf_main, enkf_config_node)")
 EnKFMain.cNamespace().get_runpath_list = cwrapper.prototype("runpath_list_ref enkf_main_get_runpath_list(enkf_main)")
+
+EnKFMain.cNamespace().add_node = cwrapper.prototype("void enkf_main_add_node(enkf_main, enkf_config_node)")

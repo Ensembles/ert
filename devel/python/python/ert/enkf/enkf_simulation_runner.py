@@ -29,51 +29,24 @@ class EnkfSimulationRunner(BaseCClass):
         return self.runSimpleStep(active_realization_mask, EnkfInitModeEnum.INIT_CONDITIONAL, iter_nr)
 
 
-    def runPostHookWorkflow(self):
+    def runWorkflows(self , runtime):
+        """:type ert.enkf.enum.HookRuntimeEnum"""
         hook_manager = self.ert.getHookManager()
-        if hook_manager.hasPostHookWorkflow():
-            hook_manager.checkRunpathListFile()
-            hook_workflow = hook_manager.getPostHookWorkflow()
-            workflow = hook_workflow.getWorkflow()
-            workflow_list = self.ert.getWorkflowList()
-            workflow.run(self.ert, context=workflow_list.getContext())     
-            
-    def runHookWorkflow(self):
-        hook_manager = self.ert.getHookManager()
-        if hook_manager.hasHookWorkflow():
-            hook_manager.checkRunpathListFile()
-            hook_workflow = hook_manager.getHookWorkflow()
-            workflow = hook_workflow.getWorkflow()
-            workflow_list = self.ert.getWorkflowList()
-            workflow.run(self.ert, context=workflow_list.getContext())     
-            
-    def isHookPreSimulation(self):
-        """ @rtype: bool """
-        hook_manager = self.ert.getHookManager()
-        if hook_manager.hasHookWorkflow():
-            hook_workflow = hook_manager.getHookWorkflow()
-            return hook_workflow.isPreSimulation()    
-                             
-    def isHookPostSimulation(self):
-        """ @rtype: bool """
-        hook_manager = self.ert.getHookManager()
-        if hook_manager.hasHookWorkflow():
-            hook_workflow = hook_manager.getHookWorkflow()
-            return hook_workflow.isPostSimulation()    
+        hook_manager.runWorkflows( runtime  , self.ert ) 
+        
+    
 
-
-    def smootherUpdate(self, target_fs):
+    def smootherUpdate(self, source_fs , target_fs):
         """ @rtype: bool """
         assert isinstance(target_fs, EnkfFs)
-        return EnkfSimulationRunner.cNamespace().smoother_update(self, target_fs)
+        return EnkfSimulationRunner.cNamespace().smoother_update(self, source_fs , target_fs)
 
 
 
 cwrapper = CWrapper(ENKF_LIB)
 cwrapper.registerType("enkf_simulation_runner", EnkfSimulationRunner)
 
-EnkfSimulationRunner.cNamespace().run_assimilation  = cwrapper.prototype("void enkf_main_run_assimilation(enkf_simulation_runner, bool_vector, int, int, int)")
 EnkfSimulationRunner.cNamespace().run_smoother      = cwrapper.prototype("void enkf_main_run_smoother(enkf_simulation_runner, char*, bool)")
 
 EnkfSimulationRunner.cNamespace().run_simple_step   = cwrapper.prototype("bool enkf_main_run_simple_step(enkf_simulation_runner, bool_vector, enkf_init_mode_enum, int)")
-EnkfSimulationRunner.cNamespace().smoother_update   = cwrapper.prototype("bool enkf_main_smoother_update(enkf_simulation_runner, enkf_fs)")
+EnkfSimulationRunner.cNamespace().smoother_update   = cwrapper.prototype("bool enkf_main_smoother_update(enkf_simulation_runner, enkf_fs , enkf_fs)")

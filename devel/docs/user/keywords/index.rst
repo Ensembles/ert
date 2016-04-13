@@ -63,7 +63,6 @@ Keyword name                                                        	Required by
 :ref:`ENKF_PEN_PRESS <enkf_pen_press>`                              	NO                    			FALSE                 		Should we want to use a penalised PRESS statistic in model selection? 
 :ref:`ENKF_RERUN <enkf_rerun>`                                      	NO                    			FALSE                 		Should the simulations be restarted from time zero after each update. 
 :ref:`ENKF_SCALING <enkf_scaling>`                                  	NO                    			TRUE           		       	Do we want to normalize the data ensemble to have unit variance? 
-:ref:`ENKF_SCHED_FILE <enkf_sched_file>`                            	NO                                          				Allows fine-grained control of the time steps in the simulation. 
 :ref:`ENKF_TRUNCATION <enfk_truncation>`                            	NO                    			0.99        	          	Cutoff used on singular value spectrum. 
 :ref:`ENSPATH <enspath>`                                            	NO                    			storage     	          	Folder used for storage of simulation results. 
 :ref:`EQUIL_INIT_FILE <equil_init_file>`                            	NO                                          				Use INIT_SECTION instead 
@@ -76,6 +75,7 @@ Keyword name                                                        	Required by
 :ref:`GEN_PARAM <gen_param>`                                        	NO                                          				Add a general parameter. 
 :ref:`GRID <grid>`                                                  	YES                                         				Provide an ECLIPSE grid for the reservoir model. 
 :ref:`HISTORY_SOURCE <history_source>`                              	NO                    			REFCASE_HISTORY     	  	Source used for historical values.
+:ref:`HOOK_WORKFLOW <hook_workflow>` 					NO 									Install a workflow to be run automatically.
 :ref:`HOST_TYPE <host_type>`                                        	NO                                          
 :ref:`IGNORE_SCHEDULE <ignore_schedule>`                            	NO                                          
 :ref:`IMAGE_TYPE <image_type>`                                      	NO                    			png                   		The type of the images created when plotting.
@@ -87,7 +87,6 @@ Keyword name                                                        	Required by
 :ref:`ITER_RETRY_COUNT <iter_retry_count>`                          	NO                    			4         	            	Number of retries for a iteration - iterated ensemble smoother 
 :ref:`JOBNAME <jobname>`                                            	NO                                          				Name used for simulation files. An alternative to ECLBASE. 
 :ref:`JOB_SCRIPT <job_script>`                                      	NO                                          				Python script managing the forward model. 
-:ref:`KEEP_RUNPATH <keep_runpath>`                                  	NO                                          				Specify realizations that simulations should be kept for. 
 :ref:`LOAD_SEED <load_seed>`                                        	NO                                          				Load random seed from given file.
 :ref:`LOAD_WORKFLOW <load_workflow>` 				    	NO                             						Load a workflow into ERT. 
 :ref:`LOAD_WORKFLOW_JOB <load_workflow_job>`  			    	NO 									Load a workflow job into ERT. 
@@ -118,7 +117,6 @@ Keyword name                                                        	Required by
 :ref:`PLOT_WIDTH <plot_width>` 						NO 					1024 				Pixel width of the plots. 
 :ref:`PRE_CLEAR_RUNPATH <pre_clear_runpath>` 				NO 					FALSE 				Should the runpath be cleared before initializing? 
 :ref:`QC_PATH <qc_path>` 						NO 					QC 				... 
-:ref:`QC_WORKFLOW <qc_workflow>` 					NO 									Name of existing workflow to do QC work. 
 :ref:`QUEUE_SYSTEM <queue_system>` 					NO 									System used for running simulation jobs. 
 :ref:`REFCASE <refcase>` 						NO (see HISTORY_SOURCE and SUMMARY) 					Reference case used for observations and plotting. 
 :ref:`REFCASE_LIST <refcase_list>` 					NO 									Full path to Eclipse .DATA files containing completed runs (which you can add to plots) 
@@ -133,7 +131,6 @@ Keyword name                                                        	Required by
 :ref:`STD_SCALE_CORRELATED_OBS <std_scale_correlated_obs>`              NO                                      FALSE                           Try to estimate the correlations in the data to inflate the observation std.     
 :ref:`SCHEDULE_FILE <schedule_file>`  					YES 									Provide an ECLIPSE schedule file for the problem. 
 :ref:`SCHEDULE_PREDICTION_FILE <schedule_prediction_file>`  		NO 									Schedule prediction file. 
-:ref:`SELECT_CASE <select_case>`  					NO 									The current case / default 	You can tell ert to select a particular case on bootup. 
 :ref:`SETENV <setenv>`  						NO 									You can modify the UNIX environment with SETENV calls. 
 :ref:`SINGLE_NODE_UPDATE <single_node_update>`  			NO 					FALSE 				... 
 :ref:`STD_CUTOFF <std_cutoff>`  					NO 					1e-6 				... 
@@ -288,7 +285,13 @@ These keywords are optional. However, they serve many useful purposes, and it is
 .. _delete_runpath:
 .. topic:: DELETE_RUNPATH
 
-	When the enkf application is running it creates directories for the ECLIPSE simulations, one for each realization. When the simulations are done, the enkf will load the results into it's internal database. If you are using the enkf application as a convenient way to start many simulations, e.g. using the screening experiment option, the default behavior is to not delete these simulation directories. This behavior can be overridden with the DELETE_RUNPATH keyword, which causes enkf to delete the specified simulation directories. When running the EnKF algorithm, the behavior is the opposite. The keyword KEEP_RUNPATH can then be used to override the default behavoir.
+	When the ert application is running it creates directories for
+	the forward model simulations, one for each realization. When
+	the simulations are done, ert will load the results into the
+	internal database. By default the realization folders will be
+	left intact after ert has loaded the results, but using the
+	keyword DELETE_RUNPATH you can request to have (some of) the
+	directories deleted after results have been loaded.
 
 	*Example A:*
 
@@ -306,46 +309,6 @@ These keywords are optional. However, they serve many useful purposes, and it is
 
 	The DELETE_RUNPATH keyword is optional.
 
-.. _enfk_sched_file:
-.. topic:: ENKF_SCHED_FILE
-
-	When the enkf application runs the EnKF algorithm, it will use
-	ECLIPSE to simulate one report step at a time, and do an
-	update after each step. However, in some cases it will be
-	beneficial to turn off the EnKF update for some report steps
-	or to skip some steps completely. The keyword ENKF_SCHED_FILE
-	can point to a file with a more advanced schedule for when to
-	perform the updates. The format of the file pointed to by
-	ENKF_SCHED_FILE should be plain text, with one entry per
-	line. Each line should have the following form:
-
-	::
-
-		REPORT_STEP1   REPORT_STEP2   ON|OFF    STRIDE  
-		...
-
-	Here REPORT_STEP1 and REPORT_STEP2 are the first and last
-	report steps respectively and ON|OFF determines whether the
-	EnKF analysis should be ON or OFF, the STRIDE argument is
-	optional. If the analysis is ON the stride will default to
-	REPORT_STEP2 minus REPORT_STEP1, thus if you want to perform
-	analysis at each report step set stride equal to 1. Observe
-	that whatever value of stride is used, the integration will
-	always start on REPORT_STEP1 and end on REPORT_STEP2. Example:
-
-	::
-
-		0     100   OFF        
-		100   125   ON     5
-		125   200   ON     1
-
-	In this example, the enkf application will do the following:
-
-	#. Simulate directly from report step 0 to report step 100. No EnKF update will be performed.
-	#. From report step 100 to report step 125 it will simulate five report steps at a time, doing EnKF update at report steps 105, 110, 115, 120 and 125.
-	#. From report step 125 to report step 200 it will simulate one report step at a time, doing EnKF update for every timestep.
-
-	The ENKF_SCHED_FILE keyword is optional.
 
 .. _end_date:
 .. topic:: END_DATE
@@ -390,16 +353,6 @@ These keywords are optional. However, they serve many useful purposes, and it is
 
 	The ENSPATH keyword is optional.
 
-.. _select_case:
-.. topic:: SELECT_CASE
-
-	By default ert will remember the selected case from the
-	previous run, or select the case "default" if this is the
-	first time you start a project. By using the SELECT_CASE
-	keyword you can tell ert to start up with a particular
-	case. If the requested case does not exist ert will ignore the
-	SELECT_CASE command, the case will not be created
-	automagically.
 
 .. _history_source:
 .. topic:: HISTORY_SOURCE
@@ -472,20 +425,6 @@ These keywords are optional. However, they serve many useful purposes, and it is
 	The configuration file used to specify an external job is easy to use and very flexible. It is documented in Customizing the simulation workflow in enkf.
 
 	The INSTALL_JOB keyword is optional.
-
-.. _keep_runpath:
-.. topic:: KEEP_RUNPATH
-
-	When the enkf application is running it creates directories for the ECLIPSE simulations, one for each realization. If you are using the enkf application to run the EnKF algorithm, the default behavior is to delete these directories after the simulation results have been internalized. This behavior can be overridden with the KEEP_RUNPATH keyword, which causes enkf to keep the specified simulation directories. When running the enkf application as a convenient way to start many simulations, e.g. using the screening experiment option, the behavior is the opposite, and can be overridden with the DELETE_RUNPATH keyword.
-
-	*Example:*
-
-	::
-	
-		-- Keep simulation directories 0 to 15 and 18 and 20
-		KEEP_RUNPATH 0-15, 18, 20
-
-	The KEEP_RUNPATH keyword is optional.
 
 .. _obs_config:
 .. topic:: OBS_CONFIG
@@ -1987,23 +1926,33 @@ The name and location of this file is available as the magical string <RUNPATH_F
 
 
 
-QC keywords
------------
-.. _qc_keywords:
+.. _hook_workflow:
+.. topic:: HOOK_WORKFLOW
 
-The QC system is mainly based on workflows.
+With the keyword :code:`HOOK_WORKFLOW` you can configure workflow
+'hooks'; meaning workflows which will be run automatically at certain
+points during ERTs execution. Currently there are two points in ERTs
+flow of execution where you can hook in a workflow, either just before
+the simulations start, :code:`PRE_SIMULATION` - or after all the
+simulations have completed :code:`POST_SIMULATION`. The
+:code:`POST_SIMULATION` hook is typically used to trigger QC
+workflows:
 
-.. _qc_workflow:
-.. topic:: QC_WORKFLOW
+::
 
-	Name of an existing workflow to do QC work. Will be invoked automatically when a ensemble simulation has been completed, can alternatively be invoked from the QC menu.
+   HOOK_WORKFLOW initWFLOW  PRE_SIMULATION
+   HOOK_WORKFLOW QC_WFLOW1  POST_SIMULATION
+   HOOK_WORKFLOW QC_WFLOW2  POST_SIMULATION
 
+In this example the the workflow :code:`initWFLOW` will run after all
+the simulation directiories have been created, just before the forward
+model is submitted to the queue. When all the simulations are complete
+the two workflows :code:`QC_WFLOW1` and :code:`QC_WFLOW2` will be
+run. Observe that the workflows being 'hooked in' with the
+:code:`HOOK_WORKFLOW` must be loaded with the :code:`LOAD_WORKFLOW`
+keyword.
 
-.. _qc_path:
-.. topic:: QC_PATH 
-
-	No information on this keyword yet
-
+NB: Currently the :code:`PRE_SIMULATION` workflow is never called.
 
 Manipulating the Unix environment
 ---------------------------------

@@ -1,4 +1,4 @@
-from ert.enkf.enums import EnkfInitModeEnum, EnkfStateType
+from ert.enkf.enums import EnkfInitModeEnum, EnkfStateType, HookRuntime
 from ert_gui.models.connectors.run import NumberOfIterationsModel, ActiveRealizationsModel, IteratedAnalysisModuleModel, BaseRunModel
 from ert_gui.models.connectors.run.target_case_format_model import TargetCaseFormatModel
 from ert_gui.models.mixins import ErtRunError
@@ -22,9 +22,6 @@ class IteratedEnsembleSmoother(BaseRunModel):
     def runAndPostProcess(self, active_realization_mask, phase, phase_count, mode):
         self.setPhase(phase, "Running iteration %d of %d simulation iterations..." % (phase, phase_count - 1), indeterminate=False)
 
-        if self.ert().getEnkfSimulationRunner().isHookPreSimulation():
-            self.ert().getEnkfSimulationRunner().runHookWorkflow()
-            
         success = self.ert().getEnkfSimulationRunner().runSimpleStep(active_realization_mask, mode, phase)
 
         if not success:
@@ -37,14 +34,10 @@ class IteratedEnsembleSmoother(BaseRunModel):
                 raise ErtRunError("Simulation failed! All realizations failed!")
             #ignore and continue
 
-
-        if self.ert().getEnkfSimulationRunner().isHookPostSimulation():
-            self.ert().getEnkfSimulationRunner().runHookWorkflow()
-            
         self.setPhaseName("Post processing...", indeterminate=True)
-        self.ert().getEnkfSimulationRunner().runPostHookWorkflow()
+        self.ert().getEnkfSimulationRunner().runWorkflows( HookRuntime.POST_SIMULATION )
 
-
+        
     def createTargetCaseFileSystem(self, phase):
         target_case_format = TargetCaseFormatModel().getValue()
         target_fs = self.ert().getEnkfFsManager().getFileSystem(target_case_format % phase)
@@ -53,7 +46,8 @@ class IteratedEnsembleSmoother(BaseRunModel):
 
     def analyzeStep(self, target_fs):
         self.setPhaseName("Analyzing...", indeterminate=True)
-        success = self.ert().getEnkfSimulationRunner().smootherUpdate(target_fs)
+        source_fs = self.ert().getEnkfFsManager().getCurrentFileSystem()
+        success = self.ert().getEnkfSimulationRunner().smootherUpdate(source_fs , target_fs)
 
         if not success:
             raise ErtRunError("Analysis of simulation failed!")
