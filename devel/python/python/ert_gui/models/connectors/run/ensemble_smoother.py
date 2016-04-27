@@ -19,11 +19,13 @@ class EnsembleSmoother(BaseRunModel):
 
     def runSimulations(self):
         self.setPhase(0, "Running simulations...", indeterminate=False)
+        
+        self.setPhaseName("Pre processing...", indeterminate=True)
+        self.ert().getEnkfSimulationRunner().runWorkflows( HookRuntime.PRE_SIMULATION )
 
+        self.setPhaseName("Running forecast...", indeterminate=True)
         self.setAnalysisModule()
-
         active_realization_mask = ActiveRealizationsModel().getActiveRealizationsMask()
-
         success = self.ert().getEnkfSimulationRunner().runSimpleStep(active_realization_mask, EnkfInitModeEnum.INIT_CONDITIONAL , 0)
 
         if not success:
@@ -53,6 +55,10 @@ class EnsembleSmoother(BaseRunModel):
 
         self.setPhase(1, "Running simulations...", indeterminate=False)
 
+        self.setPhaseName("Pre processing...", indeterminate=True)
+        self.ert().getEnkfSimulationRunner().runWorkflows( HookRuntime.PRE_SIMULATION )
+        
+        self.setPhaseName("Running forecast...", indeterminate=True)
         self.ert().getEnkfFsManager().switchFileSystem(target_fs)
         success = self.ert().getEnkfSimulationRunner().runSimpleStep(active_realization_mask, EnkfInitModeEnum.INIT_NONE, 1)
 
