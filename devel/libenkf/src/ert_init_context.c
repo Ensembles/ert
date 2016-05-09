@@ -37,11 +37,10 @@ struct ert_init_context_struct {
   UTIL_TYPE_ID_DECLARATION;
   enkf_fs_type     * init_fs;
   vector_type      * run_args;
-  bool_vector_type * iactive;   // This can be updated ....
+  bool_vector_type * iactive;   // This can be updated in the ert_init_context_deselect_matching() function.
   init_mode_type     init_mode;
   int                iter;
   int_vector_type  * iens_map;
-  
 };
 
 
@@ -159,3 +158,14 @@ run_arg_type * ert_init_context_iens_get_arg( const ert_init_context_type * cont
   else
     return NULL;
 }
+
+
+
+
+void ert_init_context_deselect_matching( ert_init_context_type * context , int mask) {
+  state_map_deselect_matching( enkf_fs_get_state_map( context->init_fs ) ,
+                               context->iactive,
+                               mask );
+}
+
+
