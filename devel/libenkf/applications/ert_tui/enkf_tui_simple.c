@@ -47,12 +47,10 @@ void enkf_tui_simple_menu(void * arg) {
   menu_add_item(menu , "Sensitivity run: No data conditioning"                , "sS" , enkf_tui_run_exp         , enkf_main , NULL);
   const model_config_type * model_config = enkf_main_get_model_config( enkf_main );
   menu_item_type * ES_item           = menu_add_item(menu , "Assimilation run: Smoother update"               , "aA" , enkf_tui_run_smoother      , enkf_main , NULL);
-  menu_item_type * it_ES_item        = menu_add_item(menu , "Assimilation run: Iterated smoother [RML-EnKF]"  , "iI" , enkf_tui_run_iterated_ES   , enkf_main , NULL);
 
-  if (!model_config_has_history( model_config )) {
-    menu_item_disable( it_ES_item );
+  if (!model_config_has_history( model_config ))
     menu_item_disable( ES_item );
-  }
+
   menu_add_separator( menu );
   menu_add_item(menu , "Help"                                  , "hH" , enkf_tui_help_menu_simple   , enkf_main , NULL);
   menu_add_item(menu , "Advanced menu"                         , "dD" , enkf_tui_main_menu        , enkf_main , NULL);
