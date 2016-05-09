@@ -26,17 +26,20 @@
 #include <ert/enkf/ensemble_config.h>
 #include <ert/enkf/enkf_config_node.h>
 #include <ert/enkf/gen_kw_config.h>
+#include <ert/enkf/ert_init_context.h>
 
 
 void test_load(const char * config_file) {
   ert_test_context_type * test_context = ert_test_context_alloc( "GEN_KW" , config_file );
   enkf_main_type * enkf_main = ert_test_context_get_main( test_context );
   int ens_size = enkf_main_get_ensemble_size( enkf_main );
+  bool_vector_type * iactive = bool_vector_alloc( ens_size , true );
   stringlist_type * param_list = stringlist_alloc_new();
   enkf_fs_type * init_fs = enkf_fs_create_fs( "fs" , BLOCK_FS_DRIVER_ID , NULL , true );
+  ert_init_context_type * init_context = enkf_main_alloc_ert_init_context(enkf_main, init_fs, iactive, INIT_FORCE, 0);
 
   stringlist_append_ref( param_list , "GEN_KW");
-  enkf_main_initialize_from_scratch( enkf_main , init_fs , param_list , 0 , ens_size - 1 , INIT_FORCE);
+  enkf_main_initialize_from_scratch_with_bool_vector( enkf_main , param_list , init_context ); 
   {
     ensemble_config_type  * ensemble_config = enkf_main_get_ensemble_config( enkf_main );
     enkf_config_node_type * config_node = ensemble_config_get_node( ensemble_config , "GEN_KW");
@@ -58,6 +61,8 @@ void test_load(const char * config_file) {
     bool_vector_free( input_mask );
   }
 
+  bool_vector_free( iactive );
+  ert_init_context_free( init_context );
   stringlist_free( param_list );
   enkf_fs_decref( init_fs );
   ert_test_context_free( test_context );

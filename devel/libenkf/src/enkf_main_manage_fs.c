@@ -120,11 +120,15 @@ static void * enkf_main_initialize_from_scratch_mt(void * void_arg) {
   return NULL;
 }
 
-void enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_main , enkf_fs_type * init_fs , const stringlist_type * param_list ,const bool_vector_type * iens_mask , init_mode_type init_mode) {
+void enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_main , const stringlist_type * param_list , const ert_init_context_type * init_context) {
   int num_cpu = 4;
   int ens_size               = enkf_main_get_ensemble_size( enkf_main );
   thread_pool_type * tp     = thread_pool_alloc( num_cpu , true );
   arg_pack_type ** arg_list = util_calloc( ens_size , sizeof * arg_list );
+
+  const bool_vector_type * iens_mask = ert_init_context_get_iactive(init_context);
+  init_mode_type init_mode = ert_init_context_get_init_mode( init_context );
+  enkf_fs_type * init_fs = ert_init_context_get_fs( init_context );
   int i;
   int iens;
 
@@ -136,7 +140,6 @@ void enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_ma
       arg_pack_append_const_ptr( arg_list[iens] , param_list );
       arg_pack_append_int( arg_list[iens] , iens );
       arg_pack_append_int( arg_list[iens] , init_mode );
-      
       thread_pool_add_job( tp , enkf_main_initialize_from_scratch_mt , arg_list[iens]);
     }
   }
@@ -148,6 +151,7 @@ void enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_ma
   thread_pool_free( tp );
 }
 
+/*
 void enkf_main_initialize_from_scratch(enkf_main_type * enkf_main , enkf_fs_type * init_fs , const stringlist_type * param_list , int iens1 , int iens2, init_mode_type init_mode) {
   int iens;
   int ens_size = enkf_main_get_ensemble_size( enkf_main );
@@ -159,7 +163,7 @@ void enkf_main_initialize_from_scratch(enkf_main_type * enkf_main , enkf_fs_type
   enkf_main_initialize_from_scratch_with_bool_vector(enkf_main, init_fs, param_list, iens_mask, init_mode);
   bool_vector_free(iens_mask);
 }
-
+*/
 
 
 

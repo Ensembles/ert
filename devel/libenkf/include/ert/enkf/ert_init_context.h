@@ -42,6 +42,7 @@ typedef struct ert_init_context_struct ert_init_context_type;
                                                  init_mode_type init_mode ,
                                                  int iter);
 
+  enkf_fs_type           * ert_init_context_get_fs( const ert_init_context_type * context );
   void                     ert_init_context_free( ert_init_context_type * );
   int                      ert_init_context_get_size( const ert_init_context_type * context );
   init_mode_type           ert_init_context_get_init_mode( const ert_init_context_type * context );

@@ -46,7 +46,7 @@ void enkf_tui_init(enkf_main_type * enkf_main, bool all_members , bool all_param
   int iens1, iens2;
   init_mode_type init_mode = INIT_FORCE;
   bool iens_valid = false;
-  
+
   /* iens2 should be interpreted as __inclusive__ */
   if ( all_members ) {
     iens1 = 0;
@@ -75,10 +75,14 @@ void enkf_tui_init(enkf_main_type * enkf_main, bool all_members , bool all_param
       free(iens1char);
     }
   }
-  
+
   if (iens_valid) {
     stringlist_type * param_list = NULL;
-    if (all_parameters) 
+    bool_vector_type * iactive = bool_vector_alloc( ens_size , false );
+    for (int iens = iens1; iens <= iens2; iens++)
+      bool_vector_iset( iactive , iens , true );
+
+    if (all_parameters)
       param_list = ensemble_config_alloc_keylist_from_var_type( ensemble_config , PARAMETER );
     else {
       const enkf_config_node_type * config_node = NULL;
@@ -89,10 +93,15 @@ void enkf_tui_init(enkf_main_type * enkf_main, bool all_members , bool all_param
     }
 
     if (param_list != NULL) {
+      int iter = 0;
       enkf_fs_type * init_fs = enkf_main_tui_get_fs( enkf_main );
-      enkf_main_initialize_from_scratch(enkf_main , init_fs , param_list , iens1 , iens2 , init_mode);
+      ert_init_context_type * init_context = enkf_main_alloc_ert_init_context( enkf_main , init_fs , iactive , INIT_FORCE , iter );
+      enkf_main_initialize_from_scratch_with_bool_vector(enkf_main , param_list , init_context );
       stringlist_free( param_list );
+      ert_init_context_free( init_context );
     }
+
+    bool_vector_free( iactive );
   }
 }
 

@@ -1408,24 +1408,21 @@ void * enkf_main_create_run_path__( enkf_main_type * enkf_main,
 
 void enkf_main_create_run_path(enkf_main_type * enkf_main , bool_vector_type * iactive , int iter) {
   init_mode_type init_mode = INIT_CONDITIONAL;
-  ert_init_context_type * init_context = NULL;
+  ert_init_context_type * init_context = enkf_main_alloc_ert_init_context( enkf_main ,
+                                                                           enkf_main_get_fs( enkf_main ),
+                                                                           iactive ,
+                                                                           init_mode ,
+                                                                           iter );
 
   enkf_main_init_internalization(enkf_main , init_mode);
   {
     stringlist_type * param_list = ensemble_config_alloc_keylist_from_var_type( enkf_main->ensemble_config , PARAMETER );
     enkf_main_initialize_from_scratch_with_bool_vector(enkf_main ,
-						       enkf_main_get_fs( enkf_main ),
 						       param_list ,
-						       iactive,
-						       init_mode);
+						       init_context );
     stringlist_free( param_list );
   }
 
-  init_context = enkf_main_alloc_ert_init_context( enkf_main ,
-                                                   enkf_main_get_fs( enkf_main ),
-                                                   iactive ,
-                                                   init_mode ,
-                                                   iter );
   enkf_main_create_run_path__( enkf_main , init_context, iactive );
   ert_init_context_free( init_context );
 }
@@ -1642,10 +1639,11 @@ void * enkf_main_get_enkf_config_node_type(const ensemble_config_type * ensemble
 */
 
 
-void enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context) {
+/*void enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context) {
   enkf_main_init_internalization(enkf_main , ert_run_context_get_mode( run_context ));
   {
     stringlist_type * param_list = ensemble_config_alloc_keylist_from_var_type( enkf_main->ensemble_config , PARAMETER );
+
     enkf_main_initialize_from_scratch_with_bool_vector(enkf_main ,
 						       ert_run_context_get_init_fs( run_context ),
 						       param_list ,
@@ -1654,29 +1652,34 @@ void enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type 
     stringlist_free( param_list );
   }
 }
+*/
 
 
-
+/*
+  This is a high level function called from the TUI / workflows.
+*/
 
 void enkf_main_run_exp(enkf_main_type * enkf_main ,
                        bool_vector_type * iactive) {
 
-  ert_run_context_type * run_context;
-  init_mode_type init_mode = INIT_CONDITIONAL;
+  hook_manager_type * hook_manager = enkf_main_get_hook_manager(enkf_main);
   int iter = 0;
 
-  run_context = enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(enkf_main ,
-                                                                    enkf_main_get_fs( enkf_main ) ,
-                                                                    iactive ,
-                                                                    init_mode ,
-                                                                    iter );
-  enkf_main_init_run( enkf_main , run_context );
-  if (enkf_main_run_step(enkf_main , run_context)) {
-    hook_manager_type * hook_manager = enkf_main_get_hook_manager(enkf_main);
-    hook_manager_run_workflows(hook_manager, POST_SIMULATION, enkf_main);
-  }
+  enkf_main_create_run_path( enkf_main , iactive , iter );
+  hook_manager_run_workflows(hook_manager, PRE_SIMULATION, enkf_main);
 
-  ert_run_context_free( run_context );
+  {
+    ert_run_context_type * run_context = enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(enkf_main ,
+                                                                                             enkf_main_get_fs( enkf_main ) ,
+                                                                                             iactive ,
+                                                                                             INIT_CONDITIONAL,
+                                                                                             iter );
+    enkf_main_init_internalization(enkf_main , ert_run_context_get_mode( run_context ));
+    if (enkf_main_run_step(enkf_main , run_context))
+      hook_manager_run_workflows(hook_manager, POST_SIMULATION, enkf_main);
+
+    ert_run_context_free( run_context );
+  }
 }
 
 
@@ -1689,7 +1692,8 @@ bool enkf_main_run_simple_step(enkf_main_type * enkf_main , bool_vector_type * i
                                                                                             iactive ,
                                                                                             init_mode ,
                                                                                             iter );
-  enkf_main_init_run( enkf_main , run_context );
+
+  enkf_main_init_internalization(enkf_main , ert_run_context_get_mode( run_context ));
   run_ok = enkf_main_run_step( enkf_main , run_context );
   ert_run_context_free( run_context );
 

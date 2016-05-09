@@ -100,7 +100,7 @@ extern "C" {
   void                          enkf_main_free(enkf_main_type * );
   void                          enkf_main_exit(enkf_main_type * enkf_main);
   void                          enkf_main_init_eclipse(enkf_main_type * , int , int );
-  void                          enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context);
+  //void                          enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context);
   void                          enkf_main_load_ecl_init_mt(enkf_main_type * enkf_main , int );
   void                          enkf_main_load_ecl_complete_mt(enkf_main_type *);
   void                          enkf_main_iload_ecl_mt(enkf_main_type *enkf_main , int );
@@ -262,18 +262,17 @@ extern "C" {
   stringlist_type * enkf_main_alloc_caselist( const enkf_main_type * enkf_main );
   void              enkf_main_set_case_table( enkf_main_type * enkf_main , const char * case_table_file );
 
-  void              enkf_main_initialize_from_scratch(enkf_main_type * enkf_main ,
+  /*void              enkf_main_initialize_from_scratch(enkf_main_type * enkf_main ,
 						      enkf_fs_type * init_fs,
                                                       const stringlist_type * param_list ,
                                                       int iens1 ,
                                                       int iens2,
                                                       init_mode_type init_mode);
+  */
 
   void              enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_main ,
-								       enkf_fs_type * init_fs,
 								       const stringlist_type * param_list ,
-								       const bool_vector_type * iens_mask ,
-								       init_mode_type init_mode);
+								       const ert_init_context_type * init_context );
 
   void              enkf_main_init_current_case_from_existing(enkf_main_type * enkf_main,
                                                               enkf_fs_type * source_case_fs,
