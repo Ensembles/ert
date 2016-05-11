@@ -57,13 +57,6 @@ void enkf_tui_run_smoother(void * arg) {
 
 
 
-void enkf_tui_run_iterated_ES(void * arg) {
-  enkf_main_type * enkf_main  = enkf_main_safe_cast( arg );
-  const analysis_config_type * analysis_config = enkf_main_get_analysis_config(enkf_main);
-  analysis_iter_config_type * iter_config = analysis_config_get_iter_config(analysis_config);
-  int num_iter = analysis_iter_config_get_num_iterations(iter_config);
-  enkf_main_run_iterated_ES(enkf_main , num_iter );
-}
 
 
 /**
@@ -210,22 +203,13 @@ void enkf_tui_run_menu(void * arg) {
   }
   menu_add_item(menu , "Ensemble run: history"                , "xX" , enkf_tui_run_exp         , enkf_main , NULL);
   {
-    const analysis_config_type * analysis_config = enkf_main_get_analysis_config(enkf_main);
     const enkf_obs_type * enkf_obs = enkf_main_get_obs( enkf_main );
 
 
     menu_item_type * ES_item           = menu_add_item(menu , "Integrated smoother update"             , "iI" , enkf_tui_run_smoother      , enkf_main , NULL);
-    menu_item_type * it_ES_item        = menu_add_item(menu , "Iterated smoother [RML-EnKF]"           , "tT" , enkf_tui_run_iterated_ES   , enkf_main , NULL);
 
-    if (!analysis_config_get_module_option(analysis_config , ANALYSIS_ITERABLE)) {
-      menu_item_disable( it_ES_item );
-    } else
+    if (!enkf_obs_have_obs( enkf_obs ))
       menu_item_disable( ES_item );
-
-    if (!enkf_obs_have_obs( enkf_obs )) {
-      menu_item_disable( it_ES_item );
-      menu_item_disable( ES_item );
-    }
   }
   menu_add_separator(menu);
   menu_add_item(menu , "Create runpath directories - NO simulation" , "cC" , enkf_tui_run_create_runpath__ , enkf_main , NULL );

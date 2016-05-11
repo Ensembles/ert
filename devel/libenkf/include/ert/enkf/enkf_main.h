@@ -100,7 +100,7 @@ extern "C" {
   void                          enkf_main_free(enkf_main_type * );
   void                          enkf_main_exit(enkf_main_type * enkf_main);
   void                          enkf_main_init_eclipse(enkf_main_type * , int , int );
-  void                          enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context);
+  //void                          enkf_main_init_run( enkf_main_type * enkf_main, const ert_run_context_type * run_context);
   void                          enkf_main_load_ecl_init_mt(enkf_main_type * enkf_main , int );
   void                          enkf_main_load_ecl_complete_mt(enkf_main_type *);
   void                          enkf_main_iload_ecl_mt(enkf_main_type *enkf_main , int );
@@ -108,14 +108,13 @@ extern "C" {
   bool                          enkf_main_UPDATE(enkf_main_type * enkf_main , const int_vector_type * step_list, enkf_fs_type * source_fs, enkf_fs_type * target_fs , int target_step , run_mode_type run_mode);
   bool                          enkf_main_smoother_update(enkf_main_type * enkf_main , enkf_fs_type * source_fs, enkf_fs_type * target_fs);
   void                          enkf_main_create_run_path(enkf_main_type * enkf_main , bool_vector_type * iactive , int iter);
-  bool                          enkf_main_run_simple_step(enkf_main_type * enkf_main , bool_vector_type * iactive , init_mode_type init_mode, int iter);
+  bool                          enkf_main_run_simple_step(enkf_main_type * enkf_main , bool_vector_type * iactive , int iter);
 
   void                          enkf_main_run_exp(enkf_main_type * enkf_main ,
                                                   bool_vector_type * iactive);
 
 
   void                          enkf_main_run_smoother(enkf_main_type * enkf_main , enkf_fs_type * source_fs, const char * target_fs_name , bool_vector_type * iactive , int iter , bool rerun);
-  void                          enkf_main_run_iterated_ES(enkf_main_type * enkf_main, int num_iterations);
   void                          enkf_main_set_data_kw(enkf_main_type * , const char * , const char *);
   void                          enkf_main_set_state_run_path(const enkf_main_type * , int );
   void                          enkf_main_set_state_eclbase(const enkf_main_type * , int );
@@ -263,18 +262,17 @@ extern "C" {
   stringlist_type * enkf_main_alloc_caselist( const enkf_main_type * enkf_main );
   void              enkf_main_set_case_table( enkf_main_type * enkf_main , const char * case_table_file );
 
-  void              enkf_main_initialize_from_scratch(enkf_main_type * enkf_main ,
+  /*void              enkf_main_initialize_from_scratch(enkf_main_type * enkf_main ,
 						      enkf_fs_type * init_fs,
                                                       const stringlist_type * param_list ,
                                                       int iens1 ,
                                                       int iens2,
                                                       init_mode_type init_mode);
+  */
 
   void              enkf_main_initialize_from_scratch_with_bool_vector(enkf_main_type * enkf_main ,
-								       enkf_fs_type * init_fs,
 								       const stringlist_type * param_list ,
-								       const bool_vector_type * iens_mask ,
-								       init_mode_type init_mode);
+								       const ert_init_context_type * init_context );
 
   void              enkf_main_init_current_case_from_existing(enkf_main_type * enkf_main,
                                                               enkf_fs_type * source_case_fs,
@@ -323,7 +321,7 @@ extern "C" {
   time_map_type   * enkf_main_alloc_readonly_time_map( const enkf_main_type * enkf_main , const char * case_path );
 
   runpath_list_type    * enkf_main_get_runpath_list( const enkf_main_type * enkf_main );
-  ert_run_context_type * enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(const enkf_main_type * enkf_main , enkf_fs_type * fs , const bool_vector_type * iactive , init_mode_type init_mode , int iter);
+  ert_run_context_type * enkf_main_alloc_ert_run_context_ENSEMBLE_EXPERIMENT(const enkf_main_type * enkf_main , enkf_fs_type * fs , const bool_vector_type * iactive , int iter);
   ert_init_context_type * enkf_main_alloc_ert_init_context(const enkf_main_type * enkf_main , enkf_fs_type * fs, const bool_vector_type * iactive , init_mode_type init_mode , int iter);
 
 

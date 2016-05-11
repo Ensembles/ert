@@ -24,6 +24,7 @@
 #include <ert/util/stringlist.h>
 #include <ert/util/type_vector_functions.h>
 
+#include <ert/enkf/enkf_fs.h>
 #include <ert/enkf/enkf_types.h>
 #include <ert/enkf/run_arg.h>
 #include <ert/enkf/ert_init_context.h>
@@ -34,12 +35,12 @@
 
 struct ert_init_context_struct {
   UTIL_TYPE_ID_DECLARATION;
+  enkf_fs_type     * init_fs;
   vector_type      * run_args;
-  bool_vector_type * iactive;   // This can be updated ....
+  bool_vector_type * iactive;   // This can be updated in the ert_init_context_deselect_matching() function.
   init_mode_type     init_mode;
   int                iter;
   int_vector_type  * iens_map;
-
 };
 
 
@@ -75,10 +76,11 @@ stringlist_type * ert_init_context_alloc_runpath_list(const bool_vector_type * i
 }
 
 
-static ert_init_context_type * ert_init_context_alloc1(const bool_vector_type * iactive , init_mode_type init_mode, int iter) {
+static ert_init_context_type * ert_init_context_alloc1(enkf_fs_type * init_fs, const bool_vector_type * iactive , init_mode_type init_mode, int iter) {
   ert_init_context_type * context = util_malloc( sizeof * context );
   UTIL_TYPE_ID_INIT( context , ERT_INIT_CONTEXT_TYPE_ID );
 
+  context->init_fs = init_fs;
   context->iactive = bool_vector_alloc_copy( iactive );
   context->iens_map = bool_vector_alloc_active_index_list( iactive , -1 );
   context->run_args = vector_alloc_new();
@@ -94,7 +96,7 @@ ert_init_context_type * ert_init_context_alloc(enkf_fs_type * init_fs , const bo
                                                init_mode_type init_mode ,
                                                int iter) {
 
-  ert_init_context_type * context = ert_init_context_alloc1( iactive , init_mode , iter );
+  ert_init_context_type * context = ert_init_context_alloc1( init_fs, iactive , init_mode , iter );
   {
     stringlist_type * runpath_list = ert_init_context_alloc_runpath_list( iactive , runpath_fmt , subst_list , iter );
     for (int iens = 0; iens < bool_vector_size( iactive ); iens++) {
@@ -145,6 +147,10 @@ run_arg_type * ert_init_context_iget_arg( const ert_init_context_type * context 
 }
 
 
+enkf_fs_type * ert_init_context_get_fs( const ert_init_context_type * context ) {
+  return context->init_fs;
+}
+
 run_arg_type * ert_init_context_iens_get_arg( const ert_init_context_type * context , int iens) {
   int index = int_vector_iget( context->iens_map , iens );
   if (index >= 0)
@@ -152,3 +158,14 @@ run_arg_type * ert_init_context_iens_get_arg( const ert_init_context_type * cont
   else
     return NULL;
 }
+
+
+
+
+void ert_init_context_deselect_matching( ert_init_context_type * context , int mask) {
+  state_map_deselect_matching( enkf_fs_get_state_map( context->init_fs ) ,
+                               context->iactive,
+                               mask );
+}
+
+
