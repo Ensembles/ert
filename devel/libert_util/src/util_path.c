@@ -21,19 +21,33 @@
 #endif
 
 #include <stdlib.h>
+
 /**
   This little function checks if the supplied path is an abolute path,
-  or a relative path. The check is extremely simple - if the first
-  character equals "/" (on Unix) it is interpreted as an abolute path,
+  or a relative path. On posix the check is extremely simple - if the
+  first character equals "/" it is interpreted as an abolute path,
   otherwise not.
 */
 
 
 bool util_is_abs_path(const char * path) {
+#ifdef ERT_WINDOWS
+  if ((path[0] == '/') || (path[0] == '\\'))
+    return true;
+  else 
+    if ((isalpha(path[0]) && (path[1] == ':')))
+      return true;
+
+  return false;
+
+#else
+
   if (path[0] == UTIL_PATH_SEP_CHAR)
     return true;
   else
     return false;
+
+#endif
 }
 
 static int util_mkdir( const char * path ) {

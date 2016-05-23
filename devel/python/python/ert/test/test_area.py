@@ -20,8 +20,8 @@ from ert.util import UtilPrototype
 
 
 class TestArea(BaseCClass):
-    _test_area_alloc           = UtilPrototype("void* test_work_area_alloc( char* )")
-    _test_area_alloc_relative  = UtilPrototype("void* test_work_area_alloc_relative( char* , char* )")
+    _test_area_alloc           = UtilPrototype("void* test_work_area_alloc( char* )" , bind = False)
+    _test_area_alloc_relative  = UtilPrototype("void* test_work_area_alloc_relative( char* , char* )" , bind = False)
     _free                      = UtilPrototype("void test_work_area_free( test_area )")
     _install_file              = UtilPrototype("void test_work_area_install_file( test_area , char* )")
     _copy_directory            = UtilPrototype("void test_work_area_copy_directory( test_area , char* )")
@@ -49,37 +49,71 @@ class TestArea(BaseCClass):
 
         
     def get_original_cwd(self):
-        return self._get_original_cwd(self)
+        return self._get_original_cwd()
 
     def get_cwd(self):
-        return self._get_cwd(self)
-        
+        return self._get_cwd()
+
+    def orgPath(self , path):
+        if os.path.isabs( path ):
+            return path
+        else:
+            return os.path.abspath( os.path.join( self.get_original_cwd( ) , path ) )
+    
+
+    # All the methods install_file() , copy_directory(),
+    # copy_parent_directory(), copy_parent_content(),
+    # copy_directory_content() and copy_file() expect an input
+    # argument which is relative to the original CWD - or absolute.
 
     def install_file( self, filename):
-        self._install_file(self, filename)
+        if os.path.isfile(self.orgPath(filename)):
+            self._install_file(filename)
+        else:
+            raise IOError("No such file:%s" % filename)
 
 
     def copy_directory( self, directory):
-        self._copy_directory(self, directory)
+        if os.path.isdir( self.orgPath(directory) ):
+            self._copy_directory(directory)
+        else:
+            raise IOError("No such directory: %s" % directory)
 
     def copy_parent_directory( self , path):
-        self._copy_parent_directory(self , path)
+        if os.path.exists( self.orgPath(path) ):
+            self._copy_parent_directory( path)
+        else:
+            raise IOError("No such file or directeory: %s" % path)
 
+        
     def copy_parent_content( self , path):
-        self._copy_parent_content(self , path)
+        if os.path.exists( self.orgPath(path) ):
+            self._copy_parent_content(path)
+        else:
+            raise IOError("No such file or directeory: %s" % path)
 
     def copy_directory_content( self, directory):
-        self._copy_directory_content(self, directory)
+        if os.path.isdir( self.orgPath(directory) ):
+            self._copy_directory_content(directory)
+        else:
+            raise IOError("No such directeory: %s" % path)
 
+        
     def copy_file( self, filename):
-        self._copy_file(self, filename)
+        if os.path.isfile( self.orgPath(filename) ):
+            self._copy_file(filename)
+        else:
+            raise IOError("No such file:%s" % filename)
 
+        
     def free(self):
-        self._free(self)
+        self._free()
 
+        
     def set_store(self, store):
-        self._set_store(self , store)
+        self._set_store(store)
 
+        
     def getFullPath(self , path):
         if not os.path.exists( path ):
             raise IOError("Path not found:%s" % path)

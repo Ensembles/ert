@@ -69,14 +69,24 @@ per module organization:
      namespace 'ecl'.
 
 """
-from ert.cwrap import clib
-
 import ert.util
 import ert.geo
 
+from ert.cwrap import clib
+from ert.cwrap.metacwrap import Prototype
 
+
+class EclPrototype(Prototype):
+    lib = clib.ert_load("libecl")
+
+    def __init__(self, prototype, bind=True):
+        super(EclPrototype, self).__init__(EclPrototype.lib, prototype, bind=bind)
+
+
+        
 ECL_LIB = clib.ert_load("libecl")
 
+from .ecl_sum_var_type import EclSumVarType
 from .ecl_sum_tstep import EclSumTStep
 from .ecl_sum import EclSum #, EclSumVector, EclSumNode, EclSMSPECNode
 from .ecl_sum_keyword_vector import EclSumKeyWordVector
