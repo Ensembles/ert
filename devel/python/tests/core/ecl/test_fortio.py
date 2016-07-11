@@ -80,6 +80,7 @@ class FortIOTest(ExtendedTestCase):
             with openFortIO("file" , mode = FortIO.WRITE_MODE) as f:
                 kw1.fwrite( f )
 
+                self.assertEqual( f.filename , "file")
             with openFortIO("file") as f:
                 kw2 = EclKW.fread( f )
 

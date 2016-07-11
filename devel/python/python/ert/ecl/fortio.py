@@ -62,6 +62,7 @@ class FortIO(BaseCClass):
     _seek           = EclPrototype("void fortio_fseek(fortio, int)")
     _close          = EclPrototype("bool fortio_fclose(fortio)")
 
+    _filename       = EclPrototype("char* fortio_filename_ref(fortio)")
 
 
     def __init__(self, file_name, mode=READ_MODE, fmt_file=False, endian_flip_header=True):
@@ -131,6 +132,8 @@ class FortIO(BaseCClass):
         return self._get_position( )
 
     def seek(self, position):
+    def filename(self):
+        return self._filename( )
         # SEEK_SET = 0
         # SEEK_CUR = 1
         # SEEK_END = 2
