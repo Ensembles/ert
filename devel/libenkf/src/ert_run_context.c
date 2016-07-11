@@ -266,3 +266,9 @@ void ert_run_context_set_update_target_fs(ert_run_context_type * context, enkf_f
   } else
     context->update_target_fs = NULL;
 }
+
+
+
+void ert_run_context_deactivate_realization( ert_run_context_type * context , int iens) {
+  bool_vector_iset( context->iactive , iens , false );
+}

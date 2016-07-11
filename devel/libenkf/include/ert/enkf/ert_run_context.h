@@ -61,6 +61,7 @@ typedef struct ert_run_context_struct ert_run_context_type;
   int                      ert_run_context_get_load_start( const ert_run_context_type * context );
   run_arg_type           * ert_run_context_iget_arg( const ert_run_context_type * context , int index);
   run_arg_type           * ert_run_context_iens_get_arg( const ert_run_context_type * context , int iens);
+  void                     ert_run_context_deactivate_realization( ert_run_context_type * context , int iens);
 
   enkf_fs_type * ert_run_context_get_init_fs(const ert_run_context_type * run_context);
   enkf_fs_type * ert_run_context_get_result_fs(const ert_run_context_type * run_context);
