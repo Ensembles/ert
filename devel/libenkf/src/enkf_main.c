@@ -1599,27 +1599,11 @@ static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
         run_arg_type * run_arg = ert_run_context_iens_get_arg( run_context , iens );
         run_status_type run_status = run_arg_get_run_status( run_arg );
 
-        switch (run_status) {
-        case JOB_RUN_FAILURE:
-          enkf_main_report_run_failure( enkf_main , run_arg );
-          bool_vector_iset(ert_run_context_get_iactive( run_context ), iens, false);
-          break;
-        case JOB_NOT_STARTED:
-          enkf_main_report_run_failure( enkf_main , run_arg );
-          bool_vector_iset(ert_run_context_get_iactive( run_context ), iens, false);
-          break;
-        case JOB_LOAD_FAILURE:
-          enkf_main_report_load_failure( enkf_main , run_arg );
-          bool_vector_iset(ert_run_context_get_iactive( run_context ), iens, false);
-          break;
-        case JOB_RUN_OK:
-          break;
-        default:
-          util_abort("%s: invalid job status:%d \n",__func__ , run_status );
+        if ((run_status == JOB_LOAD_FAILURE) || (run_status == JOB_RUN_FAILURE)) {
+          ert_run_context_deactivate_realization(run_context, iens);
+          totalOK = false;
         }
-        totalOK = totalOK && ( run_status == JOB_RUN_OK );
       }
-
     }
     enkf_fs_fsync( ert_run_context_get_result_fs( run_context ) );
     if (totalOK)
