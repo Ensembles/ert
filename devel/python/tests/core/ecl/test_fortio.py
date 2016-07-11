@@ -23,14 +23,6 @@ from ert.test import ExtendedTestCase, TestAreaContext
 
 
 class FortIOTest(ExtendedTestCase):
-    def setUp(self):
-        self.unrst_file = self.createTestPath("Statoil/ECLIPSE/Gurbat/ECLIPSE.UNRST")
-
-
-    def test_open_read(self):
-        f = FortIO(self.unrst_file, FortIO.READ_MODE)
-        self.assertIsNotNone(f)
-
 
     def test_open_write(self):
         with TestAreaContext("python/fortio/write"):
