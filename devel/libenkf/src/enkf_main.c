@@ -1502,6 +1502,7 @@ static void enkf_main_submit_jobs__( enkf_main_type * enkf_main ,
         arg_pack_append_ptr( arg_pack , enkf_main );
         arg_pack_append_ptr( arg_pack , run_arg);
 
+        run_arg_set_run_status( run_arg, JOB_SUBMITTED );
         thread_pool_add_job(submit_threads , enkf_main_isubmit_job__ , arg_pack);
       }
     }
