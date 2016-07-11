@@ -1798,7 +1798,6 @@ static bool enkf_main_run_analysis(enkf_main_type * enkf_main, enkf_fs_type * so
     updateOK = enkf_main_smoother_update(enkf_main, source_fs, enkf_main_get_fs(enkf_main));
   } else {
     enkf_fs_type * target_fs = enkf_main_mount_alt_fs(enkf_main , target_fs_name , true );
-    printf("Running analysis on case %s, target case is %s\n", enkf_main_get_current_fs(enkf_main), enkf_fs_get_case_name(target_fs));
     updateOK = enkf_main_smoother_update(enkf_main, source_fs , target_fs);
     enkf_fs_decref( target_fs );
   }
