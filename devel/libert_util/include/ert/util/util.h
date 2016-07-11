@@ -168,7 +168,7 @@ typedef enum {left_pad   = 0,
   bool         util_file_readable( const char * file );
   bool         util_entry_readable( const char * entry );
   bool         util_entry_writable( const char * entry );
-  void         util_ftruncate(FILE * stream , long size);
+  bool         util_ftruncate(FILE * stream , long size);
 
   void         util_usleep( unsigned long micro_seconds );
   void         util_yield();
