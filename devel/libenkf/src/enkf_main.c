@@ -1414,10 +1414,11 @@ void * enkf_main_icreate_run_path( enkf_main_type * enkf_main, run_arg_type * ru
   return NULL;
 }
 
-void * enkf_main_create_run_path__( enkf_main_type * enkf_main,
-                                    const ert_init_context_type * init_context,
-                                    const bool_vector_type * iactive ){
 
+static void * enkf_main_create_run_path__( enkf_main_type * enkf_main,
+                                           const ert_init_context_type * init_context) {
+
+  const bool_vector_type * iactive = ert_init_context_get_iactive(init_context);
   const int active_ens_size = util_int_min( bool_vector_size( iactive ) , enkf_main_get_ensemble_size( enkf_main ));
   int iens;
   for (iens = 0; iens < active_ens_size; iens++) {
@@ -1429,9 +1430,8 @@ void * enkf_main_create_run_path__( enkf_main_type * enkf_main,
   return NULL;
 }
 
-void enkf_main_create_run_path(enkf_main_type * enkf_main , bool_vector_type * iactive , int iter) {
+void enkf_main_create_run_path(enkf_main_type * enkf_main , const bool_vector_type * iactive , int iter) {
   init_mode_type init_mode = INIT_CONDITIONAL;
-  ert_init_context_type * init_context = NULL;
 
   enkf_main_init_internalization(enkf_main , init_mode);
   {
@@ -1444,13 +1444,17 @@ void enkf_main_create_run_path(enkf_main_type * enkf_main , bool_vector_type * i
     stringlist_free( param_list );
   }
 
-  init_context = enkf_main_alloc_ert_init_context( enkf_main ,
-                                                   enkf_main_get_fs( enkf_main ),
-                                                   iactive ,
-                                                   init_mode ,
-                                                   iter );
-  enkf_main_create_run_path__( enkf_main , init_context, iactive );
-  ert_init_context_free( init_context );
+
+  {
+    ert_init_context_type * init_context = enkf_main_alloc_ert_init_context( enkf_main ,
+                                                                             enkf_main_get_fs( enkf_main ),
+                                                                             iactive ,
+                                                                             init_mode ,
+                                                                             iter );
+    enkf_main_create_run_path__( enkf_main , init_context );
+    ert_init_context_free( init_context );
+  }
+
 
   /*
     The runpath_list is written to disk here, when all the simulation
