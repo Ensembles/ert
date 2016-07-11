@@ -1547,7 +1547,7 @@ void enkf_main_submit_jobs( enkf_main_type * enkf_main ,
 
 
 static bool enkf_main_run_step(enkf_main_type * enkf_main       ,
-                               const ert_run_context_type * run_context) {
+                               ert_run_context_type * run_context) {
 
   if (ert_run_context_get_step1(run_context))
     ecl_config_assert_restart( enkf_main_get_ecl_config( enkf_main ) );
