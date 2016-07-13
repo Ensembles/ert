@@ -164,11 +164,18 @@ class EclKW(BaseCClass):
 
     @classprop
     def int_kw( cls ):
+        warnings.warn("The EclKW.int_kw  class property has been deprecated - use class method: EclKW.intKeywords( )" , DeprecationWarning )
+        return cls.intKeywords( )
+
+
+    @classmethod
+    def intKeywords(cls):
         """Will return the current set of integer keywords."""
         return cls.int_kw_set
 
-        
-        
+
+
+
     @classmethod
     def create( cls , name, size , data_type):
         """
