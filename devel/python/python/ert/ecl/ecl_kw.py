@@ -825,7 +825,7 @@ class EclKW(BaseCClass):
         return self.equal( other )
 
 
-    def equal_numeric(self , other , epsilon = 1e-6):
+    def equal_numeric(self , other , epsilon = 1e-6, abs_epsilon = None , rel_epsilon = None):
         """
         Will check if two numerical keywords are ~nearly equal.
 
@@ -833,7 +833,13 @@ class EclKW(BaseCClass):
         absolute.
         """
         if isinstance(other , EclKW):
-            return self._equal_numeric( other , epsilon , epsilon )
+            if abs_epsilon is None:
+                abs_epsilon = epsilon
+
+            if rel_epsilon is None:
+                rel_epsilon = epsilon
+                
+            return self._equal_numeric( other , abs_epsilon , rel_epsilon )
         else:
             raise TypeError("Can only compare with another EclKW")
 
