@@ -16,6 +16,7 @@
 #  for more details.
 import os
 import random
+import numpy
 from ert.ecl import EclKW, EclTypeEnum, EclFile, FortIO, EclFileFlagEnum , openFortIO
 
 from ert.test import ExtendedTestCase , TestAreaContext
@@ -327,3 +328,11 @@ class KWTest(ExtendedTestCase):
 
         for v in kw4:
             self.assertEqual( v , 12 )
+
+    def test_numpy(self):
+        kw1 = EclKW("Name1", 10, EclTypeEnum.ECL_DOUBLE_TYPE )
+
+        arr = kw1.numpy_array
+        self.assertTrue( arr[ 0 ] == kw1[ 0 ] )
+        kw1[ 0 ] += 1
+        self.assertTrue( arr[ 0 ] == kw1[ 0 ] )

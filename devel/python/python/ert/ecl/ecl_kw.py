@@ -1058,11 +1058,18 @@ class EclKW(BaseCClass):
 
     @property
     def numpy_array( self ):
-        if self.data_ptr:
-            a = self.array
-            value = numpy.zeros( a.size , dtype = self.dtype)
-            for i in range( a.size ):
-                value[i] = a[i]
+        if not self.data_ptr:
+            return None
+
+        if self.dtype is numpy.float64:
+            ct = ctypes.c_double
+        elif self.dtype is numpy.float32:
+            ct = ctypes.c_float
+        else:
+            ct = ctypes.c_int
+
+        ap = ctypes.cast(self.data_ptr, ctypes.POINTER(ct * len(self)))
+        return numpy.frombuffer(ap.contents, dtype = self.dtype)
 
     def fwrite( self , fortio ):
         self._fwrite( fortio )
