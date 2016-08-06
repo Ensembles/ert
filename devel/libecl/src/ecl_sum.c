@@ -1285,7 +1285,8 @@ time_t_vector_type * ecl_sum_alloc_time_solution( const ecl_sum_type * ecl_sum ,
   {
     double_vector_type * seconds = ecl_sum_alloc_seconds_solution( ecl_sum , gen_key , cmp_value , rates_clamp_lower );
     time_t start_time = ecl_sum_get_start_time(ecl_sum);
-    for (int i=0; i < double_vector_size( seconds ); i++) {
+    int i = 0;
+    for (i=0; i < double_vector_size( seconds ); i++) {
       time_t t = start_time;
       util_inplace_forward_seconds( &t , double_vector_iget( seconds , i ));
       time_t_vector_append( solution , t );
