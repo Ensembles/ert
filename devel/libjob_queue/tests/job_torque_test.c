@@ -44,13 +44,10 @@ void setoption_setalloptions_optionsset() {
   test_option(driver, TORQUE_JOB_PREFIX_KEY, "coolJob");
 
   test_assert_int_equal( 0 , torque_driver_get_submit_sleep(driver));
-  test_assert_NULL( torque_driver_get_debug_stream(driver) );
 
   test_assert_true( torque_driver_set_option( driver , TORQUE_SUBMIT_SLEEP , "0.25"));
   test_assert_int_equal( 250000 , torque_driver_get_submit_sleep(driver));
 
-  test_assert_true( torque_driver_set_option( driver , TORQUE_DEBUG_OUTPUT , "/tmp/torqueue_debug.txt"));
-  test_assert_not_NULL( torque_driver_get_debug_stream(driver) );
 
   printf("Options OK\n");
   torque_driver_free(driver);
