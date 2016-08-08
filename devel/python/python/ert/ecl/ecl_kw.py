@@ -114,7 +114,7 @@ class EclKW(BaseCClass):
     _equal             = EclPrototype("bool     ecl_kw_equal( ecl_kw , ecl_kw )")
     _equal_numeric     = EclPrototype("bool     ecl_kw_numeric_equal( ecl_kw , ecl_kw , double , double)")
 
-    _assert_binary     = EclPrototype("bool     ecl_kw_assert_binary_numeric( ecl_kw , ecl_kw )")
+    _assert_binary     = EclPrototype("bool     ecl_kw_assert_binary_numeric( ecl_kw , ecl_kw )", bind = False)
     _scale_int         = EclPrototype("void     ecl_kw_scale_int( ecl_kw , int )")
     _scale_float       = EclPrototype("void     ecl_kw_scale_float_or_double( ecl_kw , double )")
     _shift_int         = EclPrototype("void     ecl_kw_shift_int( ecl_kw , int )")
@@ -521,7 +521,7 @@ class EclKW(BaseCClass):
     def __IMUL__(self , factor , mul = True):
         if self.isNumeric():
             if hasattr( factor , "ecl_kw_instance"):
-                if self._assert_binary( self, factor ):
+                if self.assert_binary( factor ):
                     if mul:
                         self._imul( factor )
                     else:
@@ -552,7 +552,7 @@ class EclKW(BaseCClass):
     def __IADD__(self , delta , add = True):
         if self.isNumeric():
             if type(self) == type(delta):
-                if self._assert_binary( delta):
+                if self.assert_binary( delta):
                     if add:
                         self._iadd(delta )
                     else:
@@ -667,7 +667,7 @@ class EclKW(BaseCClass):
         Utility function to assert that keywords @self and @other can
         be combined.
         """
-        return self._assert_binary( other )
+        return self._assert_binary( self, other )
 
     #################################################################
         
