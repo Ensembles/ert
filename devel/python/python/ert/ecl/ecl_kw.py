@@ -514,7 +514,7 @@ class EclKW(BaseCClass):
     def __IMUL__(self , factor , mul = True):
         if self.isNumeric():
             if hasattr( factor , "ecl_kw_instance"):
-                if self._assert_binary( self, factor ):
+                if self.assert_binary( factor ):
                     if mul:
                         self._imul( factor )
                     else:
@@ -545,7 +545,7 @@ class EclKW(BaseCClass):
     def __IADD__(self , delta , add = True):
         if self.isNumeric():
             if type(self) == type(delta):
-                if self._assert_binary( delta):
+                if self.assert_binary( delta):
                     if add:
                         self._iadd(delta )
                     else:
