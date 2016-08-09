@@ -114,7 +114,7 @@ class EclKW(BaseCClass):
     _equal             = EclPrototype("bool     ecl_kw_equal( ecl_kw , ecl_kw )")
     _equal_numeric     = EclPrototype("bool     ecl_kw_numeric_equal( ecl_kw , ecl_kw , double , double)")
 
-    _assert_binary     = EclPrototype("bool     ecl_kw_assert_binary_numeric( ecl_kw , ecl_kw )", bind = False)
+    _assert_binary     = EclPrototype("bool     ecl_kw_assert_binary_numeric( ecl_kw , ecl_kw )")
     _scale_int         = EclPrototype("void     ecl_kw_scale_int( ecl_kw , int )")
     _scale_float       = EclPrototype("void     ecl_kw_scale_float_or_double( ecl_kw , double )")
     _shift_int         = EclPrototype("void     ecl_kw_shift_int( ecl_kw , int )")
@@ -667,7 +667,7 @@ class EclKW(BaseCClass):
         Utility function to assert that keywords @self and @other can
         be combined.
         """
-        return self._assert_binary( self, other )
+        return self._assert_binary( other )
 
     #################################################################
         
