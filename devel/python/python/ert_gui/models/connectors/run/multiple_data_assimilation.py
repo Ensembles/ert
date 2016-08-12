@@ -50,8 +50,10 @@ class MultipleDataAssimilation(BaseRunModel):
         iteration_count = len(weights)
 
         print("Running MDA ES for %s  iterations\t%s" % (iteration_count, ", ".join(str(weight) for weight in weights)))
-        weights = self.normalizeWeights(weights)
 
+        self.setAnalysisModule()
+
+        weights = self.normalizeWeights(weights)
         weight_string = ", ".join(str(round(weight,3)) for weight in weights)
         print("Running MDA ES on (weights normalized)\t%s" % weight_string)
 
