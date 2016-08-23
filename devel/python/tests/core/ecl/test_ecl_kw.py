@@ -327,3 +327,22 @@ class KWTest(ExtendedTestCase):
 
         for v in kw4:
             self.assertEqual( v , 12 )
+
+
+
+    def test_slice(self):
+        N = 100
+        kw = EclKW("KW" , N , EclTypeEnum.ECL_INT_TYPE)
+        for i in range(len(kw)):
+            kw[i] = i
+
+        even = kw[0:len(kw):2]
+        odd  = kw[1:len(kw):2]
+
+        self.assertEqual( len(even) , N/2 )
+        self.assertEqual( len(odd)  , N/2 )
+
+        for i in range(len(even)):
+            self.assertEqual(even[i] , 2*i)
+            self.assertEqual(odd[i] , 2*i + 1)
+
