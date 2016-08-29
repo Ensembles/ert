@@ -460,22 +460,30 @@ int ecl_file_iget_named_size( const ecl_file_type * file , const char * kw , int
 
 /*****************************************************************/
 
-static void ecl_file_add_map( ecl_file_type * ecl_file , ecl_file_view_type * ecl_file_view) {
-  vector_append_owned_ref(ecl_file->view_list , ecl_file_view , ecl_file_view_free__ );
+static void ecl_file_add_view( ecl_file_type * ecl_file , ecl_file_view_type * view) {
+  vector_append_owned_ref(ecl_file->view_list , view , ecl_file_view_free__ );
 }
 
 
-static ecl_file_view_type * ecl_file_get_blockmap( ecl_file_type * ecl_file , const char * kw , int occurence , bool use_global) {
-  ecl_file_view_type * blockmap;
-  if (use_global)
-    blockmap = ecl_file_view_alloc_blockmap( ecl_file->global_view , kw , occurence );
-  else
-    blockmap = ecl_file_view_alloc_blockmap( ecl_file->active_view , kw , occurence );
+static ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
+  ecl_file_view_type * view = ecl_file_view_alloc_blockmap( ecl_file->global_view , kw , occurence );
 
-  if (blockmap != NULL)
-    ecl_file_add_map( ecl_file , blockmap );
-  return blockmap;
+  if (view)
+    ecl_file_add_view( ecl_file , view );
+
+  return view;
 }
+
+static ecl_file_view_type * ecl_file_get_relative_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
+  ecl_file_view_type * view = ecl_file_view_alloc_blockmap( ecl_file->active_view , kw , occurence );
+
+  if (view)
+    ecl_file_add_view( ecl_file , view );
+
+  return view;
+}
+
+
 
 
 /*****************************************************************/
@@ -558,7 +566,7 @@ ecl_file_type * ecl_file_open( const char * filename , int flags) {
     ecl_file->fortio = fortio;
     ecl_file->global_view = ecl_file_view_alloc( ecl_file->fortio , &ecl_file->flags , ecl_file->inv_view , true );
 
-    ecl_file_add_map( ecl_file , ecl_file->global_view );
+    ecl_file_add_view( ecl_file , ecl_file->global_view );
     if (ecl_file_scan( ecl_file )) {
       ecl_file_select_global( ecl_file );
 
@@ -605,7 +613,7 @@ void ecl_file_pop_block( ecl_file_type * ecl_file ) {
 
 
 bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  ecl_file_view_type * blockmap = ecl_file_get_blockmap( ecl_file , kw , occurence , false);
+  ecl_file_view_type * blockmap = ecl_file_get_relative_blockview( ecl_file , kw , occurence);
   if (blockmap != NULL) {
     ecl_file->active_view = blockmap;
     return true;
@@ -615,7 +623,7 @@ bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int 
 
 
 bool ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence ) {
-  ecl_file_view_type * blockmap = ecl_file_get_blockmap( ecl_file , kw , occurence , true);
+  ecl_file_view_type * blockmap = ecl_file_get_global_blockview( ecl_file , kw , occurence);
   if (blockmap != NULL) {
     ecl_file->active_view = blockmap;
     return true;
