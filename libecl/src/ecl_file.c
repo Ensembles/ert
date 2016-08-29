@@ -31,11 +31,11 @@
 #include <ert/ecl/fortio.h>
 #include <ert/ecl/ecl_kw.h>
 #include <ert/ecl/ecl_file.h>
+#include <ert/ecl/ecl_file_view.h>
 #include <ert/ecl/ecl_endian_flip.h>
 #include <ert/ecl/ecl_kw_magic.h>
 #include <ert/ecl/ecl_rsthead.h>
 #include <ert/ecl/ecl_file_kw.h>
-
 
 /**
    This file implements functionality to load an ECLIPSE file in
@@ -124,16 +124,6 @@
 
 
 
-typedef struct file_map_struct file_map_type;
-struct file_map_struct {
-  vector_type       * kw_list;      /* This is a vector of ecl_file_kw instances corresponding to the content of the file. */
-  hash_type         * kw_index;     /* A hash table with integer vectors of indices - see comment below. */
-  stringlist_type   * distinct_kw;  /* A stringlist of the keywords occuring in the file - each string occurs ONLY ONCE. */
-  fortio_type       * fortio;       /* The same fortio instance pointer as in the ecl_file styructure. */
-  bool                owner;        /* Is this map the owner of the ecl_file_kw instances; only true for the global_map. */
-  inv_map_type     *  inv_map;       /* Shared reference owned by the ecl_file structure. */
-  int               * flags;
-};
 
 
 struct ecl_file_struct {
@@ -176,335 +166,6 @@ struct ecl_file_struct {
 */
 
 
-/*****************************************************************/
-/* Here comes the functions related to the index file_map. These
-   functions are all of them static.
-*/
-
-
-static bool FILE_FLAGS_SET( int state_flags , int query_flags) {
-  if ((state_flags & query_flags) == query_flags)
-    return true;
-  else
-    return false;
-}
-
-
-
-static file_map_type * file_map_alloc( fortio_type * fortio , int * flags , inv_map_type * inv_map , bool owner ) {
-  file_map_type * file_map     = util_malloc( sizeof * file_map );
-  file_map->kw_list            = vector_alloc_new();
-  file_map->kw_index           = hash_alloc();
-  file_map->distinct_kw        = stringlist_alloc_new();
-  file_map->owner              = owner;
-  file_map->fortio             = fortio;
-  file_map->inv_map            = inv_map;
-  file_map->flags          = flags;
-  return file_map;
-}
-
-static int file_map_get_global_index( const file_map_type * file_map , const char * kw , int ith) {
-  const int_vector_type * index_vector = hash_get(file_map->kw_index , kw);
-  int global_index = int_vector_iget( index_vector , ith);
-  return global_index;
-}
-
-
-
-/**
-   This function iterates over the kw_list vector and builds the
-   internal index fields 'kw_index' and 'distinct_kw'. This function
-   must be called every time the content of the kw_list vector is
-   modified (otherwise the ecl_file instance will be in an
-   inconsistent state).
-*/
-
-
-static void file_map_make_index( file_map_type * file_map ) {
-  stringlist_clear( file_map->distinct_kw );
-  hash_clear( file_map->kw_index );
-  {
-    int i;
-    for (i=0; i < vector_get_size( file_map->kw_list ); i++) {
-      const ecl_file_kw_type * file_kw = vector_iget_const( file_map->kw_list , i);
-      const char             * header  = ecl_file_kw_get_header( file_kw );
-      if ( !hash_has_key( file_map->kw_index , header )) {
-        int_vector_type * index_vector = int_vector_alloc( 0 , -1 );
-        hash_insert_hash_owned_ref( file_map->kw_index , header , index_vector , int_vector_free__);
-        stringlist_append_copy( file_map->distinct_kw , header);
-      }
-
-      {
-        int_vector_type * index_vector = hash_get( file_map->kw_index , header);
-        int_vector_append( index_vector , i);
-      }
-    }
-  }
-}
-
-static bool file_map_has_kw( const file_map_type * file_map, const char * kw) {
-  return hash_has_key( file_map->kw_index , kw );
-}
-
-
-static ecl_file_kw_type * file_map_iget_file_kw( const file_map_type * file_map , int global_index) {
-  ecl_file_kw_type * file_kw = vector_iget( file_map->kw_list , global_index);
-  return file_kw;
-}
-
-static ecl_file_kw_type * file_map_iget_named_file_kw( const file_map_type * file_map , const char * kw, int ith) {
-  int global_index = file_map_get_global_index( file_map , kw , ith);
-  ecl_file_kw_type * file_kw = file_map_iget_file_kw( file_map , global_index );
-  return file_kw;
-}
-
-
-
-static ecl_kw_type * file_map_iget_kw( const file_map_type * file_map , int index) {
-  ecl_file_kw_type * file_kw = file_map_iget_file_kw( file_map , index );
-  ecl_kw_type * ecl_kw = ecl_file_kw_get_kw_ptr( file_kw , file_map->fortio , file_map->inv_map);
-  if (!ecl_kw) {
-    if (fortio_assert_stream_open( file_map->fortio )) {
-
-      ecl_kw = ecl_file_kw_get_kw( file_kw , file_map->fortio , file_map->inv_map);
-
-      if (FILE_FLAGS_SET( file_map->flags[0] , ECL_FILE_CLOSE_STREAM))
-        fortio_fclose_stream( file_map->fortio );
-    }
-  }
-  return ecl_kw;
-}
-
-static void file_map_index_fload_kw(const file_map_type * file_map, const char* kw, int index, const int_vector_type * index_map, char* buffer) {
-    ecl_file_kw_type * file_kw = file_map_iget_named_file_kw( file_map , kw , index);
-
-    if (fortio_assert_stream_open( file_map->fortio )) {
-        offset_type offset = ecl_file_kw_get_offset(file_kw);
-        ecl_type_enum ecl_type = ecl_file_kw_get_type(file_kw);
-        int element_count = ecl_file_kw_get_size(file_kw);
-
-        ecl_kw_fread_indexed_data(file_map->fortio, offset + ECL_KW_HEADER_FORTIO_SIZE, ecl_type, element_count, index_map, buffer);
-    }
-}
-
-
-static int file_map_find_kw_value( const file_map_type * file_map , const char * kw , const void * value) {
-  int global_index = -1;
-  if ( file_map_has_kw( file_map , kw)) {
-    const int_vector_type * index_list = hash_get( file_map->kw_index , kw );
-    int index = 0;
-    while (index < int_vector_size( index_list )) {
-      const ecl_kw_type * ecl_kw = file_map_iget_kw( file_map , int_vector_iget( index_list , index ));
-      if (ecl_kw_data_equal( ecl_kw , value )) {
-        global_index = int_vector_iget( index_list , index );
-        break;
-      }
-      index++;
-    }
-  }
-  return global_index;
-}
-
-static const char * file_map_iget_distinct_kw( const file_map_type * file_map , int index) {
-  return stringlist_iget( file_map->distinct_kw , index);
-}
-
-static int file_map_get_num_distinct_kw( const file_map_type * file_map ) {
-  return stringlist_get_size( file_map->distinct_kw );
-}
-
-static int file_map_get_size( const file_map_type * file_map ) {
-  return vector_get_size( file_map->kw_list );
-}
-
-
-static ecl_type_enum file_map_iget_type( const file_map_type * file_map , int index) {
-  ecl_file_kw_type * file_kw = file_map_iget_file_kw( file_map , index );
-  return ecl_file_kw_get_type( file_kw );
-}
-
-static int file_map_iget_size( const file_map_type * file_map , int index) {
-  ecl_file_kw_type * file_kw = file_map_iget_file_kw( file_map , index );
-  return ecl_file_kw_get_size( file_kw );
-}
-
-static const char * file_map_iget_header( const file_map_type * file_map , int index) {
-  ecl_file_kw_type * file_kw = file_map_iget_file_kw( file_map , index );
-  return ecl_file_kw_get_header( file_kw );
-}
-
-
-static ecl_kw_type * file_map_iget_named_kw( const file_map_type * file_map , const char * kw, int ith) {
-  ecl_file_kw_type * file_kw = file_map_iget_named_file_kw( file_map , kw , ith);
-  ecl_kw_type * ecl_kw = ecl_file_kw_get_kw_ptr( file_kw , file_map->fortio , file_map->inv_map );
-  if (!ecl_kw) {
-    if (fortio_assert_stream_open( file_map->fortio )) {
-
-      ecl_kw = ecl_file_kw_get_kw( file_kw , file_map->fortio , file_map->inv_map);
-
-      if (FILE_FLAGS_SET( file_map->flags[0] , ECL_FILE_CLOSE_STREAM))
-        fortio_fclose_stream( file_map->fortio );
-    }
-  }
-  return ecl_kw;
-}
-
-static ecl_type_enum file_map_iget_named_type( const file_map_type * file_map , const char * kw , int ith) {
-  ecl_file_kw_type * file_kw = file_map_iget_named_file_kw( file_map , kw, ith);
-  return ecl_file_kw_get_type( file_kw );
-}
-
-static int file_map_iget_named_size( const file_map_type * file_map , const char * kw , int ith) {
-  ecl_file_kw_type * file_kw = file_map_iget_named_file_kw( file_map , kw , ith );
-  return ecl_file_kw_get_size( file_kw );
-}
-
-
-static void file_map_replace_kw( file_map_type * file_map , ecl_kw_type * old_kw , ecl_kw_type * new_kw , bool insert_copy) {
-  int index = 0;
-  while (index < vector_get_size( file_map->kw_list )) {
-    ecl_file_kw_type * ikw = vector_iget( file_map->kw_list , index );
-    if (ecl_file_kw_ptr_eq( ikw , old_kw)) {
-      /*
-         Found it; observe that the vector_iset() function will
-         automatically invoke the destructor on the old_kw.
-      */
-      ecl_kw_type * insert_kw = new_kw;
-
-      if (insert_copy)
-        insert_kw = ecl_kw_alloc_copy( new_kw );
-      ecl_file_kw_replace_kw( ikw , file_map->fortio , insert_kw );
-
-      file_map_make_index( file_map );
-      return;
-    }
-    index++;
-  }
-  util_abort("%s: could not find ecl_kw ptr: %p \n",__func__ , old_kw);
-}
-
-
-static bool file_map_load_all( file_map_type * file_map ) {
-  bool loadOK = false;
-
-  if (fortio_assert_stream_open( file_map->fortio )) {
-    int index;
-    for (index = 0; index < vector_get_size( file_map->kw_list); index++) {
-      ecl_file_kw_type * ikw = vector_iget( file_map->kw_list , index );
-      ecl_file_kw_get_kw( ikw , file_map->fortio , file_map->inv_map);
-    }
-    loadOK = true;
-  }
-
-  if (FILE_FLAGS_SET( file_map->flags[0] , ECL_FILE_CLOSE_STREAM))
-    fortio_fclose_stream( file_map->fortio );
-
-  return loadOK;
-}
-
-
-/*****************************************************************/
-
-
-
-static void file_map_add_kw( file_map_type * file_map , ecl_file_kw_type * file_kw) {
-  if (file_map->owner)
-    vector_append_owned_ref( file_map->kw_list , file_kw , ecl_file_kw_free__ );
-  else
-    vector_append_ref( file_map->kw_list , file_kw);
-}
-
-static void file_map_free( file_map_type * file_map ) {
-  hash_free( file_map->kw_index );
-  stringlist_free( file_map->distinct_kw );
-  vector_free( file_map->kw_list );
-  free( file_map );
-}
-
-static void file_map_free__( void * arg ) {
-  file_map_type * file_map = ( file_map_type * ) arg;
-  file_map_free( file_map );
-}
-
-
-static int file_map_get_num_named_kw(const file_map_type * file_map , const char * kw) {
-  if (hash_has_key(file_map->kw_index , kw)) {
-    const int_vector_type * index_vector = hash_get(file_map->kw_index , kw);
-    return int_vector_size( index_vector );
-  } else
-    return 0;
-}
-
-static void file_map_fwrite( const file_map_type * file_map , fortio_type * target , int offset) {
-  int index;
-  for (index = offset; index < vector_get_size( file_map->kw_list ); index++) {
-    ecl_kw_type * ecl_kw = file_map_iget_kw( file_map , index );
-    ecl_kw_fwrite( ecl_kw , target );
-  }
-}
-
-
-
-
-static int file_map_iget_occurence( const file_map_type * file_map , int global_index) {
-  const ecl_file_kw_type * file_kw = vector_iget_const( file_map->kw_list , global_index);
-  const char * header              = ecl_file_kw_get_header( file_kw );
-  const int_vector_type * index_vector = hash_get( file_map->kw_index , header );
-  const int * index_data = int_vector_get_const_ptr( index_vector );
-
-  int occurence = -1;
-  {
-    /* Manual reverse lookup. */
-    int i;
-    for (i=0; i < int_vector_size( index_vector ); i++)
-      if (index_data[i] == global_index)
-        occurence = i;
-  }
-  if (occurence < 0)
-    util_abort("%s: internal error ... \n" , __func__);
-
-  return occurence;
-}
-
-static void file_map_fprintf_kw_list(const file_map_type * file_map , FILE * stream) {
-  int i;
-  for (i=0; i < vector_get_size( file_map->kw_list ); i++) {
-    const ecl_file_kw_type * file_kw = vector_iget_const( file_map->kw_list , i );
-    fprintf(stream , "%-8s %7d:%s\n",
-            ecl_file_kw_get_header( file_kw ) ,
-            ecl_file_kw_get_size( file_kw ) ,
-            ecl_util_get_type_name( ecl_file_kw_get_type( file_kw )));
-  }
-}
-
-/**
-   Will return NULL if the block which is asked for is not present.
-*/
-static file_map_type * file_map_alloc_blockmap(const file_map_type * file_map , const char * header, int occurence) {
-  if (file_map_get_num_named_kw( file_map , header ) > occurence) {
-    file_map_type * block_map = file_map_alloc( file_map->fortio , file_map->flags , file_map->inv_map , false);
-    if (file_map_has_kw( file_map , header )) {
-      int kw_index = file_map_get_global_index( file_map , header , occurence );
-      ecl_file_kw_type * file_kw = vector_iget( file_map->kw_list , kw_index );
-
-      while (true) {
-        file_map_add_kw( block_map , file_kw );
-
-        kw_index++;
-        if (kw_index == vector_get_size( file_map->kw_list ))
-          break;
-        else {
-          file_kw = vector_iget(file_map->kw_list , kw_index);
-          if (strcmp( header , ecl_file_kw_get_header( file_kw )) == 0)
-            break;
-        }
-      }
-    }
-    file_map_make_index( block_map );
-    return block_map;
-  } else
-    return NULL;
-}
 
 
 /*****************************************************************/
@@ -886,9 +547,8 @@ ecl_file_type * ecl_file_open( const char * filename , int flags) {
   bool          fmt_file;
 
   ecl_util_fmt_file( filename , &fmt_file);
-  //flags |= ECL_FILE_CLOSE_STREAM;   // DEBUG DEBUG DEBUG
 
-  if (FILE_FLAGS_SET(flags , ECL_FILE_WRITABLE))
+  if (ecl_file_view_flags_set(flags , ECL_FILE_WRITABLE))
     fortio = fortio_open_readwrite( filename , fmt_file , ECL_ENDIAN_FLIP);
   else
     fortio = fortio_open_reader( filename , fmt_file , ECL_ENDIAN_FLIP);
@@ -902,7 +562,7 @@ ecl_file_type * ecl_file_open( const char * filename , int flags) {
     if (ecl_file_scan( ecl_file )) {
       ecl_file_select_global( ecl_file );
 
-      if (FILE_FLAGS_SET( ecl_file->flags , ECL_FILE_CLOSE_STREAM))
+      if (ecl_file_view_flags_set( ecl_file->flags , ECL_FILE_CLOSE_STREAM))
         fortio_fclose_stream( ecl_file->fortio );
 
       return ecl_file;
@@ -927,11 +587,11 @@ void ecl_file_set_flags( ecl_file_type * ecl_file, int flags ) {
 }
 
 bool ecl_file_flags_set( const ecl_file_type * ecl_file , int flags) {
-  return FILE_FLAGS_SET( ecl_file->flags , flags );
+  return ecl_file_view_flags_set( ecl_file->flags , flags );
 }
 
 bool ecl_file_writable( const ecl_file_type * ecl_file ) {
-  return FILE_FLAGS_SET( ecl_file->flags , ECL_FILE_WRITABLE );
+  return ecl_file_view_flags_set( ecl_file->flags , ECL_FILE_WRITABLE );
 }
 
 
@@ -1117,7 +777,7 @@ bool ecl_file_save_kw( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_
 
       ecl_file_kw_inplace_fwrite( file_kw , ecl_file->fortio );
 
-      if (FILE_FLAGS_SET( ecl_file->flags , ECL_FILE_CLOSE_STREAM))
+      if (ecl_file_view_flags_set( ecl_file->flags , ECL_FILE_CLOSE_STREAM))
         fortio_fclose_stream( ecl_file->fortio );
 
       return true;
