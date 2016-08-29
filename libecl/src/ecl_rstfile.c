@@ -31,7 +31,7 @@
 
 
 bool ecl_file_has_sim_time( const ecl_file_type * ecl_file , time_t sim_time) {
-  return file_map_has_sim_time( ecl_file->active_map , sim_time );
+  return ecl_file_view_has_sim_time( ecl_file->active_view , sim_time );
 }
 
 
@@ -72,7 +72,7 @@ bool ecl_file_has_sim_time( const ecl_file_type * ecl_file , time_t sim_time) {
  */
 
 int ecl_file_get_restart_index( const ecl_file_type * ecl_file , time_t sim_time) {
-  int active_index = file_map_find_sim_time( ecl_file->active_map , sim_time );
+  int active_index = ecl_file_view_find_sim_time( ecl_file->active_view , sim_time );
   return active_index;
 }
 
@@ -84,7 +84,7 @@ int ecl_file_get_restart_index( const ecl_file_type * ecl_file , time_t sim_time
 */
 
 bool ecl_file_has_report_step( const ecl_file_type * ecl_file , int report_step) {
-  return file_map_has_report_step( ecl_file->active_map , report_step );
+  return ecl_file_view_has_report_step( ecl_file->active_view , report_step );
 }
 
 
@@ -96,11 +96,11 @@ bool ecl_file_has_report_step( const ecl_file_type * ecl_file , int report_step)
 */
 
 time_t ecl_file_iget_restart_sim_date( const ecl_file_type * restart_file , int index ) {
-  return file_map_iget_restart_sim_date( restart_file->active_map , index );
+  return ecl_file_view_iget_restart_sim_date( restart_file->active_view , index );
 }
 
 double ecl_file_iget_restart_sim_days( const ecl_file_type * restart_file , int index ) {
-  return file_map_iget_restart_sim_days( restart_file->active_map , index );
+  return ecl_file_view_iget_restart_sim_days( restart_file->active_view , index );
 }
 
 
@@ -120,7 +120,7 @@ bool ecl_file_iselect_rstblock( ecl_file_type * ecl_file , int seqnum_index ) {
 
 
 bool ecl_file_select_rstblock_sim_time( ecl_file_type * ecl_file , time_t sim_time) {
-  int seqnum_index = file_map_seqnum_index_from_sim_time( ecl_file->global_map , sim_time );
+  int seqnum_index = ecl_file_view_seqnum_index_from_sim_time( ecl_file->global_view , sim_time );
 
   if (seqnum_index >= 0)
     return ecl_file_iselect_rstblock( ecl_file , seqnum_index);
@@ -130,9 +130,9 @@ bool ecl_file_select_rstblock_sim_time( ecl_file_type * ecl_file , time_t sim_ti
 
 
 bool ecl_file_select_rstblock_report_step( ecl_file_type * ecl_file , int report_step) {
-  int global_index = file_map_find_kw_value( ecl_file->global_map , SEQNUM_KW , &report_step);
+  int global_index = ecl_file_view_find_kw_value( ecl_file->global_view , SEQNUM_KW , &report_step);
   if ( global_index >= 0) {
-    int seqnum_index = file_map_iget_occurence( ecl_file->global_map , global_index );
+    int seqnum_index = ecl_file_view_iget_occurence( ecl_file->global_view , global_index );
     return ecl_file_iselect_rstblock( ecl_file ,  seqnum_index);
   } else
     return false;
