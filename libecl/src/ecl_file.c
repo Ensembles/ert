@@ -53,10 +53,10 @@
    The main datatype here is the ecl_file type, but in addition each
    ecl_kw instance is wrapped in an ecl_file_kw (implemented in
    ecl_file_kw.c) structure and all the indexing is implemented with
-   the file_map type. The file_map type is not used outside this file.
+   the ecl_file_view type. The ecl_file_view type is not used outside this file.
 
    When the file is opened an index of all the keywords is created and
-   stored in the field global_map, and the field active_map is set to
+   stored in the field global_map, and the field active_view is set to
    point to global_map, i.e. all query/get operations on the ecl_file
    will be based on the complete index:
 
@@ -131,13 +131,13 @@ struct ecl_file_struct {
   fortio_type       * fortio;       /* The source of all the keywords - must be retained
                                        open for reading for the entire lifetime of the
                                        ecl_file object. */
-  file_map_type * global_map;       /* The index of all the ecl_kw instances in the file. */
-  file_map_type * active_map;       /* The currently active index. */
-  vector_type   * map_list;         /* Storage container for the map instances. */
+  ecl_file_view_type * global_view;       /* The index of all the ecl_kw instances in the file. */
+  ecl_file_view_type * active_view;       /* The currently active index. */
+  vector_type   * view_list;         /* Storage container for the map instances. */
   bool            read_only;
   int             flags;
   vector_type   * map_stack;
-  inv_map_type  * inv_map;
+  inv_map_type  * inv_view;
 };
 
 
@@ -180,9 +180,9 @@ UTIL_IS_INSTANCE_FUNCTION( ecl_file , ECL_FILE_ID)
 ecl_file_type * ecl_file_alloc_empty( int flags ) {
   ecl_file_type * ecl_file = util_malloc( sizeof * ecl_file );
   UTIL_TYPE_ID_INIT(ecl_file , ECL_FILE_ID);
-  ecl_file->map_list  = vector_alloc_new();
+  ecl_file->view_list  = vector_alloc_new();
   ecl_file->map_stack = vector_alloc_new();
-  ecl_file->inv_map   = inv_map_alloc( );
+  ecl_file->inv_view  = inv_map_alloc( );
   ecl_file->flags     = flags;
   return ecl_file;
 }
@@ -192,7 +192,7 @@ ecl_file_type * ecl_file_alloc_empty( int flags ) {
 /* fwrite functions */
 
 void ecl_file_fwrite_fortio(const ecl_file_type * ecl_file , fortio_type * target, int offset) {
-  file_map_fwrite( ecl_file->active_map , target , offset );
+  ecl_file_view_fwrite( ecl_file->active_view , target , offset );
 }
 
 
@@ -315,7 +315,7 @@ void ecl_file_fwrite(const ecl_file_type * ecl_file , const char * filename, boo
 
 
 void ecl_file_replace_kw( ecl_file_type * ecl_file , ecl_kw_type * old_kw , ecl_kw_type * new_kw , bool insert_copy) {
-  file_map_replace_kw( ecl_file->active_map , old_kw , new_kw , insert_copy );
+  ecl_file_view_replace_kw( ecl_file->active_view , old_kw , new_kw , insert_copy );
 }
 
 
@@ -333,7 +333,7 @@ ecl_kw_type * ecl_file_icopy_named_kw( const ecl_file_type * ecl_file , const ch
 */
 
 int ecl_file_get_num_named_kw(const ecl_file_type * ecl_file , const char * kw) {
-  return file_map_get_num_named_kw( ecl_file->active_map , kw);
+  return ecl_file_view_get_num_named_kw( ecl_file->active_view , kw);
 }
 
 
@@ -362,7 +362,7 @@ int ecl_file_get_num_named_kw(const ecl_file_type * ecl_file , const char * kw) 
 
 
 int ecl_file_iget_occurence( const ecl_file_type * ecl_file , int index) {
-  return file_map_iget_occurence( ecl_file->active_map , index );
+  return ecl_file_view_iget_occurence( ecl_file->active_view , index );
 }
 
 
@@ -371,7 +371,7 @@ int ecl_file_iget_occurence( const ecl_file_type * ecl_file , int index) {
     instance.
 */
 int ecl_file_get_size( const ecl_file_type * ecl_file ){
-  return file_map_get_size( ecl_file->active_map );
+  return ecl_file_view_get_size( ecl_file->active_view );
 }
 
 
@@ -380,17 +380,17 @@ int ecl_file_get_size( const ecl_file_type * ecl_file ){
    ecl_kw 'kw'.
 */
 bool ecl_file_has_kw( const ecl_file_type * ecl_file , const char * kw) {
-  return file_map_has_kw( ecl_file->active_map , kw );
+  return ecl_file_view_has_kw( ecl_file->active_view , kw );
 }
 
 
 int ecl_file_get_num_distinct_kw(const ecl_file_type * ecl_file) {
-  return file_map_get_num_distinct_kw( ecl_file->active_map );
+  return ecl_file_view_get_num_distinct_kw( ecl_file->active_view );
 }
 
 
 const char * ecl_file_iget_distinct_kw(const ecl_file_type * ecl_file, int index) {
-  return file_map_iget_distinct_kw( ecl_file->active_map , index );
+  return ecl_file_view_iget_distinct_kw( ecl_file->active_view , index );
 }
 
 
@@ -400,36 +400,36 @@ const char * ecl_file_get_src_file( const ecl_file_type * ecl_file ) {
 
 
 void ecl_file_fprintf_kw_list( const ecl_file_type * ecl_file , FILE * stream ) {
-  file_map_fprintf_kw_list( ecl_file->active_map , stream );
+  ecl_file_view_fprintf_kw_list( ecl_file->active_view , stream );
 }
 
 
 /*****************************************************************/
 
 ecl_file_kw_type * ecl_file_iget_file_kw( const ecl_file_type * file , int global_index) {
-  return file_map_iget_file_kw( file->active_map , global_index);
+  return ecl_file_view_iget_file_kw( file->active_view , global_index);
 }
 
 ecl_file_kw_type * ecl_file_iget_named_file_kw( const ecl_file_type * file , const char * kw, int ith) {
-  return file_map_iget_named_file_kw( file->active_map , kw, ith);
+  return ecl_file_view_iget_named_file_kw( file->active_view , kw, ith);
 }
 
 /* ---- */
 
 ecl_kw_type * ecl_file_iget_kw( const ecl_file_type * file , int global_index) {
-  return file_map_iget_kw( file->active_map , global_index);
+  return ecl_file_view_iget_kw( file->active_view , global_index);
 }
 
 ecl_type_enum ecl_file_iget_type( const ecl_file_type * file , int global_index) {
-  return file_map_iget_type( file->active_map , global_index);
+  return ecl_file_view_iget_type( file->active_view , global_index);
 }
 
 int ecl_file_iget_size( const ecl_file_type * file , int global_index) {
-  return file_map_iget_size( file->active_map , global_index);
+  return ecl_file_view_iget_size( file->active_view , global_index);
 }
 
 const char * ecl_file_iget_header( const ecl_file_type * file , int global_index) {
-  return file_map_iget_header( file->active_map , global_index);
+  return ecl_file_view_iget_header( file->active_view , global_index);
 }
 
 /* ---------- */
@@ -441,41 +441,49 @@ const char * ecl_file_iget_header( const ecl_file_type * file , int global_index
 */
 
 ecl_kw_type * ecl_file_iget_named_kw( const ecl_file_type * file , const char * kw, int ith) {
-  return file_map_iget_named_kw( file->active_map , kw , ith);
+  return ecl_file_view_iget_named_kw( file->active_view , kw , ith);
 }
 
 void ecl_file_indexed_read(const ecl_file_type * file , const char * kw, int index, const int_vector_type * index_map, char* buffer) {
-    file_map_index_fload_kw(file->active_map, kw, index, index_map, buffer);
+    ecl_file_view_index_fload_kw(file->active_view, kw, index, index_map, buffer);
 }
 
 ecl_type_enum ecl_file_iget_named_type( const ecl_file_type * file , const char * kw , int ith) {
-  return file_map_iget_named_type( file->active_map , kw , ith );
+  return ecl_file_view_iget_named_type( file->active_view , kw , ith );
 }
 
 int ecl_file_iget_named_size( const ecl_file_type * file , const char * kw , int ith) {
-  return file_map_iget_named_size( file->active_map , kw , ith );
+  return ecl_file_view_iget_named_size( file->active_view , kw , ith );
 }
 
 
 
 /*****************************************************************/
 
-static void ecl_file_add_map( ecl_file_type * ecl_file , file_map_type * file_map) {
-  vector_append_owned_ref(ecl_file->map_list , file_map , file_map_free__ );
+static void ecl_file_add_view( ecl_file_type * ecl_file , ecl_file_view_type * view) {
+  vector_append_owned_ref(ecl_file->view_list , view , ecl_file_view_free__ );
 }
 
 
-static file_map_type * ecl_file_get_blockmap( ecl_file_type * ecl_file , const char * kw , int occurence , bool use_global) {
-  file_map_type * blockmap;
-  if (use_global)
-    blockmap = file_map_alloc_blockmap( ecl_file->global_map , kw , occurence );
-  else
-    blockmap = file_map_alloc_blockmap( ecl_file->active_map , kw , occurence );
+static ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
+  ecl_file_view_type * view = ecl_file_view_alloc_blockmap( ecl_file->global_view , kw , occurence );
 
-  if (blockmap != NULL)
-    ecl_file_add_map( ecl_file , blockmap );
-  return blockmap;
+  if (view)
+    ecl_file_add_view( ecl_file , view );
+
+  return view;
 }
+
+static ecl_file_view_type * ecl_file_get_relative_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
+  ecl_file_view_type * view = ecl_file_view_alloc_blockmap( ecl_file->active_view , kw , occurence );
+
+  if (view)
+    ecl_file_add_view( ecl_file , view );
+
+  return view;
+}
+
+
 
 
 /*****************************************************************/
@@ -486,7 +494,7 @@ static file_map_type * ecl_file_get_blockmap( ecl_file_type * ecl_file , const c
 /**
    The ecl_file_scan() function will scan through the whole file and
    build up an index of all the kewyords. The map created from this
-   scan will be stored under the 'global_map' field; and all
+   scan will be stored under the 'global_view' field; and all
    subsequent lookup operations will ultimately be based on the global
    map.
 */
@@ -508,7 +516,7 @@ static bool ecl_file_scan( ecl_file_type * ecl_file ) {
         if (ecl_kw_fread_header( work_kw , ecl_file->fortio)) {
           ecl_file_kw_type * file_kw = ecl_file_kw_alloc( work_kw , current_offset);
           if (ecl_file_kw_fskip_data( file_kw , ecl_file->fortio ))
-            file_map_add_kw( ecl_file->global_map , file_kw );
+            ecl_file_view_add_kw( ecl_file->global_view , file_kw );
           else
             break;
         } else
@@ -519,14 +527,14 @@ static bool ecl_file_scan( ecl_file_type * ecl_file ) {
     ecl_kw_free( work_kw );
   }
   if (scan_ok)
-    file_map_make_index( ecl_file->global_map );
+    ecl_file_view_make_index( ecl_file->global_view );
 
   return scan_ok;
 }
 
 
 void ecl_file_select_global( ecl_file_type * ecl_file ) {
-  ecl_file->active_map = ecl_file->global_map;
+  ecl_file->active_view = ecl_file->global_view;
 }
 
 
@@ -534,7 +542,7 @@ void ecl_file_select_global( ecl_file_type * ecl_file ) {
    The fundamental open file function; all alternative open()
    functions start by calling this one. This function will read
    through the complete file, extract all the keyword headers and
-   create the map/index stored in the global_map field of the ecl_file
+   create the map/index stored in the global_view field of the ecl_file
    structure. No keyword data will be loaded from the file.
 
    The ecl_file instance will retain an open fortio reference to the
@@ -556,9 +564,9 @@ ecl_file_type * ecl_file_open( const char * filename , int flags) {
   if (fortio) {
     ecl_file_type * ecl_file = ecl_file_alloc_empty( flags );
     ecl_file->fortio = fortio;
-    ecl_file->global_map = file_map_alloc( ecl_file->fortio , &ecl_file->flags , ecl_file->inv_map , true );
+    ecl_file->global_view = ecl_file_view_alloc( ecl_file->fortio , &ecl_file->flags , ecl_file->inv_view , true );
 
-    ecl_file_add_map( ecl_file , ecl_file->global_map );
+    ecl_file_add_view( ecl_file , ecl_file->global_view );
     if (ecl_file_scan( ecl_file )) {
       ecl_file_select_global( ecl_file );
 
@@ -596,18 +604,18 @@ bool ecl_file_writable( const ecl_file_type * ecl_file ) {
 
 
 void ecl_file_push_block( ecl_file_type * ecl_file ) {
-  vector_append_ref( ecl_file->map_stack , ecl_file->active_map );
+  vector_append_ref( ecl_file->map_stack , ecl_file->active_view );
 }
 
 void ecl_file_pop_block( ecl_file_type * ecl_file ) {
-  ecl_file->active_map = vector_pop_back( ecl_file->map_stack );
+  ecl_file->active_view = vector_pop_back( ecl_file->map_stack );
 }
 
 
 bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  file_map_type * blockmap = ecl_file_get_blockmap( ecl_file , kw , occurence , false);
+  ecl_file_view_type * blockmap = ecl_file_get_relative_blockview( ecl_file , kw , occurence);
   if (blockmap != NULL) {
-    ecl_file->active_map = blockmap;
+    ecl_file->active_view = blockmap;
     return true;
   } else
     return false;
@@ -615,9 +623,9 @@ bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int 
 
 
 bool ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence ) {
-  file_map_type * blockmap = ecl_file_get_blockmap( ecl_file , kw , occurence , true);
+  ecl_file_view_type * blockmap = ecl_file_get_global_blockview( ecl_file , kw , occurence);
   if (blockmap != NULL) {
-    ecl_file->active_map = blockmap;
+    ecl_file->active_view = blockmap;
     return true;
   } else
     return false;
@@ -634,8 +642,8 @@ void ecl_file_close(ecl_file_type * ecl_file) {
   if (ecl_file->fortio != NULL)
     fortio_fclose( ecl_file->fortio  );
 
-  inv_map_free( ecl_file->inv_map );
-  vector_free( ecl_file->map_list  );
+  inv_map_free( ecl_file->inv_view );
+  vector_free( ecl_file->view_list  );
   vector_free( ecl_file->map_stack );
   free( ecl_file );
 }
@@ -665,7 +673,7 @@ void ecl_file_fortio_detach( ecl_file_type * ecl_file ) {
 
 
 bool ecl_file_load_all( ecl_file_type * ecl_file ) {
-  return file_map_load_all( ecl_file->active_map );
+  return ecl_file_view_load_all( ecl_file->active_view );
 }
 
 
@@ -745,7 +753,7 @@ bool ecl_file_writable( const ecl_file_type * ecl_file ) {
 */
 
 bool ecl_file_has_kw_ptr( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw) {
-  ecl_file_kw_type * file_kw = inv_map_get_file_kw( ecl_file->inv_map , ecl_kw );
+  ecl_file_kw_type * file_kw = inv_map_get_file_kw( ecl_file->inv_view , ecl_kw );
   if (file_kw == NULL)
     return false;
   else
@@ -771,9 +779,9 @@ bool ecl_file_has_kw_ptr( const ecl_file_type * ecl_file , const ecl_kw_type * e
 */
 
 bool ecl_file_save_kw( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw) {
-  ecl_file_kw_type * file_kw = inv_map_get_file_kw( ecl_file->inv_map , ecl_kw );  // We just verify that the input ecl_kw points to an ecl_kw
-  if (file_kw != NULL) {                                                           // we manage; from then on we use the reference contained in
-    if (fortio_assert_stream_open( ecl_file->fortio )) {                           // the corresponding ecl_file_kw instance.
+  ecl_file_kw_type * file_kw = inv_map_get_file_kw( ecl_file->inv_view , ecl_kw );  // We just verify that the input ecl_kw points to an ecl_kw
+  if (file_kw != NULL) {                                                             // we manage; from then on we use the reference contained in
+    if (fortio_assert_stream_open( ecl_file->fortio )) {                             // the corresponding ecl_file_kw instance.
 
       ecl_file_kw_inplace_fwrite( file_kw , ecl_file->fortio );
 
