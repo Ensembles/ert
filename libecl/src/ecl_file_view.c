@@ -35,8 +35,9 @@ struct ecl_file_view_struct {
   stringlist_type   * distinct_kw;  /* A stringlist of the keywords occuring in the file - each string occurs ONLY ONCE. */
   fortio_type       * fortio;       /* The same fortio instance pointer as in the ecl_file styructure. */
   bool                owner;        /* Is this map the owner of the ecl_file_kw instances; only true for the global_map. */
-  inv_map_type     *  inv_map;       /* Shared reference owned by the ecl_file structure. */
+  inv_map_type      * inv_map;      /* Shared reference owned by the ecl_file structure. */
   int               * flags;
+  vector_type       * child_list;
 };
 
 
@@ -61,6 +62,7 @@ ecl_file_view_type * ecl_file_view_alloc( fortio_type * fortio , int * flags , i
   ecl_file_view->kw_list              = vector_alloc_new();
   ecl_file_view->kw_index             = hash_alloc();
   ecl_file_view->distinct_kw          = stringlist_alloc_new();
+  ecl_file_view->child_list           = vector_alloc_new();
   ecl_file_view->owner                = owner;
   ecl_file_view->fortio               = fortio;
   ecl_file_view->inv_map              = inv_map;
@@ -283,6 +285,7 @@ void ecl_file_view_free( ecl_file_view_type * ecl_file_view ) {
   hash_free( ecl_file_view->kw_index );
   stringlist_free( ecl_file_view->distinct_kw );
   vector_free( ecl_file_view->kw_list );
+  vector_free( ecl_file_view->child_list );
   free( ecl_file_view );
 }
 
@@ -366,6 +369,7 @@ ecl_file_view_type * ecl_file_view_alloc_blockmap(const ecl_file_view_type * ecl
       }
     }
     ecl_file_view_make_index( block_map );
+    vector_append_owned_ref( ecl_file_view->child_list , block_map , ecl_file_view_free__ );
     return block_map;
   } else
     return NULL;
