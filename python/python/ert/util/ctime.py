@@ -47,16 +47,21 @@ class CTime(BaseCValue):
         """ @rtype: int """
         return self.value()
 
-    def time(self):
-        """Return this time_t as a time.localtime() object"""
-        return time.localtime(self.value())
+    def time(self, localtime = True):
+        """Return this time_t as a time.localtime() or time.gmtime() object"""
+        if localtime:
+            return time.localtime(self.value())
+        else:
+            return time.gmtime(self.value())
 
-    def date(self):
+    def date(self, localtime = True):
         """Return this time_t as a datetime.date([year, month, day])"""
-        return datetime.date(*self.time()[0:3])
+        t = self.time( localtime )
+        return datetime.date(*t[0:3])
 
-    def datetime(self):
-        return datetime.datetime(*self.time()[0:6])
+    def datetime(self, localtime = True):
+        t = self.time( localtime )
+        return datetime.datetime(*t[0:6])
 
     def __str__(self):
         return self.datetime().strftime("%Y-%m-%d %H:%M:%S%z")

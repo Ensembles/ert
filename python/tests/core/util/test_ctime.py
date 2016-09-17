@@ -148,4 +148,8 @@ class CTimeTest(TestCase):
         self.assertEqual(localized_dt.astimezone(utc), datetime(1970, 1, 1, 0, tzinfo=utc))
 
         localized_d = datetime(1970, 1, 1, 0, tzinfo=utc).astimezone(local_timezone)
-        self.assertEqual(t.date(), localized_d.date())
+        self.assertEqual(t.date( True ), localized_d.date())
+        
+        utc_d = datetime(1970, 1, 1, 0, tzinfo=utc)
+        self.assertEqual(t.date( False ), utc_d.date())
+        self.assertEqual(t.date( False ), utc_d.date())
