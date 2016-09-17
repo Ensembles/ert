@@ -8,16 +8,13 @@ set(TEST_SOURCES
     test_ecl_config.py
     test_es_update.py
     test_enkf.py
-    test_enkf_fs.py
     test_enkf_fs_manager1.py
     test_enkf_fs_manager2.py
     test_enkf_library.py
     test_enkf_load_results_manually.py
-    test_enkf_obs.py
     test_ert_context.py
     test_ert_log.py
     test_gen_obs.py
-    test_labscale.py
     test_linalg.py
     test_local_obsdata_node.py
     test_local_config.py
@@ -30,7 +27,6 @@ set(TEST_SOURCES
     test_summary_key_set.py
     test_summary_obs.py
     test_time_map.py
-    test_update.py
     test_ensemble_config.py
     test_deprecation.py
     test_field_export.py
@@ -66,20 +62,15 @@ addPythonTest(ert.enkf.runpath_list tests.ert.enkf.test_runpath_list.RunpathList
 
 if (STATOIL_TESTDATA_ROOT)
   addPythonTest(ert.enkf.enkf tests.ert.enkf.test_enkf.EnKFTest LABELS StatoilData)
-  addPythonTest(ert.enkf.enkf_obs tests.ert.enkf.test_enkf_obs.EnKFObsTest LABELS StatoilData)
   addPythonTest(ert.enkf.enkf_load_results_manually tests.ert.enkf.test_enkf_load_results_manually.LoadResultsManuallyTest LABELS StatoilData)
-  addPythonTest(ert.enkf.enkf_fs tests.ert.enkf.test_enkf_fs.EnKFFSTest LABELS StatoilData)
   addPythonTest(ert.enkf.enkf_fs_manager1 tests.ert.enkf.test_enkf_fs_manager1.EnKFFSManagerTest1 LABELS StatoilData)
   addPythonTest(ert.enkf.enkf_fs_manager2 tests.ert.enkf.test_enkf_fs_manager2.EnKFFSManagerTest2 LABELS StatoilData)
   addPythonTest(ert.enkf.enkf_library tests.ert.enkf.test_enkf_library.EnKFLibraryTest)
   addPythonTest(ert.enkf.summary_key_set tests.ert.enkf.test_summary_key_set.SummaryKeySetTest LABELS StatoilData)
   addPythonTest(ert.enkf.ecl_config tests.ert.enkf.test_ecl_config.EclConfigTest LABELS StatoilData)
   addPythonTest(ert.enkf.ert_test_context tests.ert.enkf.test_ert_context.ErtTestContextTest LABELS StatoilData)
-  addPythonTest(ert.enkf.update tests.ert.enkf.test_update.UpdateTest LABELS StatoilData)
-  addPythonTest(ert.enkf.labscale tests.ert.enkf.test_labscale.LabScaleTest LABELS StatoilData)
   addPythonTest(ert.enkf.field_export tests.ert.enkf.test_field_export.FieldExportTest LABELS StatoilData)
 endif()
 
 add_subdirectory(data)
 add_subdirectory(export)
-add_subdirectory(plot)

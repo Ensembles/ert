@@ -24,10 +24,6 @@ add_executable( enkf_obs_vector_fs enkf_obs_vector_fs.c )
 target_link_libraries( enkf_obs_vector_fs enkf test_util )
 add_test( enkf_obs_vector_fs ${EXECUTABLE_OUTPUT_PATH}/enkf_obs_vector_fs ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/obs_testing/config )
 
-add_executable( enkf_plot_data_fs enkf_plot_data_fs.c )
-target_link_libraries( enkf_plot_data_fs enkf test_util )
-add_test( enkf_plot_data_fs ${EXECUTABLE_OUTPUT_PATH}/enkf_plot_data_fs ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/plotData/config )
-
 add_executable( enkf_time_map enkf_time_map.c )
 target_link_libraries( enkf_time_map enkf test_util )
 add_test( enkf_time_map1  ${EXECUTABLE_OUTPUT_PATH}/enkf_time_map )
@@ -49,11 +45,6 @@ target_link_libraries( enkf_scale_correlated_std enkf test_util )
 add_test( enkf_scale_correlated_std ${EXECUTABLE_OUTPUT_PATH}/enkf_scale_correlated_std
           ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/with_data/config 
           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/STD_SCALE_CORRELATED_OBS )
-
-add_executable( enkf_plot_gendata_fs enkf_plot_gendata_fs.c )
-target_link_libraries( enkf_plot_gendata_fs  enkf test_util )
-add_test( enkf_plot_gendata_fs  ${EXECUTABLE_OUTPUT_PATH}/enkf_plot_gendata_fs
-          ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/with_GEN_DATA/config )
 
 add_test( enkf_state_report_step_compatible_TRUE 
           ${EXECUTABLE_OUTPUT_PATH}/enkf_state_report_step_compatible ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/ecl_sum_compatible_true  config_ecl_sum_compatible_true TRUE)
@@ -84,34 +75,6 @@ add_test( enkf_state_no_summary_vars_present
 #-----------------------------------------------------------------
 
 
-add_executable( enkf_export_field_test enkf_export_field_test.c )
-target_link_libraries( enkf_export_field_test  enkf test_util )
-
-add_test( enkf_export_field_test
-          ${EXECUTABLE_OUTPUT_PATH}/enkf_export_field_test ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/export_fields/config
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/EXPORT_FIELD
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/EXPORT_FIELD_ECL_GRDECL
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/EXPORT_FIELD_RMS_ROFF)
-
-
-
-add_executable( enkf_workflow_job_test enkf_workflow_job_test.c )
-target_link_libraries( enkf_workflow_job_test enkf test_util )
-
-add_test( enkf_workflow_job_test
-          ${EXECUTABLE_OUTPUT_PATH}/enkf_workflow_job_test ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/with_data/config
-                                                           ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/enkf_state_runpath/config_runpath_multiple_iterations
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal-tui/config/CREATE_CASE
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal-tui/config/INIT_CASE_FROM_EXISTING
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/LOAD_RESULTS
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/LOAD_RESULTS_ITER
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/OBSERVATION_RANKING
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/DATA_RANKING
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/EXPORT_RANKING
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/INIT_MISFIT_TABLE
-                                                           ${PROJECT_SOURCE_DIR}/share/workflows/jobs/internal/config/EXPORT_RUNPATH)
-
-#-----------------------------------------------------------------
 
 add_executable( enkf_forward_init_SURFACE enkf_forward_init_SURFACE.c )
 target_link_libraries( enkf_forward_init_SURFACE enkf test_util )
@@ -192,7 +155,6 @@ target_link_libraries( enkf_ecl_config_config enkf test_util )
 add_test( enkf_ecl_config_config  ${EXECUTABLE_OUTPUT_PATH}/enkf_ecl_config_config ${PROJECT_SOURCE_DIR}/test-data/Statoil/config/ecl_config )
 set_property( TEST enkf_ecl_config_config PROPERTY LABELS StatoilData )
 
-set_property( TEST enkf_plot_data_fs  PROPERTY LABELS StatoilData )
 set_property( TEST enkf_time_map2     PROPERTY LABELS StatoilData )
 set_property( TEST enkf_site_config   PROPERTY LABELS StatoilData )
 set_property( TEST enkf_state_report_step_compatible_TRUE  PROPERTY LABELS StatoilData )
@@ -211,7 +173,6 @@ set_property( TEST enkf_workflow_job_test PROPERTY LABELS StatoilData )
 set_property( TEST enkf_main_fs_current_file_test  PROPERTY LABELS StatoilData )
 set_property( TEST enkf_state_manual_load_test PROPERTY LABELS StatoilData )
 set_property( TEST enkf_block_obs PROPERTY LABELS StatoilData )
-set_property( TEST enkf_plot_gendata_fs PROPERTY LABELS StatoilData )
 set_property( TEST enkf_export_inactive_cells PROPERTY LABELS StatoilData )
 set_property( TEST enkf_obs_fs PROPERTY LABELS StatoilData )
 set_property( TEST enkf_obs_vector_fs PROPERTY LABELS StatoilData )
