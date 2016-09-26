@@ -1,4 +1,3 @@
-
 /*
    Copyright (C) 2011  Statoil ASA, Norway.
 
@@ -30,6 +29,7 @@ extern "C" {
 
 #include <ert/ecl/ecl_kw.h>
 #include <ert/ecl/ecl_file_kw.h>
+#include <ert/ecl/ecl_file_view.h>
 #include <ert/ecl/fortio.h>
 #include <ert/ecl/ecl_util.h>
 
@@ -87,12 +87,13 @@ extern "C" {
   void               ecl_file_indexed_read(const ecl_file_type * file , const char * kw, int index, const int_vector_type * index_map, char* buffer);
 
 
-  bool               ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence);
-  bool               ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence);
-  void               ecl_file_select_global( ecl_file_type * ecl_file );
+  bool                 ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence);
+  bool                 ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence);
+  void                 ecl_file_select_global( ecl_file_type * ecl_file );
+  ecl_file_view_type * ecl_file_get_global_view( ecl_file_type * ecl_file );
   //bool               ecl_file_writable( const ecl_file_type * ecl_file );
-  bool               ecl_file_save_kw( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
-  bool               ecl_file_has_kw_ptr( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
+  bool                 ecl_file_save_kw( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
+  bool                 ecl_file_has_kw_ptr( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
 
 /*****************************************************************/
 /*               R E S T A R T  F I L E S                        */

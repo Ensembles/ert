@@ -375,8 +375,13 @@ ecl_file_view_type * ecl_file_view_alloc_blockmap(const ecl_file_view_type * ecl
 }
 
 
-void ecl_file_view_add_child( ecl_file_view_type * parent , ecl_file_view_type * child) {
-  vector_append_owned_ref( parent->child_list , child , ecl_file_view_free__ );
+ecl_file_view_type * ecl_file_view_add_blockview(const ecl_file_view_type * file_view , const char * header, int occurence) {
+  ecl_file_view_type * child  = ecl_file_view_alloc_blockmap(file_view, header, occurence);
+
+  if (child)
+    vector_append_owned_ref( file_view->child_list , child , ecl_file_view_free__ );
+
+  return child;
 }
 
 
@@ -528,7 +533,7 @@ time_t ecl_file_view_iget_restart_sim_date(const ecl_file_view_type * ecl_file_v
 
 double ecl_file_view_iget_restart_sim_days(const ecl_file_view_type * ecl_file_view , int seqnum_index) {
   double sim_days = 0;
-  ecl_file_view_type * seqnum_map = seqnum_map = ecl_file_view_alloc_blockmap( ecl_file_view , SEQNUM_KW , seqnum_index);
+  ecl_file_view_type * seqnum_map = ecl_file_view_alloc_blockmap( ecl_file_view , SEQNUM_KW , seqnum_index);
 
   if (seqnum_map != NULL) {
     ecl_kw_type * doubhead_kw = ecl_file_view_iget_named_kw( seqnum_map , DOUBHEAD_KW , 0);
@@ -630,6 +635,31 @@ bool ecl_file_view_has_sim_time( const ecl_file_view_type * ecl_file_view , time
 }
 
 
+bool ecl_file_view_has_sim_days( const ecl_file_view_type * ecl_file_view , double sim_days) {
+  int num_DOUBHEAD = ecl_file_view_get_num_named_kw( ecl_file_view , DOUBHEAD_KW );
+  if (num_DOUBHEAD == 0)
+    return false;       /* We have no DOUBHEAD headers - probably not a restart file at all. */
+  else {
+    int doubhead_index = 0;
+    while (true) {
+      double file_sim_days  = ecl_file_view_iget_restart_sim_days( ecl_file_view , doubhead_index );
+
+      if (util_double_approx_equal(sim_days, file_sim_days)) /* Perfect hit. */
+        return true;
+
+      if (file_sim_days > sim_days)  /* We have gone past the target_time - i.e. we do not have it. */
+        return false;
+
+      doubhead_index++;
+      if (doubhead_index == num_DOUBHEAD)  /* We have iterated through the whole thing without finding sim_time. */
+        return false;
+    }
+  }
+}
+
+
+
+
 int ecl_file_view_seqnum_index_from_sim_time( ecl_file_view_type * parent_map , time_t sim_time) {
   int num_seqnum = ecl_file_view_get_num_named_kw( parent_map , SEQNUM_KW );
   int seqnum_index = 0;
@@ -651,6 +681,57 @@ int ecl_file_view_seqnum_index_from_sim_time( ecl_file_view_type * parent_map , 
     if (num_seqnum == seqnum_index)
       return -1;
   }
+}
+
+
+int ecl_file_view_seqnum_index_from_sim_days( ecl_file_view_type * file_view , double sim_days) {
+  int num_seqnum = ecl_file_view_get_num_named_kw( file_view , SEQNUM_KW );
+  int seqnum_index = 0;
+  ecl_file_view_type * seqnum_map;
+
+  while (true) {
+    seqnum_map = ecl_file_view_alloc_blockmap( file_view , SEQNUM_KW , seqnum_index);
+
+    if (seqnum_map != NULL) {
+      if (ecl_file_view_has_sim_days( seqnum_map , sim_days)) {
+        ecl_file_view_free( seqnum_map );
+        return seqnum_index;
+      } else {
+        ecl_file_view_free( seqnum_map );
+        seqnum_index++;
+      }
+    }
+
+    if (num_seqnum == seqnum_index)
+      return -1;
+  }
+}
+
+
+
+/*
+  Will mulitplex on the four input arguments.
+*/
+ecl_file_view_type * ecl_file_view_add_restart_view( ecl_file_view_type * file_view , int input_index, int report_step , time_t sim_time, double sim_days) {
+  ecl_file_view_type * child = NULL;
+  int seqnum_index = -1;
+
+  if (input_index >= 0)
+    seqnum_index = input_index;
+  else if (report_step >= 0) {
+    int global_index = ecl_file_view_find_kw_value( file_view , SEQNUM_KW , &report_step);
+    if ( global_index >= 0)
+      seqnum_index = ecl_file_view_iget_occurence( file_view , global_index );
+  } else if (sim_time != -1)
+    seqnum_index = ecl_file_view_seqnum_index_from_sim_time( file_view , sim_time );
+  else if (sim_days >= 0)
+    seqnum_index = ecl_file_view_seqnum_index_from_sim_days( file_view , sim_days );
+
+
+  if (seqnum_index >= 0)
+    child = ecl_file_view_add_blockview( file_view , SEQNUM_KW , seqnum_index );
+
+  return child;
 }
 
 
