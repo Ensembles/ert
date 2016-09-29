@@ -20,7 +20,7 @@ from ert.cwrap import CWrapper, BaseCClass
 
 class EclRestartHead(BaseCClass):
     def __init__(self , kw_arg = None , rst_view = None):
-        if kw_arg is None and rst_arg is None:
+        if kw_arg is None and rst_view is None:
             raise Exception("Invalid arguments")
 
         if not kw_arg is None:

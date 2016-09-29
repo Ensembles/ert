@@ -71,6 +71,9 @@ typedef struct ecl_file_view_struct ecl_file_view_type;
   time_t ecl_file_view_iget_restart_sim_date(const ecl_file_view_type * ecl_file_view , int seqnum_index);
   bool ecl_file_view_has_report_step( const ecl_file_view_type * ecl_file_view , int report_step);
 
+  ecl_file_view_type * ecl_file_view_add_summary_view( ecl_file_view_type * file_view , int report_step );
+  const char * ecl_file_view_get_src_file( const ecl_file_view_type * file_view );
+
 #ifdef __cplusplus
 }
 #endif

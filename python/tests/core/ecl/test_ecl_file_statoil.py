@@ -152,4 +152,4 @@ class EclFileStatoilTest(ExtendedTestCase):
         v = f.restartView( sim_days = 274 )
         v = f.restartView( sim_time = datetime.date( 2004,1,1) )
         v = f.restartView( report_step = 30 )
-        v = f.restartView( index = 30 )
+        v = f.restartView( seqnum_index = 30 )

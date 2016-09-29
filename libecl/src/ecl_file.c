@@ -484,6 +484,14 @@ ecl_file_view_type * ecl_file_get_restart_view( ecl_file_type * ecl_file , int i
 }
 
 
+ecl_file_view_type * ecl_file_get_summary_view( ecl_file_type * ecl_file , int report_step ) {
+  ecl_file_view_type * view = ecl_file_view_add_summary_view( ecl_file->global_view , report_step );
+  return view;
+}
+
+
+
+
 /*****************************************************************/
 /*
   Different functions to open and close a file.
@@ -686,14 +694,12 @@ void ecl_file_free__(void * arg) {
 
 
 /****************************************************************************/
-/* Here we include two files with functions specialized to work with
-   restart and summary files. Observe that the files ecl_rstfile.c and
-   ecl_smryfile are compiled as part of the same compilation unit as
-   ecl_file.c
+/* Here we include a file with functions specialized to work with
+   restart files. Observe that the files ecl_rstfile.c is compiled as
+   part of the same compilation unit as ecl_file.c
 */
 
 #include "ecl_rstfile.c"
-#include "ecl_smryfile.c"
 
 /*****************************************************************/
 /* Two small lookup functions which consider the INTEHEAD keyword,

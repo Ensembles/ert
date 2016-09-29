@@ -36,8 +36,8 @@ struct ecl_file_view_struct {
   fortio_type       * fortio;       /* The same fortio instance pointer as in the ecl_file styructure. */
   bool                owner;        /* Is this map the owner of the ecl_file_kw instances; only true for the global_map. */
   inv_map_type      * inv_map;      /* Shared reference owned by the ecl_file structure. */
-  int               * flags;
   vector_type       * child_list;
+  int               * flags;
 };
 
 
@@ -55,6 +55,10 @@ bool ecl_file_view_flags_set( int state_flags , int query_flags) {
     return false;
 }
 
+
+const char * ecl_file_view_get_src_file( const ecl_file_view_type * file_view ) {
+  return fortio_filename_ref( file_view->fortio );
+}
 
 
 ecl_file_view_type * ecl_file_view_alloc( fortio_type * fortio , int * flags , inv_map_type * inv_map , bool owner ) {
@@ -126,7 +130,7 @@ ecl_file_kw_type * ecl_file_view_iget_named_file_kw( const ecl_file_view_type * 
 }
 
 bool ecl_file_view_drop_flag( ecl_file_view_type * file_view , int flag)  {
-  bool flag_set = ecl_file_view_flags_set( file_view , flag );
+  bool flag_set = ecl_file_view_flags_set( *file_view->flags , flag );
   if (flag_set)
     *file_view->flags -= flag;
 
@@ -746,3 +750,8 @@ ecl_file_view_type * ecl_file_view_add_restart_view( ecl_file_view_type * file_v
 }
 
 
+
+ecl_file_view_type * ecl_file_view_add_summary_view( ecl_file_view_type * file_view , int report_step ) {
+  ecl_file_view_type * child = ecl_file_view_add_blockview( file_view , SEQHDR_KW , report_step );
+  return child;
+}

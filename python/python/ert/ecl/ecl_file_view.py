@@ -114,7 +114,7 @@ class EclFileView(BaseCClass):
 
 
     
-    def restartView(self , report_step = None , sim_time = None , sim_days = None , index = None):
+    def restartView(self , seqnum_index = None, report_step = None , sim_time = None , sim_days = None):
         if report_step is None:
             report_step = -1
 
@@ -124,11 +124,10 @@ class EclFileView(BaseCClass):
         if sim_days is None:
             sim_days = -1
 
-        if index is None:
-            index = -1
+        if seqnum_index is None:
+            seqnum_index = -1
         
-        print report_step , sim_time , sim_days , index
-        view = self._restart_view( index , report_step , CTime( sim_time ) , sim_days )
+        view = self._restart_view( seqnum_index , report_step , CTime( sim_time ) , sim_days )
         if view is None:
             raise ValueError("No such restart block could be identiefied")
 

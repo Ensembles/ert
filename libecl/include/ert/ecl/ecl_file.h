@@ -112,17 +112,17 @@ extern "C" {
 
   void             ecl_file_close_fortio_stream(ecl_file_type * ecl_file);
 
-  ecl_file_type  * ecl_file_open_rstblock_report_step( const char * filename , int report_step , int flags);
-  ecl_file_type  * ecl_file_open_rstblock_sim_time( const char * filename , time_t sim_time , int flags);
-  ecl_file_type  * ecl_file_iopen_rstblock( const char * filename , int seqnum_index , int flags);
+  ecl_file_type      * ecl_file_open_rstblock_report_step( const char * filename , int report_step , int flags);
+  ecl_file_type      * ecl_file_open_rstblock_sim_time( const char * filename , time_t sim_time , int flags);
+  ecl_file_type      * ecl_file_iopen_rstblock( const char * filename , int seqnum_index , int flags);
   ecl_file_view_type * ecl_file_get_restart_view( ecl_file_type * ecl_file , int input_index, int report_step , time_t sim_time, double sim_days);
-
+  ecl_file_view_type * ecl_file_get_summary_view( ecl_file_type * ecl_file , int report_step );
 
 /*****************************************************************/
 /* SUMMARY FILES */
 
-  bool             ecl_file_select_smryblock( ecl_file_type * ecl_file , int ministep_nr );
-  ecl_file_type  * ecl_file_open_smryblock( const char * filename , int ministep_nr , int flags);
+//  bool             ecl_file_select_smryblock( ecl_file_type * ecl_file , int ministep_nr );
+//  ecl_file_type  * ecl_file_open_smryblock( const char * filename , int ministep_nr , int flags);
 
 
   UTIL_IS_INSTANCE_HEADER( ecl_file );
