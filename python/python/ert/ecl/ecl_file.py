@@ -297,8 +297,8 @@ class EclFile(BaseCClass):
         return self.global_view.blockView( kw , kw_index )
 
 
-    def restartView( self, report_step = None , sim_time = None , sim_days = None , index = None):
-        return self.global_view.restartView( report_step , sim_time, sim_days , index )
+    def restartView( self, report_step = None , sim_time = None , sim_days = None , seqnum_index = None):
+        return self.global_view.restartView( report_step , sim_time, sim_days , seqnum_index )
     
 
     

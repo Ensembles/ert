@@ -125,6 +125,17 @@ ecl_file_kw_type * ecl_file_view_iget_named_file_kw( const ecl_file_view_type * 
   return file_kw;
 }
 
+bool ecl_file_view_drop_flag( ecl_file_view_type * file_view , int flag)  {
+  bool flag_set = ecl_file_view_flags_set( file_view , flag );
+  if (flag_set)
+    *file_view->flags -= flag;
+
+  return flag_set;
+}
+
+void ecl_file_view_add_flag( ecl_file_view_type * file_view , int flag)  {
+  *file_view->flags |= flag;
+}
 
 
 ecl_kw_type * ecl_file_view_iget_kw( const ecl_file_view_type * ecl_file_view , int index) {

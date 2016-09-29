@@ -462,6 +462,11 @@ ecl_file_view_type * ecl_file_get_global_view( ecl_file_type * ecl_file ) {
   return ecl_file->global_view;
 }
 
+// Very deprecated ...
+ecl_file_view_type * ecl_file_get_active_view( ecl_file_type * ecl_file ) {
+  return ecl_file->active_view;
+}
+
 ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
   ecl_file_view_type * view = ecl_file_view_add_blockview( ecl_file->global_view , kw , occurence );
   return view;
@@ -473,6 +478,10 @@ static ecl_file_view_type * ecl_file_get_relative_blockview( ecl_file_type * ecl
 }
 
 
+ecl_file_view_type * ecl_file_get_restart_view( ecl_file_type * ecl_file , int input_index, int report_step , time_t sim_time, double sim_days) {
+  ecl_file_view_type * view = ecl_file_view_add_restart_view( ecl_file->global_view , input_index , report_step , sim_time , sim_days);
+  return view;
+}
 
 
 /*****************************************************************/

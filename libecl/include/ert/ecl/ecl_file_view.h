@@ -61,6 +61,8 @@ typedef struct ecl_file_view_struct ecl_file_view_type;
   ecl_file_view_type * ecl_file_view_add_blockview(const ecl_file_view_type * ecl_file_view , const char * header, int occurence);
   ecl_file_view_type * ecl_file_view_add_restart_view(ecl_file_view_type * file_view , int seqnum_index, int report_step , time_t sim_time, double sim_days);
   void ecl_file_view_add_child( ecl_file_view_type * parent , ecl_file_view_type * child);
+  bool ecl_file_view_drop_flag( ecl_file_view_type * file_view , int flag);
+  void ecl_file_view_add_flag( ecl_file_view_type * file_view , int flag);
 
   int ecl_file_view_seqnum_index_from_sim_time( ecl_file_view_type * parent_map , time_t sim_time);
   bool ecl_file_view_has_sim_time( const ecl_file_view_type * ecl_file_view , time_t sim_time);

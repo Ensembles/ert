@@ -91,6 +91,7 @@ extern "C" {
   bool                 ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence);
   void                 ecl_file_select_global( ecl_file_type * ecl_file );
   ecl_file_view_type * ecl_file_get_global_view( ecl_file_type * ecl_file );
+  ecl_file_view_type * ecl_file_get_active_view( ecl_file_type * ecl_file );
   //bool               ecl_file_writable( const ecl_file_type * ecl_file );
   bool                 ecl_file_save_kw( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
   bool                 ecl_file_has_kw_ptr( const ecl_file_type * ecl_file , const ecl_kw_type * ecl_kw);
@@ -114,6 +115,7 @@ extern "C" {
   ecl_file_type  * ecl_file_open_rstblock_report_step( const char * filename , int report_step , int flags);
   ecl_file_type  * ecl_file_open_rstblock_sim_time( const char * filename , time_t sim_time , int flags);
   ecl_file_type  * ecl_file_iopen_rstblock( const char * filename , int seqnum_index , int flags);
+  ecl_file_view_type * ecl_file_get_restart_view( ecl_file_type * ecl_file , int input_index, int report_step , time_t sim_time, double sim_days);
 
 
 /*****************************************************************/
