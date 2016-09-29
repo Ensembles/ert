@@ -41,7 +41,7 @@ import datetime
 import ctypes
 import warnings
 from ert.cwrap import BaseCClass
-from ert.ecl import EclPrototype, EclKW, EclFileEnum
+from ert.ecl import EclPrototype, EclKW, EclFileEnum, EclFileView
 from ert.util import CTime
 
 
@@ -72,8 +72,8 @@ class EclFile(BaseCClass):
     _has_instance                = EclPrototype("bool        ecl_file_has_kw_ptr(ecl_file , ecl_kw)")
     _has_report_step             = EclPrototype("bool        ecl_file_has_report_step( ecl_file , int)")
     _has_sim_time                = EclPrototype("bool        ecl_file_has_sim_time( ecl_file , time_t )")
-
-
+    _get_global_view             = EclPrototype("ecl_file_view_ref ecl_file_get_global_view( ecl_file )")
+    
 
     @staticmethod
     def getFileType(filename):
@@ -247,7 +247,7 @@ class EclFile(BaseCClass):
             raise IOError("Failed to open file file:%s" % filename)
         else:
             super(EclFile , self).__init__(c_ptr)
-
+            self.global_view = self._get_global_view( )
 
 
     def save_kw( self , kw ):
@@ -293,6 +293,15 @@ class EclFile(BaseCClass):
         self.close()
 
 
+    def blockView(self, kw , kw_index):
+        return self.global_view.blockView( kw , kw_index )
+
+
+    def restartView( self, seqnum_index = None, report_step = None , sim_time = None , sim_days = None):
+        return self.global_view.restartView( seqnum_index, report_step , sim_time, sim_days )
+    
+
+    
     def select_block( self, kw , kw_index):
         OK = self._select_block( kw , kw_index )
         if not OK:

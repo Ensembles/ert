@@ -37,7 +37,7 @@
 int main(int argc , char ** argv) {
   const char * Xfile = argv[1];
   ecl_file_type * rst_file = ecl_file_open( Xfile , 0 );
-  ecl_rsthead_type * rst_head = ecl_rsthead_alloc( rst_file );
+  ecl_rsthead_type * rst_head = ecl_rsthead_alloc( rst_file , ecl_util_filename_report_nr(Xfile));
   const ecl_kw_type * iwel_kw = ecl_file_iget_named_kw( rst_file , IWEL_KW , 0 );
   const ecl_kw_type * iseg_kw = ecl_file_iget_named_kw( rst_file , ISEG_KW , 0 );
   well_rseg_loader_type * rseg_loader = well_rseg_loader_alloc(rst_file);
