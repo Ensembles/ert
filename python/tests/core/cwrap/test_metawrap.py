@@ -1,14 +1,15 @@
 import ctypes
 from types import StringType, IntType
 
-from ert.cwrap import BaseCClass, Prototype, PrototypeError
+import ert
+from cwrap import BaseCClass, Prototype, PrototypeError
 from ert.test import ExtendedTestCase
-import ert.cwrap.clib as clib
+import cwrap.clib as clib
 
 
 # Local copies so that the real ones don't get changed
 class TestUtilPrototype(Prototype):
-    lib = clib.ert_load("libert_util")
+    lib = ert.load("libert_util")
     def __init__(self, prototype, bind=False):
         super(TestUtilPrototype, self).__init__(TestUtilPrototype.lib, prototype, bind=bind)
 
@@ -77,7 +78,7 @@ class MetaWrapTest(ExtendedTestCase):
             Prototype.registerType("test_stringlist", None)
 
     def test_error_in_prototype_illegal_return_type(self):
-        func = TestUtilPrototype("test_stringlist util_alloc_date_stamp()")
+        func = TestUtilPrototype("test_stringlist util_alloc_date_stamp_utc()")
 
         with self.assertRaises(PrototypeError):
             func()
@@ -99,7 +100,7 @@ class MetaWrapTest(ExtendedTestCase):
 
 
     def test_invalid_prototype(self):
-        func = TestUtilPrototype("void util_alloc_date_stamp(")
+        func = TestUtilPrototype("void util_alloc_date_stamp_utc(")
         with self.assertRaises(PrototypeError):
             func()
 
@@ -113,6 +114,6 @@ class MetaWrapTest(ExtendedTestCase):
 
         Prototype.registerType("string_obj", stringObj)
 
-        dateStamp  = TestUtilPrototype("string_obj util_alloc_date_stamp()")
+        dateStamp  = TestUtilPrototype("string_obj util_alloc_date_stamp_utc()")
         date_stamp = dateStamp()
         self.assertIsInstance(date_stamp, str)

@@ -16,13 +16,14 @@
 #  for more details. 
 import os
 
+import ert
 from ert.config import ContentTypeEnum, UnrecognizedEnum, SchemaItem, ContentItem, ContentNode, ConfigParser, ConfigContent
-from ert.cwrap import Prototype, clib
+from cwrap import Prototype, clib
 from ert.test import ExtendedTestCase, TestAreaContext
 
 
 class TestConfigPrototype(Prototype):
-    lib = clib.ert_load("libconfig")
+    lib = ert.load("libconfig")
 
     def __init__(self, prototype, bind=False):
         super(TestConfigPrototype, self).__init__(TestConfigPrototype.lib, prototype, bind=bind)
@@ -122,6 +123,22 @@ class ConfigTest(ExtendedTestCase):
             conf.parse("DoesNotExits")
             
 
+    def test_parse_invalid(self):
+        conf = ConfigParser()
+        conf.add("INT", value_type = ContentTypeEnum.CONFIG_INT )
+        with TestAreaContext("config/parse2"):
+            with open("config","w") as fileH:
+                fileH.write("INT xx\n")
+
+            with self.assertRaises(ValueError):
+                conf.parse("config")
+
+            content = conf.parse("config" , validate = False )
+            self.assertFalse( content.isValid() )
+            self.assertEqual( len(content.getErrors()) , 1 )
+
+            
+            
     def test_parser_content(self):
         conf = ConfigParser()
         conf.add("KEY2", False)
@@ -130,6 +147,8 @@ class ConfigTest(ExtendedTestCase):
         schema_item.iset_type(3 , ContentTypeEnum.CONFIG_BOOL )
         schema_item.iset_type(4 , ContentTypeEnum.CONFIG_FLOAT )
         schema_item.iset_type(5 , ContentTypeEnum.CONFIG_PATH )
+        schema_item = conf.add("NOT_IN_CONTENT", False)
+        
         
         with TestAreaContext("config/parse2"):
             with open("config","w") as fileH:
@@ -143,6 +162,10 @@ class ConfigTest(ExtendedTestCase):
             self.assertTrue( "KEY" in content )
             self.assertFalse( "NOKEY" in content )
 
+            self.assertFalse( "NOT_IN_CONTENT" in content )
+            item = content["NOT_IN_CONTENT"]
+            self.assertEqual( len(item) , 0 )
+            
             with self.assertRaises(KeyError):
                 content["Nokey"]
                 

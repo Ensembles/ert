@@ -19,13 +19,13 @@ Constants from the header ecl_util.h - some stateless functions.
 This module does not contain any class definitions; it mostly consists
 of enum definitions/values from ecl_util.h; the enum values are
 extracted from the shared library using the
-ert.cwrap.cenum.create_enum() function in a semi-automagic manner.
+cwrap.cenum.create_enum() function in a semi-automagic manner.
 
 In addition to the enum definitions there are a few stateless
 functions from ecl_util.c which are not bound to any class type.
 """
 import ctypes
-from ert.cwrap import BaseCEnum
+from cwrap import BaseCEnum
 from ert.ecl import EclPrototype, ECL_LIB
 
 class EclFileEnum(BaseCEnum):
@@ -123,7 +123,9 @@ class EclUtil(object):
     _get_file_type  = EclPrototype("ecl_file_enum ecl_util_get_file_type( char* , bool* , int*)" , bind = False)
     _get_type_name  = EclPrototype("char* ecl_util_get_type_name( int )" , bind = False)
     _get_start_date = EclPrototype("time_t ecl_util_get_start_date( char* )" , bind = False)
+    _get_report_step = EclPrototype("int ecl_util_filename_report_nr( char* )" , bind = False)
 
+    
     @staticmethod
     def get_num_cpu( datafile ):
         """
@@ -167,8 +169,16 @@ class EclUtil(object):
             step = report_step.value
 
         return (file_type , fmt_file.value , step)
+
+    @staticmethod
+    def reportStep(filename):
+        report_step = EclUtil._get_report_step(filename)
+        if report_step < 0:
+            raise ValueError("Could not infer report step from: %s" % filename)
         
-        
+        return report_step
+
+    
 
 get_num_cpu = EclUtil.get_num_cpu
 get_file_type = EclUtil.get_file_type

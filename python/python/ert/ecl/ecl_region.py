@@ -27,7 +27,7 @@ queried for the corresponding list of indices.
 """
 import ctypes
 import warnings
-from ert.cwrap import BaseCClass
+from cwrap import BaseCClass
 from ert.ecl.faults import Layer
 from ert.ecl import EclKW, EclTypeEnum, EclPrototype
 from ert.geo import CPolyline
@@ -187,8 +187,11 @@ class EclRegion(BaseCClass):
 
     def __eq__(self , other):
         return self._equal(other)
- 
-            
+
+    def __hash__(self):
+        return hash(hash(self.grid) + hash(self.active_index))
+
+
     def __deep_copy__(self , memo):
         """
         Creates a deep copy of the current region.

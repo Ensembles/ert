@@ -24,13 +24,14 @@ class LocalConfigTest(ExtendedTestCase):
             main = test_context.getErt()
             self.assertTrue(main, "Load failed")
             
-            local_config = main.getLocalConfig()  
+            local_config = main.getLocalConfig()
+            analysis_module = main.analysisConfig().getModule("STD_ENKF")
 
             self.AllActive(local_config)
 
             local_config.clear()
 
-            self.MiniStep(local_config)
+            self.MiniStep(local_config, analysis_module)
             
             self.AttachMinistep(local_config)
             
@@ -41,10 +42,6 @@ class LocalConfigTest(ExtendedTestCase):
             local_config_file_summary = "local_config_summary.txt"
             local_config.writeSummaryFile( local_config_file_summary )
             self.assertTrue( os.path.isfile( local_config_file_summary ))
-
-            local_config_file = "local_config.txt"
-            local_config.writeLocalConfigFile( local_config_file )
-            self.assertTrue( os.path.isfile( local_config_file ))
 
             self.clear(local_config)
 
@@ -70,10 +67,10 @@ class LocalConfigTest(ExtendedTestCase):
         self.assertEqual( len(obsdata) , 3 )
         
  
-    def MiniStep( self, local_config ):                        
+    def MiniStep( self, local_config, analysis_module ):                        
             
-        # Ministep                                      
-        ministep = local_config.createMinistep("MINISTEP")
+        # Ministep        
+        ministep = local_config.createMinistep("MINISTEP", analysis_module)
         self.assertTrue(isinstance(ministep, LocalMinistep))
 
         self.assertFalse( "DATA" in ministep )

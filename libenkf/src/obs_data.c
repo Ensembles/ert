@@ -139,6 +139,12 @@ static void obs_block_free__( void * arg ) {
 }
 
 
+static void obs_block_fprintf( const obs_block_type * obs_block , FILE * stream ) {
+  for (int iobs=0; iobs < obs_block->size; iobs++) 
+    fprintf(stream , "[ %12.5f  +/-  %12.5f ] \n" , obs_block->value[iobs] , obs_block->std[iobs]);
+}
+
+
 void obs_block_deactivate( obs_block_type * obs_block , int iobs , bool verbose , const char * msg) {
   if (obs_block->active_mode[ iobs ] == ACTIVE) {
     if (verbose)
@@ -231,6 +237,7 @@ static void obs_block_initdObs( const obs_block_type * obs_block , matrix_type *
   for (iobs =0; iobs < obs_block->size; iobs++) {
     if (obs_block->active_mode[iobs] == ACTIVE) {
       matrix_iset( dObs , obs_offset , 0 , obs_block->value[ iobs ]);
+      matrix_iset( dObs , obs_offset , 1 , obs_block->std[ iobs ]);
       obs_offset++;
     }
   }
@@ -538,7 +545,7 @@ matrix_type * obs_data_alloc_innov(const obs_data_type * obs_data , const meas_d
 
 matrix_type * obs_data_allocdObs(const obs_data_type * obs_data ) {
   int active_size = obs_data_get_active_size( obs_data );
-  matrix_type * dObs = matrix_alloc( active_size , 1 );
+  matrix_type * dObs = matrix_alloc( active_size , 2 );
   {
     int obs_offset = 0;
     for (int block_nr = 0; block_nr < vector_get_size( obs_data->data ); block_nr++) {
@@ -742,4 +749,14 @@ double obs_data_iget_std( const obs_data_type * obs_data , int total_index ) {
   int total_offset;
   const obs_block_type * obs_block = obs_data_lookup_block( obs_data , total_index , &total_offset );
   return obs_block_iget_std( obs_block , total_index - total_offset );
+}
+
+
+void obs_data_fprintf( const obs_data_type * obs_data , FILE * stream) {
+  fprintf(stream , "\n");
+  for (int block_nr = 0; block_nr < vector_get_size( obs_data->data ); block_nr++) {
+    const obs_block_type * obs_block   = vector_iget_const( obs_data->data , block_nr );
+    obs_block_fprintf( obs_block , stream );
+  }
+  fprintf(stream , "\n");
 }

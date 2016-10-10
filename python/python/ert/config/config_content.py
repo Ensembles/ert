@@ -1,23 +1,23 @@
-#  Copyright (C) 2015  Statoil ASA, Norway. 
-#   
-#  The file 'config_content.py' is part of ERT - Ensemble based Reservoir Tool. 
-#   
-#  ERT is free software: you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation, either version 3 of the License, or 
-#  (at your option) any later version. 
-#   
-#  ERT is distributed in the hope that it will be useful, but WITHOUT ANY 
-#  WARRANTY; without even the implied warranty of MERCHANTABILITY or 
-#  FITNESS FOR A PARTICULAR PURPOSE.   
-#   
-#  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html> 
-#  for more details. 
+#  Copyright (C) 2015  Statoil ASA, Norway.
+#
+#  The file 'config_content.py' is part of ERT - Ensemble based Reservoir Tool.
+#
+#  ERT is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ERT is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.
+#
+#  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
+#  for more details.
 
 import os.path
 
-from ert.config import UnrecognizedEnum, ContentTypeEnum, ConfigError, ConfigPrototype
-from ert.cwrap import BaseCClass
+from ert.config import UnrecognizedEnum, ContentTypeEnum, ConfigError, ConfigPrototype, SchemaItem
+from cwrap import BaseCClass
 
 
 class ContentNode(BaseCClass):
@@ -34,6 +34,7 @@ class ContentNode(BaseCClass):
     _iget_as_double = ConfigPrototype("double config_content_node_iget_as_double( content_node , int)")
     _iget_as_path = ConfigPrototype("char* config_content_node_iget_as_path( content_node , int)")
     _iget_as_bool = ConfigPrototype("bool config_content_node_iget_as_bool( content_node , int)")
+    _iget_as_isodate = ConfigPrototype("time_t config_content_node_iget_as_isodate( content_node , int)")
 
     typed_get = {
         ContentTypeEnum.CONFIG_STRING: _iget_as_string,
@@ -41,7 +42,8 @@ class ContentNode(BaseCClass):
         ContentTypeEnum.CONFIG_FLOAT: _iget_as_double,
         ContentTypeEnum.CONFIG_PATH: _iget_as_path,
         ContentTypeEnum.CONFIG_EXISTING_PATH: _iget_as_path,
-        ContentTypeEnum.CONFIG_BOOL: _iget_as_bool
+        ContentTypeEnum.CONFIG_BOOL: _iget_as_bool,
+        ContentTypeEnum.CONFIG_ISODATE: _iget_as_isodate
     }
 
 
@@ -55,17 +57,17 @@ class ContentNode(BaseCClass):
         if isinstance(index, int):
             if index < 0:
                 index += len(self)
-                
+
             if not 0 <= index < len(self):
                 raise IndexError
             return index
         else:
             raise TypeError("Invalid argument type: %s" % index)
 
-                
+
     def __getitem__(self, index):
         index = self.__assertIndex(index)
-        
+
         content_type = self._iget_type(index)
         typed_get = self.typed_get[content_type]
         return typed_get(self, index)
@@ -84,7 +86,7 @@ class ContentNode(BaseCClass):
                     return os.path.relpath( abs_path , relative_start )
         else:
             raise TypeError("The getPath() method can only be called on PATH items")
-        
+
     def content(self, sep=" "):
         return self._get_full_string(sep)
 
@@ -102,12 +104,15 @@ class ContentNode(BaseCClass):
 class ContentItem(BaseCClass):
     TYPE_NAME = "content_item"
 
+    _alloc = ConfigPrototype("void* config_content_item_alloc( schema_item , void* )" , bind = False )
     _size = ConfigPrototype("int config_content_item_get_size( content_item )")
     _iget_content_node = ConfigPrototype("content_node_ref config_content_item_iget_node( content_item , int)")
+    _free = ConfigPrototype("void config_content_item_free( content_item )")
 
-    # Not possible to create new python instances of this class
-    def __init__(self):
-        raise NotImplementedError("Class can not be instantiated directly!")
+    def __init__(self , schema_item):
+        path_elm = None
+        c_ptr = self._alloc( schema_item , path_elm)
+        super( ContentItem, self).__init__(c_ptr)
 
 
     def __len__(self):
@@ -134,6 +139,9 @@ class ContentItem(BaseCClass):
         return node[node_index]
 
 
+    def free(self):
+        self._free( )
+
 
 
 class ConfigContent(BaseCClass):
@@ -143,7 +151,7 @@ class ConfigContent(BaseCClass):
     _is_valid = ConfigPrototype("bool config_content_is_valid( config_content )")
     _has_key = ConfigPrototype("bool config_content_has_item( config_content , char*)")
     _get_item = ConfigPrototype("content_item_ref config_content_get_item( config_content , char*)")
-    _get_errors = ConfigPrototype("config_error_ref config_content_get_errors( content_node )")
+    _get_errors = ConfigPrototype("config_error_ref config_content_get_errors( config_content )")
 
     def __init__(self):
         raise NotImplementedError("Class can not be instantiated directly!")
@@ -151,13 +159,21 @@ class ConfigContent(BaseCClass):
     def __contains__(self , key):
         return self._has_key(key)
 
+    def setParser(self , parser):
+        self._parser = parser
+
+
     def __getitem__(self , key):
         if key in self:
             item = self._get_item(key)
             item.setParent( self )
             return item
         else:
-            raise KeyError("Unrecognized key:%s" % key)
+            if key in self._parser:
+                schema_item = SchemaItem( key )
+                return ContentItem( schema_item )
+            else:
+                raise KeyError("No such key: %s" % key)
 
 
     def hasKey(self,key):
@@ -167,12 +183,12 @@ class ConfigContent(BaseCClass):
     def getValue(self , key , item_index = -1 , node_index = 0):
         item = self[key]
         return item.getValue( item_index , node_index )
-        
+
 
     def isValid(self):
         return self._is_valid()
 
-        
+
     def free(self):
         self._free()
 

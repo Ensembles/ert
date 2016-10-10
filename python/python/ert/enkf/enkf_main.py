@@ -14,7 +14,7 @@
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
 #  for more details.
 import ctypes
-from ert.cwrap import BaseCClass, CWrapper
+from cwrap import BaseCClass, CWrapper
 
 from ert.enkf import AnalysisConfig, EclConfig, EnkfObs, EnKFState, LocalConfig, ModelConfig, EnsembleConfig, PlotConfig, SiteConfig, ENKF_LIB, EnkfSimulationRunner, EnkfFsManager, ErtWorkflowList, HookManager, HookWorkflow, ESUpdate
 from ert.enkf.enums import EnkfInitModeEnum
@@ -109,7 +109,7 @@ class EnKFMain(BaseCClass):
     def getLocalConfig(self):
         """ @rtype: LocalConfig """
         config = EnKFMain.cNamespace().get_local_config(self).setParent(self)
-        config.initAttributes( self.ensembleConfig() , self.getObservations() , self.eclConfig().get_grid() )
+        config.initAttributes( self.ensembleConfig() , self.getObservations() , self.eclConfig().getGrid() )
         return config
 
 

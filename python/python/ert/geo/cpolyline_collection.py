@@ -18,7 +18,7 @@ Create a polygon
 """
 import ctypes
 
-from ert.cwrap import BaseCClass, CWrapper
+from cwrap import BaseCClass, CWrapper
 from ert.geo import GeoPrototype, CPolyline
 
 
@@ -112,6 +112,7 @@ class CPolylineCollection(BaseCClass):
             raise KeyError("The polyline collection already has an object:%s" % name)
             
         polyline = self._create_polyline(name)
+        polyline.setParent( parent = self )
         return polyline
 
 

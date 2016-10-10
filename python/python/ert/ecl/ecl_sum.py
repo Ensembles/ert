@@ -29,7 +29,7 @@ import datetime
 # regarding order of arguments: The C code generally takes the time
 # index as the first argument and the key/key_index as second
 # argument. In the python code this order has been reversed.
-from ert.cwrap import BaseCClass, CFILE
+from cwrap import BaseCClass, CFILE
 from ert.ecl import EclSumTStep
 from ert.ecl import EclSumVarType
 from ert.ecl.ecl_sum_vector import EclSumVector
@@ -191,13 +191,14 @@ class EclSum(BaseCClass):
 
 
     def addVariable(self , variable , wgname = None , num = 0 , unit = "None" , default_value = 0):
-        return self._add_variable(variable , wgname , num , unit , default_value)
+        return self._add_variable(variable , wgname , num , unit , default_value).setParent( parent = self )
 
 
     def addTStep(self , report_step , sim_days):
         """ @rtype: EclSumTStep """
         sim_seconds = sim_days * 24 * 60 * 60
-        return self._add_tstep( report_step, sim_seconds)
+        return self._add_tstep( report_step, sim_seconds).setParent( parent = self )
+
 
 
     def __private_init(self):

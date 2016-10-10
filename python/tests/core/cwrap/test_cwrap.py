@@ -1,8 +1,9 @@
 import ctypes
-from ert.cwrap import CWrapper, BaseCClass, clib, CWrapError
+import ert
+from cwrap import CWrapper, BaseCClass, CWrapError
 from ert.test  import ExtendedTestCase
 
-test_lib  = clib.ert_load("libert_util") # create a local namespace (so we don't overwrite StringList)
+test_lib  = ert.load("libert_util") # create a local namespace (so we don't overwrite StringList)
 cwrapper =  CWrapper(test_lib)
 
 class StringListTest(BaseCClass):
@@ -82,7 +83,7 @@ class CWrapTest(ExtendedTestCase):
 
         wrapper.registerType("string_obj", stringObj)
 
-        dateStamp  = wrapper.prototype("string_obj util_alloc_date_stamp()")
+        dateStamp  = wrapper.prototype("string_obj util_alloc_date_stamp_utc()")
         date_stamp = dateStamp()
         self.assertIsInstance(date_stamp, str)
 

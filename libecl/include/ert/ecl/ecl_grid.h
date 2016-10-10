@@ -102,10 +102,11 @@ extern "C" {
   void                  ecl_grid_add_self_nnc_list( ecl_grid_type * grid, const int * g1_list , const int * g2_list , int num_nnc );
 
   ecl_grid_type * ecl_grid_alloc_GRDECL_kw( int nx, int ny , int nz , const ecl_kw_type * zcorn_kw , const ecl_kw_type * coord_kw , const ecl_kw_type * actnum_kw , const ecl_kw_type * mapaxes_kw );
-  ecl_grid_type * ecl_grid_alloc_GRDECL_data(int , int , int , const float *  , const float *  , const int * , const float * mapaxes);
-  ecl_grid_type * ecl_grid_alloc_GRID_data(int num_coords , int nx, int ny , int nz , int coords_size , int ** coords , float ** corners , const float * mapaxes);
+  ecl_grid_type * ecl_grid_alloc_GRDECL_data(int , int , int , const float *  , const float *  , const int * , bool apply_mapaxes , const float * mapaxes);
+  ecl_grid_type * ecl_grid_alloc_GRID_data(int num_coords , int nx, int ny , int nz , int coords_size , int ** coords , float ** corners , bool apply_mapaxes, const float * mapaxes);
   ecl_grid_type * ecl_grid_alloc(const char * );
   ecl_grid_type * ecl_grid_load_case( const char * case_input );
+  ecl_grid_type * ecl_grid_load_case__( const char * case_input , bool apply_mapaxes);
   ecl_grid_type * ecl_grid_alloc_rectangular( int nx , int ny , int nz , double dx , double dy , double dz , const int * actnum);
   ecl_grid_type * ecl_grid_alloc_regular( int nx, int ny , int nz , const double * ivec, const double * jvec , const double * kvec , const int * actnum);
   ecl_grid_type * ecl_grid_alloc_dxv_dyv_dzv( int nx, int ny , int nz , const double * dxv , const double * dyv , const double * dzv , const int * actnum);
@@ -201,6 +202,10 @@ extern "C" {
   void                    ecl_grid_fwrite_EGRID_header__( int dims[3] , const float mapaxes[6], int dualp_flag , fortio_type * fortio);
   void                    ecl_grid_fwrite_EGRID_header( int dims[3] , const float mapaxes[6], fortio_type * fortio);
 
+  int              ecl_grid_zcorn_index(const ecl_grid_type * grid , int i, int j , int k , int c);
+  ecl_grid_type * ecl_grid_alloc_EGRID(const char * grid_file, bool apply_mapaxes );
+  ecl_grid_type * ecl_grid_alloc_GRID(const char * grid_file, bool apply_mapaxes );
+
   float          * ecl_grid_alloc_zcorn_data( const ecl_grid_type * grid );
   ecl_kw_type    * ecl_grid_alloc_zcorn_kw( const ecl_grid_type * grid );
   int            * ecl_grid_alloc_actnum_data( const ecl_grid_type * grid );
@@ -208,6 +213,7 @@ extern "C" {
   ecl_kw_type    * ecl_grid_alloc_hostnum_kw( const ecl_grid_type * grid );
   ecl_kw_type    * ecl_grid_alloc_gridhead_kw( int nx, int ny , int nz , int grid_nr);
   ecl_grid_type  * ecl_grid_alloc_copy( const ecl_grid_type * src_grid );
+  ecl_grid_type  * ecl_grid_alloc_processed_copy( const ecl_grid_type * src_grid , const double * zcorn , const int * actnum);
 
   void             ecl_grid_ri_export( const ecl_grid_type * ecl_grid , double * ri_points);
   void             ecl_grid_cell_ri_export( const ecl_grid_type * ecl_grid , int global_index , double * ri_points);
