@@ -56,6 +56,20 @@ void test_join() {
   const char * elt5 = "FFF";
 
   stringlist_type * s = stringlist_alloc_new();
+
+  {
+    // empty join
+    const char* empty_join = stringlist_alloc_joined_string(s, "!!!");
+    if (empty_join == NULL) {
+      printf("%s failure, empty join returned NULL, expected \"\".\n", __func__);
+      exit(1);
+    }
+    if (strcmp("", empty_join) != 0) {
+      printf("%s failure, empty join: expected \"\", was: \"%s\"\n", __func__, empty_join);
+      exit(1);
+    }
+  }
+
   stringlist_append_ref( s , elt0 );
   stringlist_append_ref( s , elt1 );
   stringlist_append_ref( s , elt2 );
