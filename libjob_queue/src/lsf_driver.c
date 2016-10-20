@@ -357,23 +357,26 @@ stringlist_type * lsf_driver_alloc_cmd(lsf_driver_type * driver ,
 
     char * excludes_string = NULL;
     char * req = "";
+    char * resreq = NULL;
 
-    if (driver->resource_request != NULL) {
-      char * resreq = util_alloc_string_copy(driver->resource_request);
-      if (stringlist_get_size(select_list) > 0) {
+    if (stringlist_get_size(select_list) > 0) {
+      excludes_string = stringlist_alloc_joined_string(select_list, " && ");
+      if (driver->resource_request != NULL) {
+        resreq = util_alloc_string_copy(driver->resource_request);
         util_string_tr(resreq, ']', ' '); // remove "]" from "select[A && B]
         excludes_string = stringlist_alloc_joined_string(select_list, " && ");
         req = util_alloc_sprintf("%s && %s]", resreq, excludes_string);
       } else {
-        req = util_alloc_sprintf("%s", resreq);
-      }
-      util_free(resreq);
-    } else {
-      if (stringlist_get_size(select_list) > 0) {
-        excludes_string = stringlist_alloc_joined_string(select_list, " && ");
         req = util_alloc_sprintf("select[%s]", excludes_string);
       }
+    } else {
+      if (driver->resource_request != NULL) {
+        resreq = util_alloc_string_copy(driver->resource_request);
+        req = util_alloc_sprintf("%s", resreq);
+      }
     }
+    if (resreq)
+      free(resreq);
 
     if (driver->submit_method == LSF_SUBMIT_REMOTE_SHELL)
       quoted_resource_request = util_alloc_sprintf("\"%s\"", req);
