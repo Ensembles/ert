@@ -348,7 +348,7 @@ stringlist_type * lsf_driver_alloc_cmd(lsf_driver_type * driver ,
 
   {
     stringlist_type * select_list = stringlist_alloc_new();
-    if (driver->exclude_hosts != NULL && stringlist_get_size(driver->exclude_hosts) > 0) {
+    if (stringlist_get_size(driver->exclude_hosts) > 0) {
       for (int i = 0; i < stringlist_get_size(driver->exclude_hosts); i++) {
         char * exclude_host = util_alloc_sprintf("hname!='%s'", stringlist_iget(driver->exclude_hosts, i));
         stringlist_append_owned_ref(select_list, exclude_host);
@@ -361,7 +361,7 @@ stringlist_type * lsf_driver_alloc_cmd(lsf_driver_type * driver ,
     if (driver->resource_request != NULL) {
       char * resreq = util_alloc_string_copy(driver->resource_request);
       if (stringlist_get_size(select_list) > 0) {
-        util_string_tr(resreq, ']', ' ');
+        util_string_tr(resreq, ']', ' '); // remove "]" from "select[A && B]
         excludes_string = stringlist_alloc_joined_string(select_list, " && ");
         req = util_alloc_sprintf("%s && %s]", resreq, excludes_string);
       } else {
@@ -380,9 +380,9 @@ stringlist_type * lsf_driver_alloc_cmd(lsf_driver_type * driver ,
     else
       quoted_resource_request = util_alloc_string_copy(req);
 
-    util_free(req);
+    free(req);
     if (excludes_string)
-      util_free(excludes_string);
+      free(excludes_string);
     stringlist_free(select_list);
   }
 
