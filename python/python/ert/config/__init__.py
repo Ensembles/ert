@@ -13,11 +13,12 @@
 #
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
 #  for more details.
-from ert.cwrap import clib, Prototype
+from cwrap import Prototype
+import ert
 import ert.util
 
 class ConfigPrototype(Prototype):
-    lib = clib.ert_load("libconfig")
+    lib = ert.load("libconfig")
 
     def __init__(self, prototype, bind=True):
         super(ConfigPrototype, self).__init__(ConfigPrototype.lib, prototype, bind=bind)
@@ -25,6 +26,7 @@ class ConfigPrototype(Prototype):
 from .unrecognized_enum import UnrecognizedEnum
 from .content_type_enum import ContentTypeEnum
 from .config_error import ConfigError
+from .schema_item import SchemaItem
 from .config_content import ConfigContent , ContentItem, ContentNode
-from .config_parser import ConfigParser, SchemaItem
+from .config_parser import ConfigParser
 

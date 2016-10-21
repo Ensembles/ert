@@ -1,5 +1,22 @@
+#  Copyright (C) 2016  Statoil ASA, Norway.
+#
+#  This file is part of ERT - Ensemble based Reservoir Tool.
+#
+#  ERT is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ERT is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.
+#
+#  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
+#  for more details.
+
 import ctypes
-from ert.cwrap import MetaCWrap, CWrapper
+from .metacwrap import MetaCWrap
+from .cwrap import CWrapper
 
 
 class BaseCEnum(object):
@@ -41,7 +58,7 @@ class BaseCEnum(object):
 
         setattr(cls, name, enum)
 
-        if not cls.enum_namespace.has_key(cls):
+        if cls not in cls.enum_namespace:
             cls.enum_namespace[cls] = []
 
         cls.enum_namespace[cls].append(enum)
@@ -58,6 +75,9 @@ class BaseCEnum(object):
             return self.value == other
 
         return False
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __str__(self):
         return self.name
@@ -142,7 +162,3 @@ class BaseCEnum(object):
     def registerEnum(cls, library, enum_name):
         cwrapper = CWrapper(library)
         cwrapper.registerType(enum_name, cls)
-
-
-
-

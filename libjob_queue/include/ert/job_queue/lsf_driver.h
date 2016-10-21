@@ -39,6 +39,7 @@ extern "C" {
 #define LSF_BKILL_CMD    "BKILL_CMD"
 #define LSF_DEBUG_OUTPUT "DEBUG_OUTPUT"
 #define LSF_SUBMIT_SLEEP "SUBMIT_SLEEP"
+#define LSF_EXCLUDE_HOST "EXCLUDE_HOST"
 
 #define LOCAL_LSF_SERVER "LOCAL"
 #define NULL_LSF_SERVER  "NULL"
@@ -76,7 +77,8 @@ typedef struct lsf_job_struct    lsf_job_type;
                                int           argc,
                                const char ** argv );
   job_status_type lsf_driver_convert_status( int lsf_status );
-  void            lsf_driver_kill_job(void * __driver , void * __job);
+  void            lsf_driver_blacklist_node(void * __driver , void * __job );
+  void            lsf_driver_kill_job(void * __driver , void * __job );
   void            lsf_driver_free__(void * __driver );
   void            lsf_driver_free( lsf_driver_type * driver );
   job_status_type lsf_driver_get_job_status(void * __driver , void * __job);
@@ -85,6 +87,7 @@ typedef struct lsf_job_struct    lsf_job_type;
   void            lsf_driver_display_info( void * __driver , void * __job);
   void            lsf_driver_set_bjobs_refresh_interval( lsf_driver_type * driver , int refresh_interval);
 
+  void lsf_driver_add_exclude_hosts( lsf_driver_type * driver , const char * excluded);
   lsf_submit_method_enum lsf_driver_get_submit_method( const lsf_driver_type * driver );
 
   bool            lsf_driver_has_option( const void * __driver , const char * option_key);
@@ -92,6 +95,9 @@ typedef struct lsf_job_struct    lsf_job_type;
   bool            lsf_driver_set_option( void * __driver , const char * option_key , const void * value);
   void            lsf_driver_init_option_list(stringlist_type * option_list);
   int             lsf_job_parse_bsub_stdout(const char * bsub_cmd, const char * stdout_file);
+  const char    * lsf_job_write_bjobs_to_file(const char * bjobs_cmd, lsf_driver_type * driver, const long jobid);
+
+  stringlist_type * lsf_job_alloc_parse_hostnames(const char* fname);
   UTIL_SAFE_CAST_HEADER( lsf_driver );
 
 

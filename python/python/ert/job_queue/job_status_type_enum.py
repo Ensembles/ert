@@ -13,7 +13,7 @@
 #
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
 #  for more details.
-from ert.cwrap import BaseCEnum
+from cwrap import BaseCEnum
 from ert.job_queue import JOB_QUEUE_LIB
 
 
@@ -25,11 +25,13 @@ class JobStatusType(BaseCEnum):
     JOB_QUEUE_RUNNING = None        # The job is running
     JOB_QUEUE_DONE = None           # The job is done - but we have not yet checked if the target file is produced */
     JOB_QUEUE_EXIT = None           # The job has exited - check attempts to determine if we retry or go to complete_fail   */
-    JOB_QUEUE_USER_KILLED = None    # The job has been killed by the user - can restart. */
-    JOB_QUEUE_USER_EXIT = None      # The whole job_queue has been exited by the user - the job can NOT be restarted. */
+    JOB_QUEUE_IS_KILLED = None         # The job has been killed, following a  JOB_QUEUE_DO_KILL - can restart. */
+    JOB_QUEUE_DO_KILL = None       # The the job should be killed, either due to user request, or automated measures - the job can NOT be restarted.. */
     JOB_QUEUE_SUCCESS = None
     JOB_QUEUE_RUNNING_CALLBACK = None
     JOB_QUEUE_FAILED = None
+    JOB_QUEUE_DO_KILL_NODE_FAILURE = None
+
 
 JobStatusType.addEnum("JOB_QUEUE_NOT_ACTIVE", 1)
 JobStatusType.addEnum("JOB_QUEUE_WAITING", 4)
@@ -38,13 +40,10 @@ JobStatusType.addEnum("JOB_QUEUE_PENDING", 16)
 JobStatusType.addEnum("JOB_QUEUE_RUNNING", 32)
 JobStatusType.addEnum("JOB_QUEUE_DONE", 64)
 JobStatusType.addEnum("JOB_QUEUE_EXIT", 128)
-JobStatusType.addEnum("JOB_QUEUE_USER_KILLED", 4096)
-JobStatusType.addEnum("JOB_QUEUE_USER_EXIT", 8192)
+JobStatusType.addEnum("JOB_QUEUE_IS_KILLED", 4096)
+JobStatusType.addEnum("JOB_QUEUE_DO_KILL", 8192)
 JobStatusType.addEnum("JOB_QUEUE_SUCCESS", 16384)
 JobStatusType.addEnum("JOB_QUEUE_RUNNING_CALLBACK", 32768)
 JobStatusType.addEnum("JOB_QUEUE_FAILED", 65536)
+JobStatusType.addEnum("JOB_QUEUE_DO_KILL_NODE_FAILURE", 131072)
 JobStatusType.registerEnum(JOB_QUEUE_LIB, "job_status_type_enum")
-
-
-
-

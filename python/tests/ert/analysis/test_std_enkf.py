@@ -19,7 +19,6 @@ from ert.analysis import AnalysisModule, AnalysisModuleLoadStatusEnum, AnalysisM
 
 from ert.util.enums import RngAlgTypeEnum, RngInitModeEnum
 from ert.util.rng import RandomNumberGenerator
-import ert.cwrap.clib as clib
 
 
 class StdEnKFTest(ExtendedTestCase):
@@ -44,3 +43,6 @@ class StdEnKFTest(ExtendedTestCase):
 
     def test_scaledata_option(self):
         self.toggleKey( 'ANALYSIS_SCALE_DATA' )
+
+
+    

@@ -414,7 +414,7 @@ static void ecl_smspec_fortio_fwrite( const ecl_smspec_type * smspec , fortio_ty
   {
     ecl_kw_type * startdat_kw = ecl_kw_alloc( STARTDAT_KW , STARTDAT_SIZE , ECL_INT_TYPE );
     int day,month,year;
-    util_set_date_values( smspec->sim_start_time , &day, &month , &year);
+    ecl_util_set_date_values( smspec->sim_start_time , &day, &month , &year);
 
     ecl_kw_iset_int( startdat_kw , STARTDAT_DAY_INDEX   , day );
     ecl_kw_iset_int( startdat_kw , STARTDAT_MONTH_INDEX , month );
@@ -815,6 +815,8 @@ static void ecl_smspec_install_special_keys( ecl_smspec_type * ecl_smspec , smsp
   case(ECL_SMSPEC_SEGMENT_VAR):
     break;
   case(ECL_SMSPEC_REGION_2_REGION_VAR):
+    break;
+  case(ECL_SMSPEC_AQUIFER_VAR):
     break;
   default:
     util_abort("%: Internal error - should never be here ?? \n",__func__);

@@ -29,7 +29,7 @@ three elements. The element vec[1] has not been explicitly assigned by
 the user, in that case the implementation has 'filled the hole' with
 the default value (i.e. 66 in this case). So the statement
 
-   print vec[1]
+   print(vec[1])
 
 will give '66'. The main part of the implementation is in terms of an
 "abstract base class" TVector. The TVector class should be not
@@ -43,7 +43,7 @@ float and size_t not currently implemented in the Python version.
 import  sys
 from    types import IntType, SliceType
 
-from ert.cwrap import CFILE, BaseCClass
+from cwrap import CFILE, BaseCClass
 from ert.util import UtilPrototype
 
     

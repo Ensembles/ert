@@ -14,7 +14,7 @@
 #  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html> 
 #  for more details.
 
-from ert.cwrap import BaseCClass
+from cwrap import BaseCClass
 from ert.util.rng import RandomNumberGenerator
 from ert.analysis import AnalysisPrototype
 
@@ -41,6 +41,8 @@ class AnalysisModule(BaseCClass):
     _initX               = AnalysisPrototype("void analysis_module_initX(analysis_module, matrix , matrix , matrix , matrix , matrix, matrix, matrix)")
 
 
+    # The VARIABLE_NAMES field is a completly broken special case
+    # which only applies to the rml module.
     VARIABLE_NAMES = {
         "LAMBDA0": {"type": float, "description": "Initial Lambda"},
         "USE_PRIOR": {"type": bool, "description": "Use both Prior and Observation Variability"},
@@ -102,6 +104,9 @@ class AnalysisModule(BaseCClass):
         """ :rtype: str """
         return AnalysisModule.VARIABLE_NAMES[name]["description"]
 
+    def getVar(self, name):
+        return self.getVariableValue( name )
+    
     def free(self):
         self._free( )
 
