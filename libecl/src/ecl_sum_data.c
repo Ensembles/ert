@@ -712,7 +712,7 @@ double_vector_type * ecl_sum_data_alloc_seconds_solution( const ecl_sum_data_typ
 
 
 
-static void ecl_sum_data_append_tstep__( ecl_sum_data_type * data , int ministep_nr , ecl_sum_tstep_type * tstep) {
+static void ecl_sum_data_append_tstep__( ecl_sum_data_type * data , ecl_sum_tstep_type * tstep) {
   /*
      Here the tstep is just appended naively, the vector will be
      sorted by ministep_nr before the data instance is returned.
@@ -854,7 +854,7 @@ ecl_sum_tstep_type * ecl_sum_data_add_new_tstep( ecl_sum_data_type * data , int 
   if (vector_get_size( data->data ) > 0)
     prev_tstep = vector_get_last( data->data );
 
-  ecl_sum_data_append_tstep__( data , ministep_nr , tstep );
+  ecl_sum_data_append_tstep__( data , tstep );
   {
     bool rebuild_index = true;
 
@@ -915,17 +915,17 @@ ecl_sum_tstep_type * ecl_sum_data_add_new_tstep( ecl_sum_data_type * data , int 
 static void ecl_sum_data_add_ecl_file(ecl_sum_data_type * data         ,
                                       time_t load_end ,
                                       int   report_step                ,
-                                      const ecl_file_type   * ecl_file ,
+                                      const ecl_file_view_type * summary_view,
                                       const ecl_smspec_type * smspec) {
 
 
-  int num_ministep  = ecl_file_get_num_named_kw( ecl_file , PARAMS_KW);
+  int num_ministep  = ecl_file_view_get_num_named_kw( summary_view , PARAMS_KW);
   if (num_ministep > 0) {
     int ikw;
 
     for (ikw = 0; ikw < num_ministep; ikw++) {
-      ecl_kw_type * ministep_kw = ecl_file_iget_named_kw( ecl_file , MINISTEP_KW , ikw);
-      ecl_kw_type * params_kw   = ecl_file_iget_named_kw( ecl_file , PARAMS_KW   , ikw);
+      ecl_kw_type * ministep_kw = ecl_file_view_iget_named_kw( summary_view , MINISTEP_KW , ikw);
+      ecl_kw_type * params_kw   = ecl_file_view_iget_named_kw( summary_view , PARAMS_KW   , ikw);
 
       {
         ecl_sum_tstep_type * tstep;
@@ -933,12 +933,12 @@ static void ecl_sum_data_add_ecl_file(ecl_sum_data_type * data         ,
         tstep = ecl_sum_tstep_alloc_from_file( report_step ,
                                                ministep_nr ,
                                                params_kw ,
-                                               ecl_file_get_src_file( ecl_file ),
+                                               ecl_file_view_get_src_file( summary_view ),
                                                smspec );
 
         if (tstep != NULL) {
           if (load_end == 0 || (ecl_sum_tstep_get_sim_time( tstep ) < load_end))
-            ecl_sum_data_append_tstep__( data , ministep_nr , tstep );
+            ecl_sum_data_append_tstep__( data , tstep );
           else
             /* This tstep is in a time-period overlapping with data we
                already have; discard this. */
@@ -947,6 +947,42 @@ static void ecl_sum_data_add_ecl_file(ecl_sum_data_type * data         ,
       }
     }
   }
+}
+
+
+void ecl_sum_data_add_case(ecl_sum_data_type * self, const ecl_sum_data_type * other) {
+  int * param_mapping = NULL;
+  bool  header_equal = ecl_smspec_equal( self->smspec , other->smspec);
+  float default_value = 0;
+
+  if (!header_equal)
+    param_mapping = ecl_smspec_alloc_mapping( self->smspec , other->smspec );
+
+
+  for (int tstep_nr = 0; tstep_nr < ecl_sum_data_get_length( other ); tstep_nr++) {
+    ecl_sum_tstep_type * other_tstep = ecl_sum_data_iget_ministep( other , tstep_nr );
+
+    /*
+      The dataset 'self' is the authorative in the timeinterval where
+      it has data, so if 'other' also has data in the same time interval
+      that is discarded.
+    */
+
+    if (!time_interval_contains( self->sim_time , ecl_sum_tstep_get_sim_time( other_tstep ))) {
+      ecl_sum_tstep_type * new_tstep;
+
+      if (header_equal)
+        new_tstep = ecl_sum_tstep_alloc_copy( other_tstep );
+      else
+        new_tstep = ecl_sum_tstep_alloc_remap_copy( other_tstep , self->smspec , default_value , param_mapping );
+
+      ecl_sum_data_append_tstep__( self , new_tstep );
+
+    }
+  }
+
+  ecl_sum_data_build_index( self );
+  free( param_mapping );
 }
 
 
@@ -992,7 +1028,7 @@ static bool ecl_sum_data_fread__( ecl_sum_data_type * data , time_t load_end , c
           {
             ecl_file_type * ecl_file = ecl_file_open( data_file , 0);
             if (ecl_file && ecl_sum_data_check_file( ecl_file )) {
-              ecl_sum_data_add_ecl_file( data , load_end , report_step , ecl_file , data->smspec);
+              ecl_sum_data_add_ecl_file( data , load_end , report_step , ecl_file_get_global_view( ecl_file ) , data->smspec);
               ecl_file_close( ecl_file );
             }
           }
@@ -1009,8 +1045,9 @@ static bool ecl_sum_data_fread__( ecl_sum_data_type * data , time_t load_end , c
               SEQHDR block in the unified summary file is block zero (in
               ert counting).
             */
-            if (ecl_file_select_smryblock( ecl_file , report_step - 1)) {
-              ecl_sum_data_add_ecl_file( data , load_end , report_step , ecl_file , data->smspec);
+            ecl_file_view_type * summary_view = ecl_file_get_summary_view(ecl_file , report_step - 1 );
+            if (summary_view) {
+              ecl_sum_data_add_ecl_file( data , load_end , report_step , summary_view , data->smspec);
               report_step++;
             } else break;
           }

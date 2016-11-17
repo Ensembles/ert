@@ -74,16 +74,16 @@ endif()
 
 # Treat warnings as errors if not on Windows
 if (NOT ERT_WINDOWS)
-   set( CMAKE_C_FLAGS   "-std=gnu99 -Wall -Wno-unknown-pragmas ")
-   set( CMAKE_CXX_FLAGS "-Wall " )
+   set( CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -std=gnu99 -Wall -Wno-unknown-pragmas ")
+   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall " )
 endif()
 
 if (MSVC)
     add_definitions( "/W3 /D_CRT_SECURE_NO_WARNINGS /wd4996" )
-else()
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+find_package(CXX11Features)
 
 if (ERT_USE_OPENMP)
    find_package(OpenMP)
@@ -105,8 +105,7 @@ set( CMAKE_C_FLAGS_main ${CMAKE_C_FLAGS} )
 set( CMAKE_CXX_FLAGS_main ${CMAKE_CXX_FLAGS} )
 
 if (NOT ERT_WINDOWS)
-  set( CMAKE_C_FLAGS "-std=gnu99" )
-  set( CMAKE_CXX_FLAGS "-std=c+11")
+  set( CMAKE_C_FLAGS_main "${CMAKE_C_FLAGS} -std=gnu99" )
 endif()
 
 set( ERT_EXTERNAL_UTIL_LIBS "" )
@@ -216,6 +215,7 @@ if (BUILD_PYTHON)
    else()
       include(cmake/python.cmake2)
       add_subdirectory( python )
+
       if(ERT_DOC)
          add_subdirectory( docs )
       endif()

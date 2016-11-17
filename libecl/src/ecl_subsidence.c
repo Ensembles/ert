@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#define _USE_MATH_DEFINES // for C WINDOWS
 #include <math.h>
 #include <stdbool.h>
 
@@ -46,7 +47,7 @@
 
 /**
    The ecl_subsidence_struct datastructure is the main structure for
-   calculating the subsidence from time lapse ECLIPSE simulations.  
+   calculating the subsidence from time lapse ECLIPSE simulations.
 */
 
 struct ecl_subsidence_struct {
@@ -81,24 +82,24 @@ struct ecl_subsidence_survey_struct {
 /*****************************************************************/
 
 
-static ecl_subsidence_survey_type * ecl_subsidence_survey_alloc_empty(const ecl_subsidence_type * sub, 
+static ecl_subsidence_survey_type * ecl_subsidence_survey_alloc_empty(const ecl_subsidence_type * sub,
                                                                       const char * name) {
   ecl_subsidence_survey_type * survey = util_malloc( sizeof * survey );
   UTIL_TYPE_ID_INIT( survey , ECL_SUBSIDENCE_SURVEY_ID );
   survey->grid_cache   = sub->grid_cache;
   survey->aquifer_cell = sub->aquifer_cell;
   survey->name         = util_alloc_string_copy( name );
-  
+
   survey->porv     = util_calloc( ecl_grid_cache_get_size( sub->grid_cache ) , sizeof * survey->porv     );
   survey->pressure = util_calloc( ecl_grid_cache_get_size( sub->grid_cache ) , sizeof * survey->pressure );
-  
+
   return survey;
 }
 
 static UTIL_SAFE_CAST_FUNCTION( ecl_subsidence_survey , ECL_SUBSIDENCE_SURVEY_ID )
 
 static ecl_subsidence_survey_type * ecl_subsidence_survey_alloc_PRESSURE(ecl_subsidence_type * ecl_subsidence ,
-                                                                         const ecl_file_type * restart_file ,
+                                                                         const ecl_file_view_type * restart_view ,
                                                                          const char * name ) {
 
   ecl_subsidence_survey_type * survey = ecl_subsidence_survey_alloc_empty( ecl_subsidence , name );
@@ -107,8 +108,8 @@ static ecl_subsidence_survey_type * ecl_subsidence_survey_alloc_PRESSURE(ecl_sub
   const int size = ecl_grid_cache_get_size( grid_cache );
   int active_index;
   ecl_kw_type * init_porv_kw = ecl_file_iget_named_kw( ecl_subsidence->init_file , PORV_KW , 0); /*Global indexing*/
-  ecl_kw_type * pressure_kw = ecl_file_iget_named_kw( restart_file , PRESSURE_KW , 0); /*Active indexing*/
-  
+  ecl_kw_type * pressure_kw = ecl_file_view_iget_named_kw( restart_view , PRESSURE_KW , 0); /*Active indexing*/
+
   for (active_index = 0; active_index < size; active_index++){
     survey->porv[ active_index ] = ecl_kw_iget_float( init_porv_kw , global_index[active_index] );
     survey->pressure[ active_index ] = ecl_kw_iget_float( pressure_kw , active_index );
@@ -138,7 +139,7 @@ static void ecl_subsidence_survey_free__( void * __subsidence_survey ) {
 static double ecl_subsidence_survey_eval( const ecl_subsidence_survey_type * base_survey ,
                                           const ecl_subsidence_survey_type * monitor_survey,
                                           ecl_region_type * region ,
-                                          double utm_x , double utm_y , double depth, 
+                                          double utm_x , double utm_y , double depth,
                                           double compressibility, double poisson_ratio) {
 
   const ecl_grid_cache_type * grid_cache = base_survey->grid_cache;
@@ -154,13 +155,43 @@ static double ecl_subsidence_survey_eval( const ecl_subsidence_survey_type * bas
     for (index = 0; index < size; index++)
       weight[index] = base_survey->porv[index] * base_survey->pressure[index];
   }
-  
-  deltaz = compressibility * 31.83099*(1-poisson_ratio) * 
+
+  deltaz = compressibility * 31.83099*(1-poisson_ratio) *
     ecl_grav_common_eval_biot_savart( grid_cache , region , base_survey->aquifer_cell , weight , utm_x , utm_y , depth );
-  
+
   free( weight );
   return deltaz;
 }
+
+
+static double ecl_subsidence_survey_eval_geertsma( const ecl_subsidence_survey_type * base_survey ,
+                                                   const ecl_subsidence_survey_type * monitor_survey,
+                                                   ecl_region_type * region ,
+                                                   double utm_x , double utm_y , double depth,
+                                                   double youngs_modulus, double poisson_ratio) {
+
+  const ecl_grid_cache_type * grid_cache = base_survey->grid_cache;
+  const double * cell_volume = ecl_grid_cache_get_volume( grid_cache );
+  const int size  = ecl_grid_cache_get_size( grid_cache );
+  double scale_factor = 1e4 *(1 + poisson_ratio) * ( 1 - 2*poisson_ratio) / ( 4*M_PI*( 1 - poisson_ratio)  * youngs_modulus );
+  double * weight = util_calloc( size , sizeof * weight );
+  double deltaz;
+
+  for (int index = 0; index < size; index++) {
+    if (monitor_survey) {
+        weight[index] = - scale_factor * cell_volume[index] * (monitor_survey->pressure[index] - base_survey->pressure[index]);
+    } else {
+        weight[index] = - scale_factor * cell_volume[index] * (base_survey->pressure[index] );
+    }
+  }
+
+  deltaz = ecl_grav_common_eval_geertsma( grid_cache , region , base_survey->aquifer_cell , weight , utm_x , utm_y , depth , poisson_ratio);
+
+  free( weight );
+  return deltaz;
+}
+
+
 
 /*****************************************************************/
 /**
@@ -175,7 +206,7 @@ ecl_subsidence_type * ecl_subsidence_alloc( const ecl_grid_type * ecl_grid, cons
   ecl_subsidence->init_file      = init_file;
   ecl_subsidence->grid_cache     = ecl_grid_cache_alloc( ecl_grid );
   ecl_subsidence->aquifer_cell   = ecl_grav_common_alloc_aquifer_cell( ecl_subsidence->grid_cache , init_file );
-  
+
   ecl_subsidence->surveys        = hash_alloc();
   return ecl_subsidence;
 }
@@ -186,39 +217,40 @@ static void ecl_subsidence_add_survey__( ecl_subsidence_type * subsidence , cons
   hash_insert_hash_owned_ref( subsidence->surveys , name , survey , ecl_subsidence_survey_free__ );
 }
 
-ecl_subsidence_survey_type * ecl_subsidence_add_survey_PRESSURE( ecl_subsidence_type * subsidence , const char * name , const ecl_file_type * restart_file ) {
-  ecl_subsidence_survey_type * survey = ecl_subsidence_survey_alloc_PRESSURE( subsidence , restart_file , name );
+ecl_subsidence_survey_type * ecl_subsidence_add_survey_PRESSURE( ecl_subsidence_type * subsidence , const char * name , const ecl_file_view_type * restart_view ) {
+  ecl_subsidence_survey_type * survey = ecl_subsidence_survey_alloc_PRESSURE( subsidence , restart_view , name );
   ecl_subsidence_add_survey__( subsidence , name , survey );
   return survey;
+}
+
+
+bool ecl_subsidence_has_survey( const ecl_subsidence_type * subsidence , const char * name) {
+  return hash_has_key( subsidence->surveys , name );
 }
 
 static ecl_subsidence_survey_type * ecl_subsidence_get_survey( const ecl_subsidence_type * subsidence , const char * name) {
   if (name == NULL)
     return NULL;  // Calling scope must determine if this is OK?
-  else {
-    if (hash_has_key( subsidence->surveys , name))
-      return hash_get( subsidence->surveys , name );
-    else {
-      hash_iter_type * survey_iter = hash_iter_alloc( subsidence->surveys );
-      fprintf(stderr,"Survey name:%s not registered. Available surveys are: \n\n     " , name);
-      while (!hash_iter_is_complete( survey_iter )) {
-        const char * survey = hash_iter_get_next_key( survey_iter );
-        fprintf(stderr,"%s ",survey);
-      }
-      fprintf(stderr,"\n\n");
-      hash_iter_free( survey_iter );
-      exit(1);
-    }
-  }
+  else
+    return hash_get( subsidence->surveys , name );
 }
 
 
-double ecl_subsidence_eval( const ecl_subsidence_type * subsidence , const char * base, const char * monitor , ecl_region_type * region , 
-                            double utm_x, double utm_y , double depth, 
+double ecl_subsidence_eval( const ecl_subsidence_type * subsidence , const char * base, const char * monitor , ecl_region_type * region ,
+                            double utm_x, double utm_y , double depth,
                             double compressibility, double poisson_ratio) {
   ecl_subsidence_survey_type * base_survey    = ecl_subsidence_get_survey( subsidence , base );
   ecl_subsidence_survey_type * monitor_survey = ecl_subsidence_get_survey( subsidence , monitor );
   return ecl_subsidence_survey_eval( base_survey , monitor_survey , region , utm_x , utm_y , depth , compressibility, poisson_ratio);
+}
+
+
+double ecl_subsidence_eval_geertsma( const ecl_subsidence_type * subsidence , const char * base, const char * monitor , ecl_region_type * region ,
+                                     double utm_x, double utm_y , double depth,
+                                     double youngs_modulus, double poisson_ratio) {
+  ecl_subsidence_survey_type * base_survey    = ecl_subsidence_get_survey( subsidence , base );
+  ecl_subsidence_survey_type * monitor_survey = ecl_subsidence_get_survey( subsidence , monitor );
+  return ecl_subsidence_survey_eval_geertsma( base_survey , monitor_survey , region , utm_x , utm_y , depth , youngs_modulus, poisson_ratio);
 }
 
 void ecl_subsidence_free( ecl_subsidence_type * ecl_subsidence ) {
