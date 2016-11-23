@@ -1193,13 +1193,16 @@ class EclSum(BaseCClass):
         return name
 
     def __repr__(self):
+        """Returns, e.g.
+           EclSum("NORNE_ATW2013.UNSMRY", [1997-11-06 00:00:00, 2006-12-01 00:00:00], keys = 3781) at 0x1609e20
+        """
         name = self._nicename()
         if name:
             name = '"%s", ' % name
         s_time   = self.getStartTime()
         e_time   = self.getEndTime()
         num_keys = len(self.keys())
-        return 'EclSum(%s[%s, %s], keys=%d) at 0x%x' % (name, s_time, e_time, num_keys, self._address())
+        return 'EclSum(%s[%s, %s], keys = %d) at 0x%x' % (name, s_time, e_time, num_keys, self._address())
 
     def dumpCSVLine(self, time, keywords, pfile):
         """
