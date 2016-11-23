@@ -159,6 +159,7 @@ class EclSum(BaseCClass):
         else:
             super(EclSum, self).__init__(c_pointer)
             self.__private_init( )
+        self.__str__ = self.__repr__
 
 
     @classmethod
@@ -1001,7 +1002,7 @@ class EclSum(BaseCClass):
     @property
     def first_report(self):
         """
-        The number of the last report step in the dataset.
+        The number of the first report step in the dataset.
         """
         return self._get_first_report_step( )
 
@@ -1178,6 +1179,15 @@ class EclSum(BaseCClass):
 
     def free(self):
         self._free( )
+
+    def __repr__(self):
+        len_self = len(self)
+        len_sim  = self.getSimulationLength()
+        s_time   = self.getStartTime()
+        e_time   = self.getEndTime()
+        rep_fst  = self.first_report
+        rep_lst  = self.last_report
+        return 'EclSum(%d (sim=%d), [%s, %s], first=%d, last=%d) at 0x%x' % (len_self, len_sim, s_time, e_time, rep_fst, rep_lst, self._address())
 
     def dumpCSVLine(self, time, keywords, pfile):
         """
