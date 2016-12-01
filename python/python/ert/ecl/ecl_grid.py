@@ -86,7 +86,8 @@ class EclGrid(BaseCClass):
     _get_depth                    = EclPrototype("double ecl_grid_get_cdepth1( ecl_grid , int )")
     _fwrite_grdecl                = EclPrototype("void   ecl_grid_grdecl_fprintf_kw( ecl_grid , ecl_kw , char* , FILE , double)") 
     _load_column                  = EclPrototype("void   ecl_grid_get_column_property( ecl_grid , ecl_kw , int , int , double_vector)")
-    _get_top                      = EclPrototype("double ecl_grid_get_top2( ecl_grid , int , int )") 
+    _get_top                      = EclPrototype("double ecl_grid_get_top2( ecl_grid , int , int )")
+    _get_top1A                    = EclPrototype("double ecl_grid_get_top1A(ecl_grid , int )")
     _get_bottom                   = EclPrototype("double ecl_grid_get_bottom2( ecl_grid , int , int )") 
     _locate_depth                 = EclPrototype("int    ecl_grid_locate_depth( ecl_grid , double , int , int )") 
     _invalid_cell                 = EclPrototype("bool   ecl_grid_cell_invalid1( ecl_grid , int)")
@@ -225,10 +226,33 @@ class EclGrid(BaseCClass):
             super(EclGrid, self).__init__(c_ptr)
         else:
             raise IOError("Loading grid from:%s failed" % filename)
+        self.__str__ = self.__repr__
 
     def free(self):
         self._free( )
-    
+
+    def _nicename(self):
+        """name is often full path to grid, if so, output basename, else name"""
+        name = self.getName()
+        if os.path.isfile(name):
+            name = os.path.basename(name)
+        return name
+
+    def _info_str(self):
+        """Returns, e.g.:
+           EclGrid("NORNE_ATW2013.EGRID", 46x112x22, global_size = 113344, active_size = 44431) at 0x28c4a70
+        """
+        name = self._nicename()
+        if name:
+            name = '"%s", ' % name
+        g_size = self.getGlobalSize()
+        a_size = self.getNumActive()
+        addr   = self._address()
+        xyz_s  = '%dx%dx%d' % (self.getNX(),self.getNY(),self.getNZ())
+        return 'EclGrid(%s%s, global_size = %d, active_size = %d) at 0x%x' % (name, xyz_s, g_size, a_size, addr)
+
+    def __repr__(self):
+        return self._info_str()
 
     def equal(self , other , include_lgr = True , include_nnc = False , verbose = False):
         """
@@ -716,8 +740,20 @@ class EclGrid(BaseCClass):
     def top( self , i , j ):
         """
         Top of the reservoir; in the column (@i , @j).
+        Returns average depth of the four top corners.
         """
-        return self._get_top( i , j ) 
+        return self._get_top( i , j )
+
+    def top_active( self, i, j ):
+        """
+        Top of the active part of the reservoir; in the column (@i , @j).
+        Raises ValueError if (i,j) column is inactive.
+        """
+        for k in range(self.getNZ()):
+            a_idx = self.get_active_index(ijk=(i,j,k))
+            if a_idx >= 0:
+                return self._get_top1A(a_idx)
+        raise ValueError('No active cell in column (%d,%d)' % (i,j))
 
     def bottom( self , i , j ):
         """

@@ -129,7 +129,7 @@ class EclKW(BaseCClass):
     _max_min_double    = EclPrototype("void     ecl_kw_max_min_double( ecl_kw , double* , double*)")
     _fix_uninitialized = EclPrototype("void     ecl_kw_fix_uninitialized( ecl_kw ,int , int , int, int*)")
     _first_different   = EclPrototype("int      ecl_kw_first_different( ecl_kw , ecl_kw , int , double, double)")
-
+    _resize            = EclPrototype("void     ecl_kw_resize( ecl_kw , int)")
     
     @classmethod
     def createCReference(cls, c_ptr, parent=None):
@@ -924,6 +924,19 @@ class EclKW(BaseCClass):
         return mm[0]
 
        
+
+    def resize(self , new_size):
+        """
+        Will set the new size of the kw to @new_size.
+        """
+        if new_size >= 0:
+            self._resize( new_size )
+
+        # Iteration is based on a pointer to the underlying storage,
+        # that will generally by reset by the resize( ) call; i.e. we
+        # need to call the __private_init() method again.
+        self.__private_init()
+
     
     def getMinMax(self):
         """
@@ -934,20 +947,20 @@ class EclKW(BaseCClass):
         """
         ecl_type = self.getEclType( )
         if ecl_type == EclTypeEnum.ECL_FLOAT_TYPE:
-            min = ctypes.c_float()
-            max = ctypes.c_float()
-            self._max_min_float( ctypes.byref( max ) , ctypes.byref( min ))
+            min_ = ctypes.c_float()
+            max_ = ctypes.c_float()
+            self._max_min_float( ctypes.byref( max_ ) , ctypes.byref( min_ ))
         elif ecl_type == EclTypeEnum.ECL_DOUBLE_TYPE:
-            min = ctypes.c_double()
-            max = ctypes.c_double()
-            self._max_min_double( ctypes.byref( max ) , ctypes.byref( min ))
+            min_ = ctypes.c_double()
+            max_ = ctypes.c_double()
+            self._max_min_double( ctypes.byref( max_ ) , ctypes.byref( min_ ))
         elif ecl_type == EclTypeEnum.ECL_INT_TYPE:
-            min = ctypes.c_int()
-            max = ctypes.c_int()
-            self._max_min_int( ctypes.byref( max ) , ctypes.byref( min ))
+            min_ = ctypes.c_int()
+            max_ = ctypes.c_int()
+            self._max_min_int( ctypes.byref( max_ ) , ctypes.byref( min_ ))
         else:
             raise TypeError("min_max property not defined for keywords of type: %s" % self.type)
-        return (min.value , max.value)
+        return (min_.value , max_.value)
 
 
     def getMax( self ):
