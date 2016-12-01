@@ -20,7 +20,7 @@ from ert.enkf import EnkfPrototype
 class RunArg(BaseCClass):
     TYPE_NAME = "run_arg"
 
-    _alloc_ENSEMBLE_EXPERIMENT = EnkfPrototype("run_arg_obj run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs , int, int, char*)", bind = False)
+    _alloc_ENSEMBLE_EXPERIMENT = EnkfPrototype("run_arg_obj run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs , int, int, char*, int)", bind = False)
     _free                      = EnkfPrototype("void run_arg_free(run_arg)")
     _get_queue_index           = EnkfPrototype("int  run_arg_get_queue_index(run_arg)")
     _is_submitted              = EnkfPrototype("bool run_arg_is_submitted(run_arg)")
@@ -29,8 +29,8 @@ class RunArg(BaseCClass):
         raise NotImplementedError("Cannot instantiat RunArg directly!")
 
     @classmethod
-    def createEnsembleExperimentRunArg(cls, fs, iens, runpath, iter=0):
-        return cls._alloc_ENSEMBLE_EXPERIMENT(fs, iens, iter, runpath)
+    def createEnsembleExperimentRunArg(cls, fs, iens, runpath, iter=0, max_runtime = 0):
+        return cls._alloc_ENSEMBLE_EXPERIMENT(fs, iens, iter, runpath, max_runtime)
 
     def free(self):
         self._free()

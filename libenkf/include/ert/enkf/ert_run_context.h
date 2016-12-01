@@ -39,14 +39,17 @@ typedef struct ert_run_context_struct ert_run_context_type;
                                                                    bool_vector_type * iactive ,
                                                                    path_fmt_type * runpath_fmt ,
                                                                    subst_list_type * subst_list ,
-                                                                   int iter);
+                                                                   int iter,
+                                                                   int max_runtime);
 
 
   ert_run_context_type * ert_run_context_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * target_update_fs ,
                                                             bool_vector_type * iactive ,
                                                             path_fmt_type * runpath_fmt ,
                                                             subst_list_type * subst_list ,
-                                                            int iter);
+                                                            int iter,
+                                                            int max_runtime);
+  
   void                     ert_run_context_set_init_fs(ert_run_context_type * context,  enkf_fs_type * init_fs);
   void                     ert_run_context_set_result_fs(ert_run_context_type * context, enkf_fs_type * result_fs);
   void                     ert_run_context_set_update_target_fs(ert_run_context_type * context, enkf_fs_type * update_target_fs);

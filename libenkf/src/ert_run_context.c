@@ -108,14 +108,15 @@ static ert_run_context_type * ert_run_context_alloc(bool_vector_type * iactive ,
 ert_run_context_type * ert_run_context_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , bool_vector_type * iactive ,
                                                                  path_fmt_type * runpath_fmt ,
                                                                  subst_list_type * subst_list ,
-                                                                 int iter) {
+                                                                 int iter,
+                                                                 int max_runtime) {
 
   ert_run_context_type * context = ert_run_context_alloc( iactive , ENSEMBLE_EXPERIMENT , fs , fs , NULL , iter);
   {
     stringlist_type * runpath_list = ert_run_context_alloc_runpath_list( iactive , runpath_fmt , subst_list , iter );
     for (int iens = 0; iens < bool_vector_size( iactive ); iens++) {
       if (bool_vector_iget( iactive , iens )) {
-        run_arg_type * arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( fs , iens , iter , stringlist_iget( runpath_list , iens));
+        run_arg_type * arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( fs , iens , iter , stringlist_iget( runpath_list , iens) , max_runtime);
         vector_append_owned_ref( context->run_args , arg , run_arg_free__);
       }
     }
@@ -130,14 +131,15 @@ ert_run_context_type * ert_run_context_alloc_SMOOTHER_RUN(enkf_fs_type * simulat
                                                           bool_vector_type * iactive ,
                                                           path_fmt_type * runpath_fmt ,
                                                           subst_list_type * subst_list ,
-                                                          int iter) {
+                                                          int iter,
+                                                          int max_runtime) {
 
   ert_run_context_type * context = ert_run_context_alloc( iactive , SMOOTHER_UPDATE , simulate_fs , simulate_fs , target_update_fs , iter);
   {
     stringlist_type * runpath_list = ert_run_context_alloc_runpath_list( iactive , runpath_fmt , subst_list , iter );
     for (int iens = 0; iens < bool_vector_size( iactive ); iens++) {
       if (bool_vector_iget( iactive , iens )) {
-        run_arg_type * arg = run_arg_alloc_SMOOTHER_RUN( simulate_fs , target_update_fs , iens , iter , stringlist_iget( runpath_list , iens));
+        run_arg_type * arg = run_arg_alloc_SMOOTHER_RUN( simulate_fs , target_update_fs , iens , iter , stringlist_iget( runpath_list , iens), max_runtime);
         vector_append_owned_ref( context->run_args , arg , run_arg_free__);
       }
     }
