@@ -1592,15 +1592,16 @@ static int enkf_main_run_step(enkf_main_type * enkf_main       ,
       else
         util_exit("No job script specified, can not start any jobs. Use the key JOB_SCRIPT in the config file\n");
 
+      {
+        int max_runtime = analysis_config_get_max_runtime(enkf_main_get_analysis_config( enkf_main ));
+        job_queue_set_max_job_duration(job_queue, max_runtime);
+      }
 
       enkf_main_submit_jobs( enkf_main , run_context );
-
 
       job_queue_submit_complete( job_queue );
       ert_log_add_message( 1 , NULL , "All jobs submitted to internal queue - waiting for completion" ,  false);
 
-      int max_runtime = analysis_config_get_max_runtime(enkf_main_get_analysis_config( enkf_main ));
-      job_queue_set_max_job_duration(job_queue, max_runtime);
       enkf_main_monitor_job_queue( enkf_main );
 
       job_queue_manager_wait( queue_manager );
