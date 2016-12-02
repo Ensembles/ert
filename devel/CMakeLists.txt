@@ -9,7 +9,7 @@ endif()
 
 set( ERT_VERSION_MAJOR 2 )
 set( ERT_VERSION_MINOR 0 )
-set( ERT_VERSION_MICRO 13)
+set( ERT_VERSION_MICRO 14)
 
 # If the micro version is not integer, that should be interpreted as a
 # development version leading towards version MAJOR.MINOR.0
