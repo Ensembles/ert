@@ -90,9 +90,12 @@ class EnKFObsTest(ExtendedTestCase):
             for v in obs:
                 self.assertTrue(isinstance(v, ObsVector))
 
-            with self.assertRaises(IndexError):
-                v = obs[-1]
+            self.assertEqual(obs[-1].getKey(),    'RFT_TEST')
+            self.assertEqual(obs[-1].getDataKey(),'4289383' )
+            self.assertEqual(obs[-1].getObsKey(), 'RFT_TEST')
 
+            with self.assertRaises(IndexError):
+                v = obs[-40]
             with self.assertRaises(IndexError):
                 v = obs[40]
 
@@ -168,7 +171,7 @@ class EnKFObsTest(ExtendedTestCase):
         grid = EclGrid(self.grid)
         refcase = EclSum(self.refcase)
 
-        history = History.alloc_from_refcase( refcase , False )
+        history = History( refcase , False )
         obs = EnkfObs( ensemble_config , grid = grid , history = history )
         with self.assertRaises(IOError):
             obs.load("/does/not/exist")
