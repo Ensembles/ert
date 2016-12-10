@@ -1,6 +1,5 @@
 set(PYTHON_SOURCES
     __init__.py
-    ecl.py
     ecl_3d_file.py
     ecl_3dkw.py
     ecl_case.py
