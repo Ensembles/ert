@@ -81,9 +81,14 @@ class LoadResultsPanel(QWidget):
         all_cases = self._case_model.getAllItems()
         selected_case  = all_cases[self._case_combo.currentIndex()]
         realizations = self._active_realizations_model.getActiveRealizationsMask()
-        iteration = self._iterations_model.getActiveIteration()
-
+        iteration = self._iterations_model.getValue()
+        try:
+            iteration = int(iteration)
+        except ValueError as e:
+            print(e)
+            return False
         LoadResultsModel.loadResults(selected_case, realizations, iteration)
+        return True
 
     def setCurrectCase(self):
         current_case = getCurrentCaseName()
