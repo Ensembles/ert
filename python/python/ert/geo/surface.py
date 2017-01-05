@@ -44,7 +44,7 @@ class Surface(BaseCClass):
     _imul         = GeoPrototype("void   geo_surface_imul( surface , surface )")
     _isub         = GeoPrototype("void   geo_surface_isub( surface , surface )")
     _isqrt        = GeoPrototype("void   geo_surface_isqrt( surface )")
-    _get_xy       = GeoPrototype("void   geo_surface_get_xy(surface, int, double*, double*)")
+    _iget_xy       = GeoPrototype("void   geo_surface_iget_xy(surface, int, double*, double*)")
 
 
     def __init__(self, filename=None, nx=None, ny=None, xinc=None, yinc=None,
@@ -228,7 +228,7 @@ class Surface(BaseCClass):
 
         x = ctypes.c_double()
         y = ctypes.c_double()
-        self._get_xy(index, ctypes.byref(x), ctypes.byref(y))
+        self._iget_xy(index, ctypes.byref(x), ctypes.byref(y))
 
         return x.value, y.value
 
