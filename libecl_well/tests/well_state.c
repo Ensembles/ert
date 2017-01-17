@@ -35,7 +35,7 @@ int main(int argc , char ** argv) {
   test_assert_int_equal( well_state_translate_ecl_type_int( IWEL_WATER_INJECTOR) , ECL_WELL_WATER_INJECTOR);
   test_assert_int_equal( well_state_translate_ecl_type_int( IWEL_GAS_INJECTOR)   , ECL_WELL_GAS_INJECTOR);
   test_assert_int_equal( well_state_translate_ecl_type_int( IWEL_OIL_INJECTOR)   , ECL_WELL_OIL_INJECTOR);
-  
+
   {
     const char * well_name = "WELL";
     int report_nr = 100;
@@ -59,9 +59,12 @@ int main(int argc , char ** argv) {
     test_assert_false( well_state_has_global_connections( well_state ));
     test_assert_NULL( well_state_get_grid_connections( well_state , "GRID"));
     test_assert_false( well_state_has_grid_connections( well_state , "GRID"));
-    
+
+    test_assert_double_equal( 0.0, well_state_get_oil_rate( well_state ));
+    test_assert_double_equal( 0.0, well_state_get_gas_rate( well_state ));
+    test_assert_double_equal( 0.0, well_state_get_water_rate( well_state ));
+
     well_state_free( well_state );
   }
-
   exit(0);
 }

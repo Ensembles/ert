@@ -169,6 +169,10 @@ struct well_state_struct {
   bool             open;
   well_type_enum   type;
   bool             is_MSW_well;
+  double           oil_rate;
+  double           gas_rate;
+  double           water_rate;
+
 
   hash_type      * connections;                                                       // hash<grid_name,well_conn_collection>
   well_segment_collection_type * segments;
@@ -201,6 +205,10 @@ well_state_type * well_state_alloc(const char * well_name , int global_well_nr ,
   well_state->segments = well_segment_collection_alloc();
   well_state->branches = well_branch_collection_alloc();
   well_state->is_MSW_well = false;
+  well_state->oil_rate = 0;
+  well_state->gas_rate = 0;
+  well_state->water_rate = 0;
+
 
   /* See documentation of the 'IWEL_UNDOCUMENTED_ZERO' in well_const.h */
   if ((type == ECL_WELL_ZERO) && open)
@@ -209,6 +217,21 @@ well_state_type * well_state_alloc(const char * well_name , int global_well_nr ,
 }
 
 
+
+
+double well_state_get_oil_rate( const well_state_type * well_state ) {
+  return well_state->oil_rate;
+}
+
+
+double well_state_get_gas_rate( const well_state_type * well_state ) {
+  return well_state->gas_rate;
+}
+
+
+double well_state_get_water_rate( const well_state_type * well_state) {
+  return well_state->water_rate;
+}
 
 
 
@@ -220,6 +243,25 @@ void well_state_add_wellhead( well_state_type * well_state , const ecl_rsthead_t
     hash_insert_ref( well_state->name_wellhead , grid_name , wellhead );
   }
 
+}
+
+static bool well_state_add_rates( well_state_type * well_state ,
+                                  ecl_file_view_type * rst_view ,
+                                  int well_nr) {
+
+  const ecl_kw_type * xwel_kw = ecl_file_view_iget_named_kw( rst_view , XWEL_KW , 0);
+  ecl_rsthead_type  * header   = ecl_rsthead_alloc( rst_view , -1);
+  int offset = header->nxwelz * well_nr;
+
+  well_state->oil_rate   = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_ORAT_ITEM );
+  well_state->gas_rate   = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_GRAT_ITEM );
+  well_state->water_rate = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_WRAT_ITEM );
+
+  for (int i = 0; i < 7; i++)
+    printf("%16.4f " , ecl_kw_iget_double( xwel_kw , offset + i ));
+  printf("\n");
+
+  ecl_rsthead_free( header );
 }
 
 
@@ -375,6 +417,7 @@ void well_state_add_connections2( well_state_type * well_state ,
 }
 
 
+
 bool well_state_add_MSW( well_state_type * well_state ,
                          ecl_file_type * rst_file ,
                          int well_nr,
@@ -488,7 +531,10 @@ well_state_type * well_state_alloc_from_file2( ecl_file_view_type * file_view , 
       if (ecl_file_view_has_kw( file_view , ISEG_KW))
         well_state_add_MSW2( well_state , file_view , global_well_nr , load_segment_information);
 
-
+      if (util_string_equal( well_state->name , "OP_4")) {
+        printf("%02d ",report_nr);
+        well_state_add_rates( well_state , file_view , global_well_nr);
+      }
     }
     ecl_rsthead_free( global_header );
     return well_state;

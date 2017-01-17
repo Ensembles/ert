@@ -22,7 +22,11 @@ class WellState(BaseCClass):
     _has_segment_data        = WellPrototype("bool  well_state_has_segment_data(well_state)")
     _sim_time                = WellPrototype("time_t well_state_get_sim_time(well_state)")
     _well_type               = WellPrototype("well_type_enum well_state_get_type(well_state)")
+    _oil_rate                = WellPrototype("double well_state_get_oil_rate(well_state)")
+    _gas_rate                = WellPrototype("double well_state_get_gas_rate(well_state)")
+    _water_rate              = WellPrototype("double well_state_get_water_rate(well_state)")
 
+    
     def __init__(self):
         raise NotImplementedError("Class can not be instantiated directly")
 
@@ -124,3 +128,13 @@ class WellState(BaseCClass):
         open_ = 'open' if self.isOpen() else 'shut'
         cnt = '%s%s, number = %s, type = "%s", state = %s' % (name, msw, wn, type_, open_)
         return self._create_repr(cnt)
+
+
+    def gasRate(self):
+        return self._gas_rate( )
+
+    def waterRate(self):
+        return self._water_rate( )
+
+    def oilRate(self):
+        return self._oil_rate( )
