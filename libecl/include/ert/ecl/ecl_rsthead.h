@@ -58,6 +58,7 @@ extern "C" {
     int    nwells;          // Number of wells
     int    niwelz;          // Number of elements pr well in IWEL array
     int    nzwelz;          // Number of 8 character words pr well in ZWEL array
+    int    nxwelz;          // Number of elements pr well in XWEL array.
 
     // Connection properties
     int    niconz;          // Number of elements per completion in ICON array

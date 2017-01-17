@@ -356,6 +356,7 @@ values (2e20) are denoted with '*'.
 #define STARTSOL_KW  "STARTSOL"
 #define ENDSOL_KW    "ENDSOL"
 
+#define XWEL_KW      "XWEL"
 #define IWEL_KW      "IWEL"
 #define ZWEL_KW      "ZWEL"
 #define ICON_KW      "ICON"
@@ -381,6 +382,7 @@ values (2e20) are denoted with '*'.
 
 #define INTEHEAD_NWELLS_INDEX  16     // Number of wells
 #define INTEHEAD_NIWELZ_INDEX  24     // Number of elements pr. well in the IWEL array.
+#define INTEHEAD_NXWELZ_INDEX  26     // Number of elements pr. well in the XWEL array.
 #define INTEHEAD_NZWELZ_INDEX  27     // Number of 8 character words pr. well
 
 #define INTEHEAD_NCWMAX_INDEX  17     // Maximum number of completions per well
