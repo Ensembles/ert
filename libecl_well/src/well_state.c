@@ -249,19 +249,23 @@ static bool well_state_add_rates( well_state_type * well_state ,
                                   ecl_file_view_type * rst_view ,
                                   int well_nr) {
 
-  const ecl_kw_type * xwel_kw = ecl_file_view_iget_named_kw( rst_view , XWEL_KW , 0);
-  ecl_rsthead_type  * header   = ecl_rsthead_alloc( rst_view , -1);
-  int offset = header->nxwelz * well_nr;
+  bool has_xwel_kw = ecl_file_view_has_kw(rst_view, XWEL_KW);
+  if (has_xwel_kw) {
+    const ecl_kw_type *xwel_kw = ecl_file_view_iget_named_kw(rst_view, XWEL_KW, 0);
+    ecl_rsthead_type *header = ecl_rsthead_alloc(rst_view, -1);
+    int offset = header->nxwelz * well_nr;
 
-  well_state->oil_rate   = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_ORAT_ITEM );
-  well_state->gas_rate   = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_GRAT_ITEM );
-  well_state->water_rate = ecl_kw_iget_double( xwel_kw , offset + XWEL_RES_WRAT_ITEM );
+    well_state->oil_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_ORAT_ITEM);
+    well_state->gas_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_GRAT_ITEM);
+    well_state->water_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_WRAT_ITEM);
 
-  for (int i = 0; i < 7; i++)
-    printf("%16.4f " , ecl_kw_iget_double( xwel_kw , offset + i ));
-  printf("\n");
+    for (int i = 0; i < 7; i++)
+      printf("%16.4f ", ecl_kw_iget_double(xwel_kw, offset + i));
+    printf("\n");
 
-  ecl_rsthead_free( header );
+    ecl_rsthead_free(header);
+  }
+  return has_xwel_kw;
 }
 
 
@@ -531,10 +535,7 @@ well_state_type * well_state_alloc_from_file2( ecl_file_view_type * file_view , 
       if (ecl_file_view_has_kw( file_view , ISEG_KW))
         well_state_add_MSW2( well_state , file_view , global_well_nr , load_segment_information);
 
-      if (util_string_equal( well_state->name , "OP_4")) {
-        printf("%02d ",report_nr);
-        well_state_add_rates( well_state , file_view , global_well_nr);
-      }
+      well_state_add_rates(well_state, file_view, global_well_nr);
     }
     ecl_rsthead_free( global_header );
     return well_state;
