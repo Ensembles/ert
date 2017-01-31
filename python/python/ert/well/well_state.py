@@ -130,7 +130,6 @@ class WellState(BaseCClass):
         cnt = '%s%s, number = %s, type = "%s", state = %s' % (name, msw, wn, type_, open_)
         return self._create_repr(cnt)
 
-
     def gasRate(self):
         return self._gas_rate( )
 
@@ -141,4 +140,16 @@ class WellState(BaseCClass):
         return self._oil_rate( )
 
     def volumeRate(self):
+        return self._volume_rate( )
+
+    def gasRateSI(self):
+        return self._gas_rate( )
+
+    def waterRateSI(self):
+        return self._water_rate( )
+
+    def oilRateSI(self):
+        return self._oil_rate( )
+
+    def volumeRateSI(self):
         return self._volume_rate( )

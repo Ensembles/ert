@@ -85,3 +85,12 @@ class WellConnection(BaseCClass):
 
     def oilRate(self):
         return self._oil_rate( )
+
+    def gasRateSI(self):
+        return self._gas_rate( )
+
+    def waterRateSI(self):
+        return self._water_rate( )
+
+    def oilRateSI(self):
+        return self._oil_rate( )
