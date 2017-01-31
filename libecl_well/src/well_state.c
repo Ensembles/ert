@@ -172,6 +172,7 @@ struct well_state_struct {
   double           oil_rate;
   double           gas_rate;
   double           water_rate;
+  double           volume_rate;
 
 
   hash_type      * connections;                                                       // hash<grid_name,well_conn_collection>
@@ -208,6 +209,7 @@ well_state_type * well_state_alloc(const char * well_name , int global_well_nr ,
   well_state->oil_rate = 0;
   well_state->gas_rate = 0;
   well_state->water_rate = 0;
+  well_state->volume_rate = 0;
 
 
   /* See documentation of the 'IWEL_UNDOCUMENTED_ZERO' in well_const.h */
@@ -233,6 +235,9 @@ double well_state_get_water_rate( const well_state_type * well_state) {
   return well_state->water_rate;
 }
 
+double well_state_get_volume_rate( const well_state_type * well_state) {
+  return well_state->volume_rate;
+}
 
 
 void well_state_add_wellhead( well_state_type * well_state , const ecl_rsthead_type * header , const ecl_kw_type * iwel_kw , int well_nr , const char * grid_name , int grid_nr) {
@@ -258,6 +263,7 @@ static bool well_state_add_rates( well_state_type * well_state ,
     well_state->oil_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_ORAT_ITEM);
     well_state->gas_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_GRAT_ITEM);
     well_state->water_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_WRAT_ITEM);
+    well_state->volume_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RESV_ITEM);
 
     ecl_rsthead_free(header);
   }

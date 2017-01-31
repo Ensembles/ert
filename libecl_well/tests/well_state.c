@@ -63,6 +63,7 @@ int main(int argc , char ** argv) {
     test_assert_double_equal( 0.0, well_state_get_oil_rate( well_state ));
     test_assert_double_equal( 0.0, well_state_get_gas_rate( well_state ));
     test_assert_double_equal( 0.0, well_state_get_water_rate( well_state ));
+    test_assert_double_equal( 0.0, well_state_get_volume_rate( well_state ));
 
     well_state_free( well_state );
   }

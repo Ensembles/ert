@@ -24,7 +24,7 @@ class EclWellTest3(ExtendedTestCase):
                 # print "%03d  %g   %g " % (R , well_state.oilRate(), sum.get_from_report( "WOPR:%s" % well , R))
                 if wtl.getName() == "OP_4":
                     pass
-                    # print well_state.oilRate(), well_state.waterRate(), well_state.gasRate()
+                    # print well_state.oilRate(), well_state.waterRate(), well_state.gasRate(), well_state.volumeRate()
                     # print sum.get_from_report("WOPR:%s" % wtl.getName(), 1)
                     # print sum.get_from_report( "WWPR:%s" % wtl.getName(), 30 )
 

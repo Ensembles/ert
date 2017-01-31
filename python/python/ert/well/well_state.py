@@ -25,6 +25,7 @@ class WellState(BaseCClass):
     _oil_rate                = WellPrototype("double well_state_get_oil_rate(well_state)")
     _gas_rate                = WellPrototype("double well_state_get_gas_rate(well_state)")
     _water_rate              = WellPrototype("double well_state_get_water_rate(well_state)")
+    _volume_rate              = WellPrototype("double well_state_get_volume_rate(well_state)")
 
     
     def __init__(self):
@@ -138,3 +139,6 @@ class WellState(BaseCClass):
 
     def oilRate(self):
         return self._oil_rate( )
+
+    def volumeRate(self):
+        return self._volume_rate( )
