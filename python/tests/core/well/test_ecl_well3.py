@@ -7,10 +7,8 @@ from ert.util.ctime import CTime
 from ert.well import WellInfo, WellConnection, WellTypeEnum, WellConnectionDirectionEnum, WellSegment
 
 
-
 class EclWellTest3(ExtendedTestCase):
     grid = None
-
 
     def test_rates(self):
         grid_path = self.createTestPath("Statoil/ECLIPSE/Gurbat/ECLIPSE.EGRID")
@@ -19,21 +17,22 @@ class EclWellTest3(ExtendedTestCase):
 
         grid = EclGrid(grid_path)
         well_info = WellInfo(grid, rst_path)
-        sum = EclSum( sum_path )
+        sum = EclSum(sum_path)
 
-        for well in ["OP_1"]:# , "OP_2", "OP_3", "OP_4" , "OP_5"]:
-            for R in range(1,60):
-                well_state = well_info[well][R]
+        for wtl in well_info:
+            for well_state in wtl:
+                # print "%03d  %g   %g " % (R , well_state.oilRate(), sum.get_from_report( "WOPR:%s" % well , R))
+                if wtl.getName() == "OP_4":
+                    pass
+                    # print well_state.oilRate(), well_state.waterRate(), well_state.gasRate()
+                    # print sum.get_from_report("WOPR:%s" % wtl.getName(), 1)
+                    # print sum.get_from_report( "WWPR:%s" % wtl.getName(), 30 )
 
-                print "%03d  %g   %g " % (R , well_state.oilRate(), sum.get_from_report( "WOPR:%s" % well , R))
-            
-            #rint well_state.oilRate(), well_state.waterRate(), well_state.gasRate()
-            #
-            #rint sum.get_from_report( "WOPR:%s" % well , 30 )
-            #rint sum.get_from_report( "WWPR:%s" % well , 30 )
-            #rint sum.get_from_report( "WGPR:%s" % well , 30 )
-            #
-            #elf.assertFloatEqual( well_state.oilRate( ) , sum.get_from_report( "WOPR:%s" % well , 30 ))
-            #elf.assertFloatEqual( well_state.waterRate( ) , sum.get_from_report( "WWPR:%s" % well , 30 ))
-            #elf.assertFloatEqual( well_state.gasRate( ) , sum.get_from_report( "WGPR:%s" % well , 30 ))
-            
+                    # for conn in well_state.globalConnections():
+                    #     print conn.gasRate(), conn.waterRate(), conn.oilRate()
+                    #
+                    # print sum.get_from_report("WGPR:%s" % wtl.getName(), 30)
+                    #
+                    # self.assertFloatEqual(well_state.oilRate(), sum.get_from_report("WOPR:%s" % wtl.getName(), 30))
+                    # self.assertFloatEqual(well_state.waterRate(), sum.get_from_report("WWPR:%s" % wtl.getName(), 30))
+                    # self.assertFloatEqual(well_state.gasRate(), sum.get_from_report("WGPR:%s" % wtl.getName(), 30))

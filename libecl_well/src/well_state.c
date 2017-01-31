@@ -259,10 +259,6 @@ static bool well_state_add_rates( well_state_type * well_state ,
     well_state->gas_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_GRAT_ITEM);
     well_state->water_rate = ecl_kw_iget_double(xwel_kw, offset + XWEL_RES_WRAT_ITEM);
 
-    for (int i = 0; i < 7; i++)
-      printf("%16.4f ", ecl_kw_iget_double(xwel_kw, offset + i));
-    printf("\n");
-
     ecl_rsthead_free(header);
   }
   return has_xwel_kw;
@@ -367,11 +363,16 @@ static void well_state_add_connections__( well_state_type * well_state ,
 
   {
     ecl_kw_type * scon_kw = NULL;
-    well_conn_collection_type * wellcc = hash_get( well_state->connections , grid_name );
     if (ecl_file_view_has_kw( rst_view , SCON_KW))
       scon_kw = ecl_file_view_iget_named_kw( rst_view , SCON_KW , 0);
 
-    well_conn_collection_load_from_kw( wellcc , iwel_kw , icon_kw , scon_kw , well_nr , header );
+    ecl_kw_type * xcon_kw = NULL;
+    if (ecl_file_view_has_kw( rst_view , XCON_KW)) {
+      xcon_kw = ecl_file_view_iget_named_kw(rst_view, XCON_KW, 0);
+    }
+
+    well_conn_collection_type * wellcc = hash_get( well_state->connections , grid_name );
+    well_conn_collection_load_from_kw( wellcc , iwel_kw , icon_kw , scon_kw, xcon_kw , well_nr , header );
   }
   ecl_rsthead_free( header );
 }

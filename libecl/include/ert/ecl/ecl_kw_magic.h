@@ -361,6 +361,7 @@ values (2e20) are denoted with '*'.
 #define ZWEL_KW      "ZWEL"
 #define ICON_KW      "ICON"
 #define SCON_KW      "SCON"
+#define XCON_KW      "XCON"
 #define ISEG_KW      "ISEG"
 #define RSEG_KW      "RSEG"
 
@@ -392,7 +393,7 @@ values (2e20) are denoted with '*'.
 #define INTEHEAD_NXWELZ_INDEX  26
 #define INTEHEAD_NICONZ_INDEX  32     // Number of elements pr completion in the ICON array.
 #define INTEHEAD_NSCONZ_INDEX  33     // Number of elements pr completion in the SCON array
-#define INTEHEAD_NXCONZ_INDEX  34
+#define INTEHEAD_NXCONZ_INDEX  34     // Number of elements pr completion in the XCON array
 #define INTEHEAD_NIGRPZ_INDEX  36     // Number of elements pr group in the IGRP array.
 
 

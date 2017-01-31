@@ -104,6 +104,10 @@ extern "C" {
 #define ICON_DEFAULT_DIR_TARGET   ICON_DIRZ
 
 #define SCON_CF_INDEX              0
+
+#define XCON_WRAT_INDEX           46
+#define XCON_GRAT_INDEX           47
+#define XCON_ORAT_INDEX           48
 #define XCON_QR_INDEX             49
 
 #define RSEG_LENGTH_INDEX       0
