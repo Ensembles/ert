@@ -70,6 +70,12 @@ extern "C" {
   double             well_conn_get_oil_rate(const well_conn_type *conn);
   double             well_conn_get_gas_rate(const well_conn_type *conn);
   double             well_conn_get_water_rate(const well_conn_type *conn);
+  double             well_conn_get_volume_rate(const well_conn_type *conn);
+
+  double             well_conn_get_oil_rate_si(const well_conn_type *conn);
+  double             well_conn_get_gas_rate_si(const well_conn_type *conn);
+  double             well_conn_get_water_rate_si(const well_conn_type *conn);
+  double             well_conn_get_volume_rate_si(const well_conn_type *conn);
 
 
 UTIL_IS_INSTANCE_HEADER( well_conn );

@@ -239,6 +239,24 @@ double well_state_get_volume_rate( const well_state_type * well_state) {
   return well_state->volume_rate;
 }
 
+double well_state_get_oil_rate_si( const well_state_type * well_state ) {
+  return well_state->oil_rate;
+}
+
+
+double well_state_get_gas_rate_si( const well_state_type * well_state ) {
+  return well_state->gas_rate;
+}
+
+
+double well_state_get_water_rate_si( const well_state_type * well_state) {
+  return well_state->water_rate;
+}
+
+double well_state_get_volume_rate_si( const well_state_type * well_state) {
+  return well_state->volume_rate;
+}
+
 
 void well_state_add_wellhead( well_state_type * well_state , const ecl_rsthead_type * header , const ecl_kw_type * iwel_kw , int well_nr , const char * grid_name , int grid_nr) {
   well_conn_type * wellhead = well_conn_alloc_wellhead( iwel_kw , header , well_nr );

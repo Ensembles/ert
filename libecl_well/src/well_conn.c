@@ -53,6 +53,7 @@ struct  well_conn_struct {
   double             oil_rate;
   double             gas_rate;
   double             water_rate;
+  double             volume_rate;
 
 };
 
@@ -109,6 +110,7 @@ static well_conn_type * well_conn_alloc__( int i , int j , int k , double connec
     conn->water_rate = 0;
     conn->gas_rate = 0;
     conn->oil_rate = 0;
+    conn->volume_rate = 0;
 
     return conn;
   } else {
@@ -228,6 +230,7 @@ well_conn_type * well_conn_alloc_from_kw( const ecl_kw_type * icon_kw ,
       conn->water_rate = ecl_kw_iget_as_double(xcon_kw, xcon_offset + XCON_WRAT_INDEX);
       conn->gas_rate = ecl_kw_iget_as_double(xcon_kw, xcon_offset + XCON_GRAT_INDEX);
       conn->oil_rate = ecl_kw_iget_as_double(xcon_kw, xcon_offset + XCON_ORAT_INDEX);
+      conn->volume_rate = ecl_kw_iget_double(xcon_kw, xcon_offset + XCON_QR_INDEX);
     }
 
     /**
@@ -334,4 +337,24 @@ double well_conn_get_gas_rate(const well_conn_type *conn) {
 
 double well_conn_get_water_rate(const well_conn_type *conn) {
   return conn->water_rate;
+}
+
+double well_conn_get_volume_rate(const well_conn_type *conn) {
+  return conn->volume_rate;
+}
+
+double well_conn_get_oil_rate_si(const well_conn_type *conn) {
+  return conn->oil_rate;
+}
+
+double well_conn_get_gas_rate_si(const well_conn_type *conn) {
+  return conn->gas_rate;
+}
+
+double well_conn_get_water_rate_si(const well_conn_type *conn) {
+  return conn->water_rate;
+}
+
+double well_conn_get_volume_rate_si(const well_conn_type *conn) {
+  return conn->volume_rate;
 }

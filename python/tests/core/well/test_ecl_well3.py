@@ -39,6 +39,7 @@ class EclWellTest3(ExtendedTestCase):
                         self.assertEqual(conn.gasRate(), conn.gasRateSI())
                         self.assertEqual(conn.waterRate(), conn.waterRateSI())
                         self.assertEqual(conn.oilRate(), conn.oilRateSI())
+                        self.assertEqual(conn.volumeRate(), conn.volumeRateSI())
                     #
                     # print sum.get_from_report("WGPR:%s" % wtl.getName(), 30)
                     #
