@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+#cmake_minimum_required( VERSION 2.8 )
 project( ERT C CXX )
 
 if(POLICY CMP0042)
