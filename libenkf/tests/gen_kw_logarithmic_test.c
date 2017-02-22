@@ -71,7 +71,7 @@ void test_write_gen_kw_export_file(enkf_main_type * enkf_main)
 
   {
     enkf_fs_type * init_fs = enkf_main_get_fs( enkf_main );
-    run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( init_fs , 0 ,0 , "simulations/run0");
+    run_arg_type * run_arg = run_arg_alloc_INIT_ONLY( init_fs , 0 ,0 , "simulations/run0", 0);
     enkf_state_ecl_write(state, run_arg , init_fs);
     test_assert_true(util_file_exists("simulations/run0/parameters.txt"));
     run_arg_free( run_arg );

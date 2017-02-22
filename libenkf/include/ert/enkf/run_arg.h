@@ -36,9 +36,9 @@ UTIL_SAFE_CAST_HEADER( run_arg );
 UTIL_IS_INSTANCE_HEADER( run_arg );
 
 
-  run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath);
-  run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath);
-  run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath);
+  run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath, int max_runtime);
+  run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath, int max_runtime);
+  run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath, int max_runtime);
 
   int            run_arg_get_step1( const run_arg_type * run_arg );
   int            run_arg_get_step2( const run_arg_type * run_arg );
@@ -48,6 +48,7 @@ UTIL_IS_INSTANCE_HEADER( run_arg );
   int            run_arg_get_iter( const run_arg_type * run_arg );
   void           run_arg_increase_submit_count( run_arg_type * run_arg );
   void           run_arg_set_queue_index( run_arg_type * run_arg , int queue_index);
+  int            run_arg_get_max_runtime( const run_arg_type * run_arg );
 
   void run_arg_free(run_arg_type * run_arg);
   void run_arg_free__(void * arg);

@@ -45,7 +45,7 @@ void test_queue_index() {
   test_work_area_type * test_area = test_work_area_alloc("run_arg/ENS");
   {
     enkf_fs_type * fs   = enkf_fs_create_fs("sim" , BLOCK_FS_DRIVER_ID , NULL , true);
-    run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT(fs , 0 , 6 , "path");
+    run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT(fs , 0 , 6 , "path", 0);
 
     test_assert_false( run_arg_is_submitted( run_arg ) );
     test_assert_util_abort("run_arg_get_queue_index" , call_get_queue_index , run_arg );
@@ -79,7 +79,7 @@ void test_SMOOTHER_RUN( ) {
   {
     enkf_fs_type * sim_fs    = enkf_fs_create_fs("sim" , BLOCK_FS_DRIVER_ID , NULL , true);
     enkf_fs_type * target_fs = enkf_fs_create_fs("target" , BLOCK_FS_DRIVER_ID , NULL , true);
-    run_arg_type * run_arg = run_arg_alloc_SMOOTHER_RUN(sim_fs , target_fs , 0 , 6 , "path");
+    run_arg_type * run_arg = run_arg_alloc_SMOOTHER_RUN(sim_fs , target_fs , 0 , 6 , "path", 0);
     test_assert_true( run_arg_is_instance( run_arg ));
     test_assert_ptr_equal( run_arg_get_init_fs( run_arg ) , sim_fs );
     test_assert_ptr_equal( run_arg_get_result_fs( run_arg ) , sim_fs );
@@ -97,7 +97,7 @@ void alloc_invalid_run_arg(void *arg) {
   test_work_area_type * test_area = test_work_area_alloc("run_arg/invalid");
   {
     enkf_fs_type * fs    = enkf_fs_create_fs("fs" , BLOCK_FS_DRIVER_ID , NULL , true);
-    run_arg_type * run_arg = run_arg_alloc_SMOOTHER_RUN(fs , fs , 0 , 6 , "path"); // This should explode ...
+    run_arg_type * run_arg = run_arg_alloc_SMOOTHER_RUN(fs , fs , 0 , 6 , "path", 0); // This should explode ...
     run_arg_free( run_arg );
     enkf_fs_decref( fs );
   }
@@ -115,7 +115,7 @@ void test_INIT_ONLY( ) {
   {
     enkf_fs_type * init_fs   = enkf_fs_create_fs("sim" , BLOCK_FS_DRIVER_ID , NULL , true);
 
-    run_arg_type * run_arg = run_arg_alloc_INIT_ONLY(init_fs , 0 , 6 , "path");
+    run_arg_type * run_arg = run_arg_alloc_INIT_ONLY(init_fs , 0 , 6 , "path",0);
     test_assert_true( run_arg_is_instance( run_arg ));
     test_assert_ptr_equal( run_arg_get_init_fs( run_arg ) , init_fs );
 
@@ -134,7 +134,7 @@ void test_ENSEMBLE_EXPERIMENT( ) {
   {
     enkf_fs_type * fs   = enkf_fs_create_fs("sim" , BLOCK_FS_DRIVER_ID , NULL , true);
 
-    run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT(fs , 0 , 6 , "path");
+    run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT(fs , 0 , 6 , "path",0);
     test_assert_true( run_arg_is_instance( run_arg ));
 
     test_assert_ptr_equal( run_arg_get_init_fs( run_arg ) , fs );

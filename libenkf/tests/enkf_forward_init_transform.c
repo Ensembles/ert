@@ -80,7 +80,7 @@ int main(int argc , char ** argv) {
   enkf_main_type * enkf_main = enkf_main_bootstrap( config_file , strict , true );
   enkf_fs_type * init_fs = enkf_main_get_fs(enkf_main);
   enkf_state_type * state = enkf_main_iget_state( enkf_main , 0 );
-  run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( init_fs , 0 ,0 , "simulations/run0");
+  run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( init_fs , 0 ,0 , "simulations/run0", 0);
   enkf_node_type * field_node = enkf_state_get_node( state , "PORO" );
 
   bool forward_init;

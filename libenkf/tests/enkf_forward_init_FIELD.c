@@ -85,7 +85,7 @@ int main(int argc , char ** argv) {
       enkf_state_type * state   = enkf_main_iget_state( enkf_main , 0 );
       enkf_fs_type * fs = enkf_main_get_fs( enkf_main );
       enkf_node_type * field_node = enkf_state_get_node( state , "PORO" );
-      run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( fs , 0 ,0 , "simulations/run0");
+      run_arg_type * run_arg = run_arg_alloc_ENSEMBLE_EXPERIMENT( fs , 0 ,0 , "simulations/run0", 0);
       node_id_type node_id = {.report_step = 0 ,
                               .iens = 0 };
 

@@ -40,7 +40,8 @@ typedef struct ert_init_context_struct ert_init_context_type;
                                                  path_fmt_type * runpath_fmt ,
                                                  subst_list_type * subst_list ,
                                                  init_mode_type init_mode ,
-                                                 int iter);
+                                                 int iter,
+                                                 int max_runtime);
 
   void                     ert_init_context_free( ert_init_context_type * );
   int                      ert_init_context_get_size( const ert_init_context_type * context );

@@ -42,6 +42,7 @@ struct run_arg_struct {
   char                  * run_path;             /* The currently used  runpath - is realloced / freed for every step. */
   run_mode_type           run_mode;             /* What type of run this is */
   int                     queue_index;          /* The job will in general have a different index in the queue than the iens number. */
+  int                     max_runtime;
 
   enkf_fs_type          * init_fs;
   enkf_fs_type          * result_fs;
@@ -65,7 +66,8 @@ static run_arg_type * run_arg_alloc(enkf_fs_type * init_fs ,
                                     int step1                       ,
                                     int step2                       ,
                                     int iter                        ,
-                                    const char * runpath) {
+                                    const char * runpath,
+                                    int max_runtime) {
   if ((result_fs != NULL) && (result_fs == update_target_fs))
     util_abort("%s: internal error - can  not have result_fs == update_target_fs \n",__func__);
   {
@@ -85,6 +87,7 @@ static run_arg_type * run_arg_alloc(enkf_fs_type * init_fs ,
     run_arg->num_internal_submit = 0;
     run_arg->queue_index = INVALID_QUEUE_INDEX;
     run_arg->run_status = JOB_NOT_STARTED;
+    run_arg->max_runtime = max_runtime;
 
     if (step1 == 0)
       run_arg->load_start = 1;
@@ -99,18 +102,18 @@ static run_arg_type * run_arg_alloc(enkf_fs_type * init_fs ,
 
 
 
-run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath) {
-  return run_arg_alloc(fs , fs , NULL , iens , ENSEMBLE_EXPERIMENT , 0 , 0 , iter , runpath);
+run_arg_type * run_arg_alloc_ENSEMBLE_EXPERIMENT(enkf_fs_type * fs , int iens , int iter , const char * runpath, int max_runtime) {
+  return run_arg_alloc(fs , fs , NULL , iens , ENSEMBLE_EXPERIMENT , 0 , 0 , iter , runpath, max_runtime);
 }
 
 
-run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath) {
-  return run_arg_alloc(init_fs , NULL , NULL , iens , INIT_ONLY , 0 , 0 , iter , runpath);
+run_arg_type * run_arg_alloc_INIT_ONLY(enkf_fs_type * init_fs , int iens , int iter , const char * runpath, int max_runtime) {
+  return run_arg_alloc(init_fs , NULL , NULL , iens , INIT_ONLY , 0 , 0 , iter , runpath, max_runtime);
 }
 
 
-run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath) {
-  return run_arg_alloc(simulate_fs , simulate_fs , update_target_fs , iens , ENSEMBLE_EXPERIMENT , 0 , 0 , iter , runpath);
+run_arg_type * run_arg_alloc_SMOOTHER_RUN(enkf_fs_type * simulate_fs , enkf_fs_type * update_target_fs , int iens , int iter , const char * runpath, int max_runtime) {
+  return run_arg_alloc(simulate_fs , simulate_fs , update_target_fs , iens , ENSEMBLE_EXPERIMENT , 0 , 0 , iter , runpath, max_runtime);
 }
 
 
@@ -159,6 +162,10 @@ const char * run_arg_get_runpath( const run_arg_type * run_arg) {
 
 int run_arg_get_iter( const run_arg_type * run_arg ) {
   return run_arg->iter;
+}
+
+int run_arg_get_max_runtime( const run_arg_type * run_arg ) {
+  return run_arg->max_runtime;
 }
 
 

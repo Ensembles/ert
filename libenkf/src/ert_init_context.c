@@ -92,14 +92,16 @@ ert_init_context_type * ert_init_context_alloc(enkf_fs_type * init_fs , const bo
                                                path_fmt_type * runpath_fmt ,
                                                subst_list_type * subst_list ,
                                                init_mode_type init_mode ,
-                                               int iter) {
+                                               int iter,
+                                               int max_runtime) {
 
-  ert_init_context_type * context = ert_init_context_alloc1( iactive , init_mode , iter );
+  ert_init_context_type * context = ert_init_context_alloc1( iactive , init_mode , iter);
   {
     stringlist_type * runpath_list = ert_init_context_alloc_runpath_list( iactive , runpath_fmt , subst_list , iter );
+
     for (int iens = 0; iens < bool_vector_size( iactive ); iens++) {
       if (bool_vector_iget( iactive , iens )) {
-        run_arg_type * arg = run_arg_alloc_INIT_ONLY( init_fs , iens , iter , stringlist_iget( runpath_list , iens));
+        run_arg_type * arg = run_arg_alloc_INIT_ONLY( init_fs , iens , iter , stringlist_iget( runpath_list , iens) , max_runtime);
         vector_append_owned_ref( context->run_args , arg , run_arg_free__);
       }
     }

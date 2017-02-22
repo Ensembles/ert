@@ -1420,14 +1420,17 @@ void enkf_state_init_eclipse(enkf_state_type *enkf_state, const run_arg_type * r
       }
     }
     member_config_get_jobname( my_config );
-    mode_t umask = site_config_get_umask(enkf_state->shared_info->site_config);
 
+    {
+      mode_t umask = site_config_get_umask(enkf_state->shared_info->site_config);
 
-    /* This is where the job script is created */
-    forward_model_python_fprintf( model_config_get_forward_model( enkf_state->shared_info->model_config ) ,
-                                  run_arg_get_runpath( run_arg ) ,
-                                  enkf_state->subst_list,
-                                  umask);
+      /* This is where the job script is created */
+      forward_model_python_fprintf( model_config_get_forward_model( enkf_state->shared_info->model_config ) ,
+                                    run_arg_get_runpath( run_arg ) ,
+                                    enkf_state->subst_list,
+                                    umask,
+                                    run_arg_get_max_runtime( run_arg ));
+    }
   }
 }
 
