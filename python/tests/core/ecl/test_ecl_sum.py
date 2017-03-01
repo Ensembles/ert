@@ -16,7 +16,7 @@
 #  for more details.
 import datetime
 import os.path
-from cwrap import CFILE
+
 from ert.ecl import EclSum, EclSumKeyWordVector, EclFile,FortIO, openFortIO,openEclFile,EclKW
 from ert.test import ExtendedTestCase , TestAreaContext
 
@@ -51,8 +51,7 @@ class EclSumTest(ExtendedTestCase):
         dtime = datetime.datetime( 2002 , 1 , 1 , 0 , 0 , 0 )
         with TestAreaContext("EclSum/csv_dump"):
             test_file_name = self.createTestPath("dump.csv")
-            outputH = open(test_file_name , "w")
-            self.ecl_sum.dumpCSVLine( dtime, ecl_sum_vector, outputH)
+            self.ecl_sum.dumpCSVLine( dtime, ecl_sum_vector, fname = test_file_name)
             assert os.path.isfile(test_file_name)
 
 

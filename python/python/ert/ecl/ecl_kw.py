@@ -247,8 +247,11 @@ class EclKW(BaseCClass):
         @kw, in which case the method will load the first keyword
         it finds in the file.
         """
-        
-        cfile  = CFILE( fileH )
+
+        if isinstance(cfile, str):
+            fname = cfile
+        else:
+            raise NotImplementedError('Does not support reading file, must be filename.')
         if kw:
             if len(kw) > 8:
                 raise TypeError("Sorry keyword:%s is too long, must be eight characters or less." % kw)

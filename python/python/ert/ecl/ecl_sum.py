@@ -30,7 +30,7 @@ import os.path
 # regarding order of arguments: The C code generally takes the time
 # index as the first argument and the key/key_index as second
 # argument. In the python code this order has been reversed.
-from cwrap import BaseCClass, CFILE
+from cwrap import BaseCClass
 from ert.ecl import EclSumTStep
 from ert.ecl import EclSumVarType
 from ert.ecl.ecl_sum_vector import EclSumVector
@@ -1206,14 +1206,15 @@ class EclSum(BaseCClass):
         content = 'name = "%s", time = [%s, %s], keys = %d' % (name, s_time, e_time, num_keys)
         return self._create_repr(content)
 
-    def dumpCSVLine(self, time, keywords, pfile):
+    def dumpCSVLine(self, time, keywords, pfile=None, fname=None):
         """
         Will dump a csv formatted line of the keywords in @keywords,
         evaluated at the intertpolated time @time. @pfile should point to an open Python file handle.
         """
-        cfile = CFILE(pfile )
+        if pfile:
+            raise NotImplementedError('Cannot provide file handle, use filename.')
         ctime = CTime( time )
-        EclSum._dump_csv_line(self , ctime, keywords, cfile)
+        EclSum._dump_csv_line(self , ctime, keywords, fname)
 
 
     def exportCSV(self , filename , keys = None , date_format = "%Y-%m-%d" , sep = ";"):
@@ -1242,4 +1243,4 @@ class EclSum(BaseCClass):
 
 
 import ert.ecl.ecl_sum_keyword_vector
-EclSum._dump_csv_line = EclPrototype("void  ecl_sum_fwrite_interp_csv_line(ecl_sum , time_t , ecl_sum_vector, FILE)" , bind = False)
+EclSum._dump_csv_line = EclPrototype("void  ecl_sum_fwrite_interp_csv_line_to_filename(ecl_sum , time_t , ecl_sum_vector, char*)" , bind = False)

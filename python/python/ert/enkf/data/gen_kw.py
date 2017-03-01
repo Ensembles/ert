@@ -15,7 +15,7 @@
 #  for more details.
 import os.path
 
-from cwrap import BaseCClass, CFILE
+from cwrap import BaseCClass
 
 from ert.util import DoubleVector
 from ert.enkf import EnkfPrototype
@@ -26,7 +26,7 @@ class GenKw(BaseCClass):
     TYPE_NAME = "gen_kw"
     _alloc             = EnkfPrototype("void*  gen_kw_alloc(gen_kw_config)", bind = False)
     _free              = EnkfPrototype("void   gen_kw_free(gen_kw_config)")
-    _export_parameters = EnkfPrototype("void   gen_kw_write_export_file(gen_kw , FILE)")
+    _export_parameters = EnkfPrototype("void   gen_kw_write_export_to_filename(gen_kw , char*)")
     _export_template   = EnkfPrototype("void   gen_kw_ecl_write_template(gen_kw , char* )")
     _data_iget         = EnkfPrototype("double gen_kw_data_iget(gen_kw, int, bool)")
     _data_iset         = EnkfPrototype("void   gen_kw_data_iset(gen_kw, int, double)")
@@ -35,7 +35,7 @@ class GenKw(BaseCClass):
     _data_set          = EnkfPrototype("void   gen_kw_data_set(gen_kw, char*, double)")
     _size              = EnkfPrototype("int    gen_kw_data_size(gen_kw)")
     _has_key           = EnkfPrototype("bool   gen_kw_data_has_key(gen_kw, char*)")
-    _ecl_write         = EnkfPrototype("void   gen_kw_ecl_write(gen_kw,    char* , char* , FILE)")
+    _ecl_write         = EnkfPrototype("void   gen_kw_ecl_write(gen_kw,    char* , char* , void*)")
     _iget_key          = EnkfPrototype("char*  gen_kw_get_name(gen_kw, int)")
     
 
@@ -50,13 +50,11 @@ class GenKw(BaseCClass):
             self.__str__ = self.__repr__
         else:
             raise ValueError('Cannot issue a GenKw from the given keyword config: %s.' % str(gen_kw_config))
-    
 
-    def exportParameters(self, file_name):
+
+    def exportParameters(self, fname):
         """ @type: str """
-        with open(file_name , "w") as py_file:
-            cfile  = CFILE( py_file )
-            self._export_parameters(cfile)
+        self._export_parameters(fname)
 
 
     def exportTemplate(self, file_name):
@@ -107,14 +105,13 @@ class GenKw(BaseCClass):
                         self._data_iget(index, do_transform)) )
         return v
 
-        
+
     def eclWrite(self , path , filename , export_file = None):
         if not path is None:
             if not os.path.isdir(path):
                 raise IOError("The directory:%s does not exist" % path)
         if export_file:
-            with open(export_file , "w") as fileH:
-                self._ecl_write(path , filename , CFILE( fileH ))
+            raise NotImplementedError('Cannot use export_file, must use filename')
         else:
             self._ecl_write( path , filename , None )
 
