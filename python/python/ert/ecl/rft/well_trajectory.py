@@ -17,6 +17,7 @@
 import sys
 import os
 from collections import namedtuple
+from cwrap import Stream
 
 TrajectoryPoint = namedtuple("TrajectoryPoint", "utm_x utm_y measured_depth true_vertical_depth zone")
 
@@ -25,7 +26,7 @@ class WellTrajectory:
     def __init__(self , filename):
         if os.path.isfile(filename):
             self.points = []
-            with open(filename) as fileH:
+            with Stream(filename) as fileH:
                 for line in fileH.readlines():
                     line = line.partition("--")[0]
                     line = line.strip()

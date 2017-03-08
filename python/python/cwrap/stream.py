@@ -43,7 +43,7 @@ class Stream(BaseCClass):
     _fclose = LibcPrototype("size_t   fclose (stream)", bind=True)
     _fflush = LibcPrototype("size_t   fflush (stream)", bind=True)
 
-    def __init__(self, fname, mode='rb'):
+    def __init__(self, fname, mode='r'):
         c_ptr = self._fopen(fname, mode)
         self._mode = mode
         self._fname = fname
@@ -55,7 +55,7 @@ class Stream(BaseCClass):
         try:
             super(Stream, self).__init__(c_ptr)
         except ValueError as e:
-            self.closed = True
+            self._closed = True
             raise IOError('Could not load file "%s" in mode %s.' % (fname, mode))
 
     @property
@@ -64,7 +64,7 @@ class Stream(BaseCClass):
 
     def _assert_open(self):
         if self.closed:
-            raise IOError('File "%s" is closed.' % self._fname)
+            raise IOError('Stream is closed: %s' % self)
 
     def _read_rest_of_file(self):
         out = numpy.zeros(0, dtype=numpy.byte)
@@ -105,7 +105,7 @@ class Stream(BaseCClass):
         """ returns string.  sep defaults to linesep=\n """
         self._assert_open()
         if not self._textmode():
-            print('Warning: reading line in byte mode is nonsensical.')
+            raise IOError('Warning: reading line from %s in byte mode is nonsensical.' % self)
         out = numpy.zeros(0, dtype=numpy.byte)
         while True:
             bptr = numpy.zeros(1, dtype=numpy.byte)
@@ -140,7 +140,7 @@ class Stream(BaseCClass):
         return 'b' not in self._mode
 
     def _writable(self):
-        return any(m in self._mode for m in 'rw+')
+        return any(m in self._mode for m in 'aw+')
 
     def write(self, np_arr):
         """ @type np_arr: numpy.array """
@@ -165,8 +165,8 @@ class Stream(BaseCClass):
 
     def __repr__(self):
         cl = ', closed' if self.closed else ''
-        fmt = 'Stream(fname=%s, mode=%s%s) %s'
-        return fmt % (self._fname, self._mode, cl, self._ad_str())
+        fmt = 'fname=%s, mode=%s%s'
+        return self._create_repr(fmt % (self._fname, self._mode, cl))
 
     def __enter__(self):
         return self

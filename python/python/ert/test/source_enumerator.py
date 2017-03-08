@@ -1,5 +1,6 @@
 import os
 import re
+from cwrap import Stream
 
 class SourceEnumerator(object):
 
@@ -12,7 +13,7 @@ class SourceEnumerator(object):
     
     @classmethod
     def findEnum(cls, enum_name, full_source_file_path):
-        with open(full_source_file_path, "r") as f:
+        with Stream(full_source_file_path, "r") as f:
             text = f.read()
 
         text = SourceEnumerator.removeComments(text)

@@ -23,13 +23,16 @@ alone create a grid with ecl_grid module. The functionality is
 implemented in the EclGrid class. The ecl_grid module is a thin
 wrapper around the ecl_grid.c implementation from the libecl library.
 """
+from __future__ import absolute_import
+
 import ctypes
 
 import numpy
 import sys
 import os.path
 import math
-from cwrap import CFILE, BaseCClass
+from cwrap import BaseCClass
+from cwrap import Stream
 from ert.util import IntVector
 from ert.ecl import EclPrototype, EclDataType, EclKW, FortIO, EclUnitTypeEnum
 
@@ -125,24 +128,25 @@ class EclGrid(BaseCClass):
         faster.
         """
 
-        if os.path.isfile(filename):
-            with open(filename) as f:
-                specgrid = EclKW.read_grdecl(f, "SPECGRID", ecl_type=EclDataType.ECL_INT, strict=False)
-                zcorn = EclKW.read_grdecl(f, "ZCORN")
-                coord = EclKW.read_grdecl(f, "COORD")
-                try:
-                    actnum = EclKW.read_grdecl(f, "ACTNUM", ecl_type=EclDataType.ECL_INT)
-                except ValueError:
-                    actnum = None
+        if not os.path.isfile(filename):
+            raise IOError('No such file "%s".' % filename)
 
-                try:
-                    mapaxes = EclKW.read_grdecl(f, "MAPAXES")
-                except ValueError:
-                    mapaxes = None
-
-            return EclGrid.create( specgrid , zcorn , coord , actnum , mapaxes )
-        else:
-            raise IOError("No such file:%s" % filename)
+        specgrid , zcorn , coord , actnum , mapaxes  = None, None, None, None, None
+        with Stream(filename) as f:
+            specgrid = EclKW.read_grdecl(f, "SPECGRID", ecl_type=EclTypeEnum.ECL_INT_TYPE, strict=False)
+            zcorn = EclKW.read_grdecl(f, "ZCORN")
+            coord = EclKW.read_grdecl(f, "COORD")
+            try:
+                actnum = EclKW.read_grdecl(f, "ACTNUM", ecl_type=EclTypeEnum.ECL_INT_TYPE)
+            except ValueError:
+                actnum = None
+            try:
+                mapaxes = EclKW.read_grdecl(f, "MAPAXES")
+            except ValueError:
+                mapaxes = None
+        if None in (specgrid, zcorn, coord):
+            raise ValueError('None of (specgrid, zcorn, coord) can be None: was (%s, %s, %s).' % (specgrid,zcorn,coord))
+        return EclGrid.create( specgrid , zcorn , coord , actnum , mapaxes )
 
     @classmethod
     def loadFromFile(cls , filename):
@@ -223,7 +227,6 @@ class EclGrid(BaseCClass):
             super(EclGrid, self).__init__(c_ptr)
         else:
             raise IOError("Loading grid from:%s failed" % filename)
-        self.__str__ = self.__repr__
 
     def free(self):
         self._free( )

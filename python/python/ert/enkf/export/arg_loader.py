@@ -6,15 +6,15 @@ from ert.enkf import ErtImplType, EnKFMain, EnkfFs, RealizationStateEnum, GenKwC
 from ert.enkf.plot_data import EnsemblePlotGenData
 from ert.util import BoolVector
 
-
 class ArgLoader(object):
 
     @staticmethod
     def load(filename , column_names = None):
         rows = 0
         columns = 0
-        with open(filename,"r") as fileH:
+        with open(filename, "r") as fileH:
             for line in fileH.readlines():
+                print(line)
                 rows += 1
                 columns = max(columns , len( line.split()) )
 
@@ -22,7 +22,8 @@ class ArgLoader(object):
             if len(column_names) <= columns:
                 columns = len(column_names)
             else:
-                raise ValueError("To many coloumns in input")
+                raise ValueError("Too many columns (should be at most %d) in input for line '%s'." %
+                                 (columns, column_names))
 
         data = numpy.empty(shape=(rows , columns) , dtype=numpy.float64)
         data.fill( numpy.nan )

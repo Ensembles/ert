@@ -23,11 +23,13 @@ from ert.ecl import EclGrid, EclDataType , EclKW
 from ert.test import ExtendedTestCase
 from ert.ecl.faults import FaultBlock, FaultBlockLayer
 
+from cwrap import Stream
+
 class FaultBlockTest(ExtendedTestCase):
     def setUp(self):
         self.grid = EclGrid( self.createTestPath("Statoil/ECLIPSE/Mariner/MARINER.EGRID"))
-        fileH = open( self.createTestPath("Statoil/ECLIPSE/Mariner/faultblock.grdecl") )
-        self.kw = EclKW.read_grdecl( fileH , "FAULTBLK" , ecl_type = EclDataType.ECL_INT )
+        fileH = Stream( self.createTestPath("Statoil/ECLIPSE/Mariner/faultblock.grdecl") )
+        self.kw = EclKW.read_grdecl( fileH , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
 
 
         

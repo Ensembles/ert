@@ -19,7 +19,7 @@ from random import randint
 from ert.ecl import FortIO, EclDataType, EclKW , openFortIO, EclFile
 from ert.test import ExtendedTestCase, TestAreaContext
 
-
+from cwrap import Stream
 
 
 class FortIOTest(ExtendedTestCase):
@@ -132,7 +132,7 @@ class FortIOTest(ExtendedTestCase):
             with openFortIO("fortran_file" , mode = FortIO.WRITE_MODE) as f:
                 kw1.fwrite( f )
 
-            with open("text_file" , "w") as f:
+            with Stream("text_file" , "w") as f:
                 kw1.write_grdecl( f )
 
             self.assertTrue( FortIO.isFortranFile( "fortran_file" ))

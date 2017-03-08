@@ -69,11 +69,19 @@ class StreamTest(ExtendedTestCase):
                 self.assertEqual(cnt[c], line)
                 c += 1
 
-    def test_with(self):
-        with TestAreaContext("stream_tests") as test_area:
-            with Stream('writewith', 'w') as s:
+    def test_with1(self):
+        with TestAreaContext("stream_tests_with1") as test_area:
+            with open('writewith', 'w') as s:
                 s.write('testing ```with``` syntax')
             with Stream('writewith', 'r') as s:
+                l = s.readline()
+                self.assertEqual('testing ```with``` syntax', l)
+
+    def test_with(self):
+        with TestAreaContext("stream_tests_with2") as test_area:
+            with Stream('writewith', 'w') as s:
+                s.write('testing ```with``` syntax')
+            with open('writewith', 'r') as s:
                 l = s.readline()
                 self.assertEqual('testing ```with``` syntax', l)
 

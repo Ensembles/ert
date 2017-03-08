@@ -1,4 +1,5 @@
 import os.path
+from cwrap import Stream
 from ert.enkf.data import GenKw
 from ert.enkf.config import GenKwConfig
 from ert.test import TestAreaContext, ExtendedTestCase
@@ -7,12 +8,12 @@ from ert.test import TestAreaContext, ExtendedTestCase
 def create_gen_kw():
     parameter_file ="MULTFLT.txt"
     template_file ="MULTFLT.tmpl"
-    with open(parameter_file, "w") as f:
+    with Stream(parameter_file, "w") as f:
         f.write("MULTFLT1  NORMAL  0   1\n")
         f.write("MULTFLT2  RAW \n")
         f.write("MULTFLT3  NORMAL  0   1\n")
 
-    with open(template_file, "w") as f:
+    with Stream(template_file, "w") as f:
         f.write("<MULTFLT1> <MULTFLT2> <MULTFLT3>\n")
         f.write("/\n")
         

@@ -28,7 +28,7 @@
 # choice.
 
 
-from cwrap import BaseCClass,CFILE
+from cwrap import BaseCClass
 from ert.util import UtilPrototype
 
 
@@ -212,9 +212,9 @@ class Matrix(BaseCClass):
          6 7 8
 
         """
-        self._fprint( fmt , CFILE( fileH))
+        self._fprint(fmt, fileH)
 
-        
+
     def randomInit(self, rng):
         self._random_init(rng)
 

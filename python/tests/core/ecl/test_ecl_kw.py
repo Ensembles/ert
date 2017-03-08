@@ -22,7 +22,7 @@ import warnings
 from ert.ecl import EclKW, EclDataType, EclTypeEnum, EclFile, FortIO, EclFileFlagEnum , openFortIO
 
 from ert.test import ExtendedTestCase , TestAreaContext
-
+from cwrap import Stream
 
 def copy_long():
     src = EclKW("NAME", 100, EclDataType.ECL_FLOAT)
@@ -73,11 +73,11 @@ class KWTest(ExtendedTestCase):
             kw[i] = d
             i += 1
 
-        file1 = open(name1, "w")
+        file1 = Stream(name1, "w")
         kw.fprintf_data(file1, fmt)
         file1.close()
 
-        file2 = open(name2, "w")
+        file2 = Stream(name2, "w")
         for d in data:
             file2.write(fmt % d)
         file2.close()
@@ -183,11 +183,11 @@ class KWTest(ExtendedTestCase):
             for i in range(len(kw)):
                 kw[i] = i
                 
-            fileH = open("test" , "w")
+            fileH = Stream("test" , "w")
             kw.fprintf_data( fileH )
             fileH.close()
 
-            fileH = open("test" , "r")
+            fileH = Stream("test" , "r")
             data = []
             for line in fileH.readlines():
                 tmp = line.split()
