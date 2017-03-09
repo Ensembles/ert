@@ -21,38 +21,38 @@ from cwrap import Stream
 
 TrajectoryPoint = namedtuple("TrajectoryPoint", "utm_x utm_y measured_depth true_vertical_depth zone")
 
-class WellTrajectory:
+class WellTrajectory(object):
 
     def __init__(self , filename):
-        if os.path.isfile(filename):
-            self.points = []
-            with Stream(filename) as fileH:
-                for line in fileH.readlines():
-                    line = line.partition("--")[0]
-                    line = line.strip()
-                    if line:
-                        point = line.split()
-                        if len(point) < 4 or len(point) > 5:
-                            raise UserWarning("Trajectory data file not on correct format: \"utm_x utm_y md tvd [zone]\" - zone is optional")
-                            
-                        try:
-                            utm_x = float(point[0])
-                            utm_y = float(point[1])
-                            md = float(point[2])
-                            tvd = float(point[3])
-                            if len(point) > 4:
-                                zone = point[4]
-                            else:
-                                zone = None
-                        except ValueError:
-                            raise UserWarning("Error: Failed to extract data from line %s\n" % line)
-                            
-                        self.points.append(TrajectoryPoint(utm_x , utm_y , md , tvd , zone))
-                
-        else:
-            raise IOError("File not found:%s" % filename)
-            
-    
+        if not os.path.isfile(filename):
+            raise IOError('No such file "%s".' % filename)
+
+        self.points = []
+        with open(filename) as fileH:
+            for line in fileH:
+                self._append(line)
+
+    def _append(self, line):
+        """Appends a content of a TrajectoryPoint line to self.points."""
+        line = line.split('--')[0].strip()
+        if not line:
+            return
+        point = line.split()
+        if len(point) not in (4, 5):
+            raise UserWarning("Trajectory data file not on correct format: \"utm_x utm_y md tvd [zone]\" - zone is optional")
+        try:
+            utm_x = float(point[0])
+            utm_y = float(point[1])
+            md = float(point[2])
+            tvd = float(point[3])
+            if len(point) > 4:
+                zone = point[4]
+            else:
+                zone = None
+            self.points.append(TrajectoryPoint(utm_x , utm_y , md , tvd , zone))
+        except ValueError:
+            raise UserWarning("Warning: Failed to extract data from line %s\n" % line)
+
     def __len__(self):
         return len(self.points)
 
@@ -62,3 +62,9 @@ class WellTrajectory:
             index += len(self)
 
         return self.points[index]
+
+    def __repr__(self):
+        return repr(self.points)
+
+    def __str__(self):
+        return str(self.points)

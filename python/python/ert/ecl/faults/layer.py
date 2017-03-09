@@ -23,7 +23,6 @@ from ert.util import IntVector
 class Layer(BaseCClass):
     TYPE_NAME = "layer"
     _alloc              = EclPrototype("void* layer_alloc(int,  int)", bind = False)
-    _copy               = EclPrototype("void  layer_memcpy(layer , layer)")
     _free               = EclPrototype("void  layer_free(layer)")
     _get_nx             = EclPrototype("int   layer_get_nx(layer)")
     _get_ny             = EclPrototype("int   layer_get_ny(layer)")
@@ -50,13 +49,6 @@ class Layer(BaseCClass):
             super( Layer , self ).__init__(c_ptr)
         else:
             raise ValueError("Invalid input - no Layer object created")
-
-    @classmethod
-    def copy(cls , src):
-        layer = Layer( src.getNX() , src.getNY())
-        self._copy( layer , src )
-        return layer
-
 
     def __assertIJ(self , i,j):
         if i < 0 or i >= self.getNX():

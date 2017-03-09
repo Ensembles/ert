@@ -30,7 +30,7 @@ import os.path
 # regarding order of arguments: The C code generally takes the time
 # index as the first argument and the key/key_index as second
 # argument. In the python code this order has been reversed.
-from cwrap import BaseCClass, CFILE
+from cwrap import BaseCClass
 from ert.ecl import EclSumTStep
 from ert.ecl import EclSumVarType
 from ert.ecl.ecl_sum_vector import EclSumVector
@@ -154,11 +154,11 @@ class EclSum(BaseCClass):
         loader will, in the case of a restarted ECLIPSE simulation,
         try to load summary results also from the restarted case.
         """
-        c_pointer = self._fread_alloc( load_case , join_string , include_restart)
-        if c_pointer is None:
+        c_ptr = self._fread_alloc( load_case , join_string , include_restart)
+        if not c_ptr:
             raise IOError("Failed to create summary instance from argument:%s" % load_case)
         else:
-            super(EclSum, self).__init__(c_pointer)
+            super(EclSum, self).__init__(c_ptr)
             self.__private_init( )
         self._load_case = load_case
 
@@ -1208,11 +1208,10 @@ class EclSum(BaseCClass):
     def dumpCSVLine(self, time, keywords, pfile):
         """
         Will dump a csv formatted line of the keywords in @keywords,
-        evaluated at the intertpolated time @time. @pfile should point to an open Python file handle.
+        evaluated at the intertpolated time @time. @pfile should point to an open Stream.
         """
-        cfile = CFILE(pfile )
         ctime = CTime( time )
-        EclSum._dump_csv_line(self , ctime, keywords, cfile)
+        EclSum._dump_csv_line(self , ctime, keywords, pfile)
 
 
     def exportCSV(self , filename , keys = None , date_format = "%Y-%m-%d" , sep = ";"):

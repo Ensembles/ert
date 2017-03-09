@@ -202,7 +202,7 @@ class EclFile(BaseCClass):
         FIPNUM from an INIT file.
         """
         c_ptr = self._open( filename , flags )
-        if c_ptr is None:
+        if not c_ptr:
             raise IOError('Failed to open file "%s"' % filename)
         else:
             super(EclFile , self).__init__(c_ptr)

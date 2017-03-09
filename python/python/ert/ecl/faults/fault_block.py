@@ -79,14 +79,15 @@ class FaultBlock(BaseCClass):
             raise TypeError("Index:%s wrong type - integer expected")
 
     def __str__(self):
-        return "Block ID: %d" % self.getBlockID()
-
+        b_id = 'block_id=%d' % self.getBlockID()
+        return self._create_repr(b_id)
 
     def __len__(self):
         return self._get_size( )
 
     def free(self):
-        self._free( )
+        # TODO no such method self._free( )
+        pass
 
     def getCentroid(self):
         xc = self._get_xc( )

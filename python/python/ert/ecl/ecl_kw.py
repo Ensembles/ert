@@ -820,14 +820,18 @@ class EclKW(BaseCClass):
         The check is based on the content of the keywords, and not
         pointer comparison.
         """
-        if isinstance(other , EclKW):
+        if isinstance(other, EclKW):
             return self._equal( other )
         else:
             raise TypeError("Can only compare with another EclKW")
 
 
     def __eq__(self , other):
-        return self.equal( other )
+        if other is None:
+            return False
+        if isinstance(other, EclKW):
+            return self.equal(other)
+        return NotImplemented
 
     def __hash__(self):
         return hash(self._get_header( ))
@@ -1052,7 +1056,7 @@ class EclKW(BaseCClass):
     def fwrite( self , fortio ):
         self._fwrite( fortio )
 
-    def write_grdecl( self , file ):
+    def write_grdecl( self , fileH ):
         """
         Will write keyword in GRDECL format.
 
@@ -1074,12 +1078,12 @@ class EclKW(BaseCClass):
             fileH.close()
 
         """
-        cfile = CFILE( file )
-        self._fprintf_grdecl( cfile )
+        # cfile = CFILE( file )
+        self._fprintf_grdecl( fileH )
 
 
 
-    def fprintf_data( self , file , fmt = None):
+    def fprintf_data( self , fileH , fmt = None):
         """
         Will print the keyword data formatted to file.
 
