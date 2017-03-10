@@ -173,7 +173,7 @@ class Stream(BaseCClass):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
-        return self
+        return exc_type is None
 
     def free(self):
         self.close()
