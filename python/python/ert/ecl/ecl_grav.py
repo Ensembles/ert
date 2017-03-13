@@ -23,7 +23,7 @@ ecl_grav.c implementation in the libecl library.
 """
 from cwrap import BaseCClass
 from ert.ecl import EclPhaseEnum, EclPrototype
-
+from ert.util import BoolVector
 
 class EclGrav(BaseCClass):
     """
@@ -52,7 +52,7 @@ class EclGrav(BaseCClass):
     _add_std_density = EclPrototype("void ecl_grav_add_std_density( ecl_grav , int , int , double)")
     _eval = EclPrototype("double ecl_grav_eval( ecl_grav , char* , char* , ecl_region , double , double , double, int)")
 
-    
+    _alloc_aquifer_cell = EclPrototype("bool_vector_ref ecl_grav_common_alloc_aquifer_cell( ecl_grid, ecl_file )", bind=False)
 
     def __init__( self, grid, init_file ):
         """
@@ -71,6 +71,9 @@ class EclGrav(BaseCClass):
                          "PORMOD" : self.add_survey_PORMOD,
                          "RPORV"  : self.add_survey_RPORV}
 
+    @classmethod
+    def aquifer(cls, ecl_grid, init_file):
+        return cls._alloc_aquifer_cell(ecl_grid, init_file)
 
     def add_survey_RPORV( self, survey_name, restart_view ):
         """
