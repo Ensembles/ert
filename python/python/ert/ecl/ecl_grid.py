@@ -1185,7 +1185,7 @@ class EclGrid(BaseCClass):
         
         if len(ecl_kw) == self.getNumActive() or len(ecl_kw) == self.getGlobalSize():
             cfile = CFILE( pyfile )
-            self._fwrite_grdecl2( ecl_kw , special_header , cfile , default_value )
+            self._fwrite_grdecl( ecl_kw , special_header , cfile , default_value )
         else:
             raise ValueError("Keyword: %s has invalid size(%d), must be either nactive:%d  or nx*ny*nz:%d" % (ecl_kw.getName() , len(ecl_kw) , self.getNumActive() , self.getGlobalSize()))
 
