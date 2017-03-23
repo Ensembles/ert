@@ -8,6 +8,17 @@ from ert.util import BoolVector
 
 class RunpathListTest(ExtendedTestCase):
 
+    def test_an_enkf_runpath(self):
+        # TODO this test is flaky and we need to figure out why.  See #1370
+        # enkf_util_assert_buffer_type: wrong target type in file (expected:104 got:0)
+        test_path = self.createTestPath("local/snake_oil_field/snake_oil.ert")
+        with ErtTestContext("runpathlist_basic", test_path) as tc:
+            ert = tc.getErt()
+            ens_size = ert.getEnsembleSize()
+            runner = ert.getEnkfSimulationRunner()
+            mask = BoolVector(initial_size=ens_size, default_value=True)
+            runner.createRunPath(mask, 0)
+
     def test_runpath_list(self):
         runpath_list = RunpathList('')
 
