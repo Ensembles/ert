@@ -253,6 +253,12 @@ void gen_kw_filter_file(const gen_kw_type * gen_kw , const char * target_file) {
 }
 
 
+void gen_kw_write_export_to_filename(const gen_kw_type * gen_kw, char * fname) {
+  FILE * filestream = util_fopen__( fname , "w");
+  gen_kw_write_export_file(gen_kw, filestream);
+  fclose(filestream);
+}
+
 void gen_kw_write_export_file(const gen_kw_type * gen_kw, FILE * filestream) {
   const int size = gen_kw_config_get_data_size(gen_kw->config );
   int ikw;

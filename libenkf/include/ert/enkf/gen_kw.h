@@ -59,6 +59,9 @@ char           * gen_kw_alloc_user_key(const gen_kw_config_type *  , const char 
 void             gen_kw_set_subst_parent(gen_kw_type * gen_kw , const subst_list_type * parent_subst);
 void             gen_kw_ecl_write_template(const gen_kw_type * gen_kw , const char * file_name);
 
+void             gen_kw_write_export_to_filename(const gen_kw_type * gen_kw, char * filename);
+void             gen_kw_write_export_file(const gen_kw_type * gen_kw, FILE * filestream);
+
 
 UTIL_SAFE_CAST_HEADER(gen_kw);
 UTIL_SAFE_CAST_HEADER_CONST(gen_kw);

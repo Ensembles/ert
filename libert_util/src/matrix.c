@@ -546,7 +546,11 @@ void matrix_pretty_print(const matrix_type * matrix , const char * name , const 
   matrix_pretty_fprint(matrix , name , fmt , stdout );
 }
 
-
+void matrix_fprint_to_filename( const matrix_type * matrix , const char * fmt , const char * fname) {
+  FILE * filestream = util_fopen__( fname , "w");
+  matrix_fprintf(matrix, fmt, filestream);
+  fclose(filestream);
+}
 void matrix_fprintf( const matrix_type * matrix , const char * fmt , FILE * stream ) {
   int i,j;
   for (i=0; i < matrix->rows; i++) {

@@ -44,7 +44,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import  sys
 
-from cwrap import CFILE, BaseCClass
+from cwrap import BaseCClass
 from ert.util import UtilPrototype
 
     
@@ -401,18 +401,6 @@ class VectorTemplate(BaseCClass):
         The number of elements in the vector.
         """
         return self._size( )
-
-
-    def printf(self, fmt=None, name=None, stream=sys.stdout):
-        """
-        See also the str() method which returns string representantion
-        of the vector.
-        """
-        cfile = CFILE(stream)
-        if not fmt:
-            fmt = self.default_format
-        self._fprintf(cfile, name, fmt)
-
 
     def max(self):
         if len(self) > 0:

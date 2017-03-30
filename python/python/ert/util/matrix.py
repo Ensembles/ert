@@ -28,7 +28,7 @@
 # choice.
 
 
-from cwrap import BaseCClass,CFILE
+from cwrap import BaseCClass
 from ert.util import UtilPrototype
 
 
@@ -51,6 +51,7 @@ class Matrix(BaseCClass):
     _equal             = UtilPrototype("bool matrix_equal(matrix, matrix)")
     _pretty_print      = UtilPrototype("void matrix_pretty_print(matrix, char*, char*)")
     _fprint            = UtilPrototype("void matrix_fprintf(matrix, char*, FILE)")
+    _fprint_to_filename= UtilPrototype("void matrix_fprintf(matrix, char*, char*)")
     _random_init       = UtilPrototype("void matrix_random_init(matrix, rng)")
     _dump_csv          = UtilPrototype("void matrix_dump_csv(matrix, char*)")
     
@@ -188,7 +189,7 @@ class Matrix(BaseCClass):
     def prettyPrint(self, name, fmt="%6.3g"):
         self._pretty_print(name, fmt)
 
-    def fprint(self , fileH , fmt = "%g "):
+    def fprint(self , fileH = None , filename = None, fmt = "%g "):
         """Will print ASCII representation of matrix.
 
         The fileH argument should point to an open Python
@@ -212,7 +213,9 @@ class Matrix(BaseCClass):
          6 7 8
 
         """
-        self._fprint( fmt , CFILE( fileH))
+        if fileH is not None:
+            raise NotImplementedError('Unsupported operation.  Please provide a filename.')
+        self._fprint_to_filename( fmt , filename)
 
         
     def randomInit(self, rng):
