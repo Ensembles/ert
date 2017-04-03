@@ -170,7 +170,7 @@ static double ecl_subsidence_survey_eval_geertsma( const ecl_subsidence_survey_t
                                                    double utm_x , double utm_y , double depth,
                                                    double youngs_modulus, double poisson_ratio, double seabed) {
 
-  const ecl_grid_cache_type * grid_cache = base_survey->grid_cache;
+  const ecl_grid_cache_type * grid_cache = monitor_survey->grid_cache;
   const double * cell_volume = ecl_grid_cache_get_volume( grid_cache );
   const int size  = ecl_grid_cache_get_size( grid_cache );
   double scale_factor = 1e4 *(1 + poisson_ratio) * ( 1 - 2*poisson_ratio) / ( 4*M_PI*( 1 - poisson_ratio)  * youngs_modulus );
@@ -178,14 +178,14 @@ static double ecl_subsidence_survey_eval_geertsma( const ecl_subsidence_survey_t
   double deltaz;
 
   for (int index = 0; index < size; index++) {
-    if (monitor_survey) {
+    if (base_survey) {
         weight[index] = scale_factor * cell_volume[index] * (monitor_survey->pressure[index] - base_survey->pressure[index]);
     } else {
-        weight[index] = scale_factor * cell_volume[index] * (base_survey->pressure[index] );
+        weight[index] = scale_factor * cell_volume[index] * (monitor_survey->pressure[index] );
     }
   }
 
-  deltaz = ecl_grav_common_eval_geertsma( grid_cache , region , base_survey->aquifer_cell , weight , utm_x , utm_y , depth , poisson_ratio, seabed);
+  deltaz = ecl_grav_common_eval_geertsma( grid_cache , region , monitor_survey->aquifer_cell , weight , utm_x , utm_y , depth , poisson_ratio, seabed);
 
   free( weight );
   return deltaz;

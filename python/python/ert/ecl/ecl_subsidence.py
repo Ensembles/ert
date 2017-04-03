@@ -93,12 +93,12 @@ class EclSubsidence(BaseCClass):
 
 
     def evalGeertsma(self, base_survey, monitor_survey, pos, youngs_modulus, poisson_ratio, seabed, region=None):
-        if not base_survey in self:
-            raise KeyError("No such survey: %s" % base_survey)
+        if not monitor_survey in self:
+            raise KeyError("No such survey: %s" % monitor_survey)
 
-        if monitor_survey is not None:
-            if not monitor_survey in self:
-                raise KeyError("No such survey: %s" % monitor_survey)
+        if base_survey is not None:
+            if not base_survey in self:
+                raise KeyError("No such survey: %s" % base_survey)
         
         return self._eval_geertsma(base_survey, monitor_survey, region, pos[0], pos[1], pos[2], youngs_modulus, poisson_ratio, seabed)
 
