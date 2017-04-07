@@ -105,7 +105,7 @@ typedef struct ecl_type_struct ecl_data_type;
 #define ECL_DOUBLE (ecl_data_type) {.type = ECL_DOUBLE_TYPE, .element_size = sizeof(double)}
 #define ECL_BOOL (ecl_data_type) {.type = ECL_BOOL_TYPE, .element_size = sizeof(int)}
 #define ECL_MESS (ecl_data_type) {.type = ECL_MESS_TYPE, .element_size = 0}
-#define ECL_STRING(size) (ecl_data_type) {.type = ECL_STRING_TYPE, .element_size=size+1}
+#define ECL_STRING(size) (ecl_data_type) {.type = ECL_STRING_TYPE, .element_size=size}
 
 // TODO: The ECL_C010 macro is to be removed
 #define ECL_C010 (ecl_data_type) {.type = ECL_C010_TYPE, .element_size = 10+1}
