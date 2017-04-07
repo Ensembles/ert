@@ -155,6 +155,8 @@ class FortIO(BaseCClass):
         # SEEK_END = 2
         self._seek(position, whence)
 
+    def __repr__(self):
+        return self._create_repr('filename=%s'  % self.filename())
 
     @classmethod
     def isFortranFile(cls, filename, endian_flip=True):

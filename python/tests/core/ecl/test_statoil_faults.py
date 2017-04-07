@@ -23,13 +23,13 @@ import time
 from ert.ecl.faults import FaultCollection, Fault, FaultLine, FaultSegment
 from ert.ecl import EclGrid, EclKW, EclDataType
 from ert.test import ExtendedTestCase
-
+from cwrap import Stream
 
 
 class StatoilFaultTest(ExtendedTestCase):
     def loadGrid(self):
         grid_file   = self.createTestPath("Statoil/ECLIPSE/Faults/grid.grdecl")
-        fileH = open(grid_file, "r")
+        fileH = Stream(grid_file, "r")
         specgrid = EclKW.read_grdecl(fileH, "SPECGRID", ecl_type=EclDataType.ECL_INT, strict=False)
         zcorn = EclKW.read_grdecl(fileH, "ZCORN")
         coord = EclKW.read_grdecl(fileH, "COORD")

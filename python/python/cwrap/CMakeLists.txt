@@ -4,6 +4,7 @@ set(PYTHON_SOURCES
     basecenum.py
     basecvalue.py
     cfile.py
+    stream.py
     clib.py
     metacwrap.py
     prototype.py

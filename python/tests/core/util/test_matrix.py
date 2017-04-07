@@ -1,3 +1,5 @@
+from cwrap import Stream
+
 from ert.util import Matrix , RandomNumberGenerator
 from ert.util.enums import RngAlgTypeEnum, RngInitModeEnum
 from ert.test import ExtendedTestCase, TestAreaContext
@@ -108,14 +110,16 @@ class MatrixTest(ExtendedTestCase):
         m[0,1] = 1
         m[1,0] = 2
         m[1,1] = 3
-        
-        with TestAreaContext("matrix_fprint"):
-            with open("matrix.txt", "w") as f:
-                m.fprint( f )
 
-            with open("matrix.txt") as f:
-                l1 = [ float(x) for x in f.readline().split()]
-                l2 = [ float(x) for x in f.readline().split()]
+        with TestAreaContext("matrix_fprint"):
+            fout = Stream("matrix.txt", "w")
+            m.fprint(fout)
+            fout.close()
+
+            fin = Stream("matrix.txt")
+            l1 = [ float(x) for x in fin.readline().split()]
+            l2 = [ float(x) for x in fin.readline().split()]
+            fin.close()
 
             self.assertEqual( l1[0] , m[0,0])
             self.assertEqual( l1[1] , m[0,1])

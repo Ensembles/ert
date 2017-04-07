@@ -15,7 +15,8 @@
 #  for more details.
 import os.path
 
-from cwrap import BaseCClass, CFILE
+from cwrap import BaseCClass
+from cwrap import Stream
 
 from ert.util import DoubleVector
 from ert.enkf import EnkfPrototype
@@ -50,13 +51,12 @@ class GenKw(BaseCClass):
             self.__str__ = self.__repr__
         else:
             raise ValueError('Cannot issue a GenKw from the given keyword config: %s.' % str(gen_kw_config))
-    
+
 
     def exportParameters(self, file_name):
         """ @type: str """
-        with open(file_name , "w") as py_file:
-            cfile  = CFILE( py_file )
-            self._export_parameters(cfile)
+        with Stream(file_name , "w") as stream:
+            self._export_parameters(stream)
 
 
     def exportTemplate(self, file_name):
@@ -113,8 +113,8 @@ class GenKw(BaseCClass):
             if not os.path.isdir(path):
                 raise IOError("The directory:%s does not exist" % path)
         if export_file:
-            with open(export_file , "w") as fileH:
-                self._ecl_write(path , filename , CFILE( fileH ))
+            with Stream(export_file , "w") as fileH:
+                self._ecl_write(path , filename , fileH)
         else:
             self._ecl_write( path , filename , None )
 

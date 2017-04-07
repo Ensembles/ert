@@ -5,6 +5,7 @@ set(TEST_SOURCES
     test_basecvalue.py
     test_metawrap.py
     test_cfile.py
+    test_stream.py
 )
 
 add_python_package("python.tests.core.cwrap" ${PYTHON_INSTALL_PREFIX}/tests/core/cwrap "${TEST_SOURCES}" False)
@@ -14,4 +15,4 @@ addPythonTest(core.cwrap.basecenum tests.core.cwrap.test_basecenum.BaseCEnumTest
 addPythonTest(core.cwrap.basecvalue tests.core.cwrap.test_basecvalue.BaseCValueTest)
 addPythonTest(core.cwrap.metacwrap tests.core.cwrap.test_metawrap.MetaWrapTest)
 addPythonTest(core.cwrap.cfile tests.core.cwrap.test_cfile.CFILETest)
-
+addPythonTest(core.cwrap.stream tests.core.cwrap.test_stream.StreamTest)

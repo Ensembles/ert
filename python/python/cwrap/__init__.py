@@ -44,9 +44,10 @@ from .basecvalue import BaseCValue
 
 from .cfile import CFILE
 from .clib import load, lib_name
+from .stream import Stream
 
 from .metacwrap import MetaCWrap
 from .prototype import REGISTERED_TYPES, Prototype, PrototypeError
 
 __all__ = ['BaseCClass', 'BaseCEnum', 'BaseCValue', 'CFILE',
-           'MetaCWrap', 'Prototype', 'load', 'lib_name']
+           'MetaCWrap', 'Prototype', 'load', 'lib_name', 'Stream']

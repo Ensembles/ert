@@ -69,7 +69,10 @@ class EclRFT(BaseCClass):
 
     def __init__(self , name , type_string , date , days):
         c_ptr = self._alloc( name , type_string , CTime( date ) , days )
-        super(EclRFT , self).__init__( c_ptr )
+        if c_ptr:
+            super(EclRFT , self).__init__( c_ptr )
+        else:
+            raise ValueError('Failed to construct EclRFT object from given input.')
 
 
     def free(self):

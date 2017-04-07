@@ -43,8 +43,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import ctypes
 import warnings
 
-import  numpy
-from cwrap import CFILE, BaseCClass
+import numpy
+from cwrap import BaseCClass
+from cwrap import Stream
 from ert.ecl import EclDataType
 from ert.ecl import EclTypeEnum, EclUtil, EclPrototype
 
@@ -274,10 +275,12 @@ class EclKW(BaseCClass):
         it finds in the file.
         """
 
-        cfile  = CFILE( fileH )
-        if kw:
-            if len(kw) > 8:
-                raise TypeError("Sorry keyword:%s is too long, must be eight characters or less." % kw)
+        if not isinstance(fileH, Stream):
+            raise ValueError('Must be a Stream, fileH was a %s.' % type(fileH))
+        if kw and len(kw) > 8:
+            raise TypeError('Sorry keyword "%s" is too long, ' +
+                            'must be eight characters or less, was %d.'
+                            % (kw, len(kw)))
 
         if ecl_type is None:
             if cls.int_kw_set.__contains__( kw ):
@@ -321,8 +324,8 @@ class EclKW(BaseCClass):
         true the function rewind to the beginning of the file and
         search from there after the initial search.
         """
-        cfile = CFILE( fileH )
-        return cls._fseek_grdecl( kw , rewind , cfile)
+        # cfile = CFILE( fileH )
+        return cls._fseek_grdecl( kw , rewind , fileH)
 
 
     @classmethod
@@ -817,14 +820,18 @@ class EclKW(BaseCClass):
         The check is based on the content of the keywords, and not
         pointer comparison.
         """
-        if isinstance(other , EclKW):
+        if isinstance(other, EclKW):
             return self._equal( other )
         else:
             raise TypeError("Can only compare with another EclKW")
 
 
     def __eq__(self , other):
-        return self.equal( other )
+        if other is None:
+            return False
+        if isinstance(other, EclKW):
+            return self.equal(other)
+        return NotImplemented
 
     def __hash__(self):
         return hash(self._get_header( ))
@@ -1049,7 +1056,7 @@ class EclKW(BaseCClass):
     def fwrite( self , fortio ):
         self._fwrite( fortio )
 
-    def write_grdecl( self , file ):
+    def write_grdecl( self , fileH ):
         """
         Will write keyword in GRDECL format.
 
@@ -1071,12 +1078,12 @@ class EclKW(BaseCClass):
             fileH.close()
 
         """
-        cfile = CFILE( file )
-        self._fprintf_grdecl( cfile )
+        # cfile = CFILE( file )
+        self._fprintf_grdecl( fileH )
 
 
 
-    def fprintf_data( self , file , fmt = None):
+    def fprintf_data( self , fileH , fmt = None):
         """
         Will print the keyword data formatted to file.
 
@@ -1094,8 +1101,8 @@ class EclKW(BaseCClass):
         """
         if fmt is None:
             fmt = self.str_fmt + "\n"
-        cfile = CFILE( file )
-        self._fprintf_data( fmt , cfile )
+        #cfile = CFILE( file )
+        self._fprintf_data( fmt , fileH )
 
 
     def fixUninitialized(self , grid):

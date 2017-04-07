@@ -23,7 +23,7 @@ from ert.ecl.faults import FaultCollection, Fault, FaultLine, FaultSegment,Fault
 from ert.ecl import EclGrid, EclKW, EclDataType
 from ert.test import ExtendedTestCase, TestAreaContext
 from ert.geo import Polyline , CPolyline
-
+from cwrap import Stream
 
 class FaultTest(ExtendedTestCase):
     @classmethod
@@ -502,7 +502,7 @@ class FaultTest(ExtendedTestCase):
         nz = 43
         grid = EclGrid.createRectangular( (nx , ny , nz) , (1,1,1) )
         with TestAreaContext("python/faults/line_order"):
-            with open("faults.grdecl" , "w") as f:
+            with Stream("faults.grdecl" , "w") as f:
                 f.write("""FAULTS
 \'F\'              105  107     50   50      1   43    \'Y\'    /
 \'F\'              108  108     50   50      1   43    \'X\'    /
@@ -644,7 +644,7 @@ class FaultTest(ExtendedTestCase):
         nz = 1
         grid = EclGrid.createRectangular( (nx , ny , nz) , (1,1,1) )
         with TestAreaContext("python/faults/line_order"):
-            with open("faults.grdecl" , "w") as f:
+            with Stream("faults.grdecl" , "w") as f:
                 f.write("""FAULTS
 \'F1\'              1    4       2    2       1    1    \'Y\'    /
 \'F1\'              6    8       2    2       1    1    \'Y\'    /

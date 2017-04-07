@@ -17,6 +17,7 @@ import re
 
 from .fault import Fault
 from ert.ecl import EclGrid
+from cwrap import Stream
 
 comment_regexp = re.compile("--.*")
 
@@ -62,12 +63,7 @@ class FaultCollection(object):
 
     def __iter__(self):
         return iter(self.__fault_list)
-        
 
-    def getGrid(self):
-        return self.__grid
-
-            
     def getFault(self , name):
         return self.__getitem__(name)
 
@@ -121,7 +117,7 @@ class FaultCollection(object):
 
 
     def load(self , grid , file_name):
-        with open(file_name) as fileH:
+        with Stream(file_name) as fileH:
             for line in fileH:
                 if line.startswith("FAULTS"):
                     self.loadFaults(grid , fileH)

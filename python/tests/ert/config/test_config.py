@@ -16,9 +16,12 @@
 #  for more details. 
 import os
 
-import ert
-from ert.config import ContentTypeEnum, UnrecognizedEnum, SchemaItem, ContentItem, ContentNode, ConfigParser, ConfigContent,ConfigSettings
 from cwrap import Prototype, clib
+from cwrap import Stream
+import ert
+from ert.config import (ContentTypeEnum, UnrecognizedEnum, SchemaItem,
+                        ContentItem, ContentNode, ConfigParser, ConfigContent,
+                        ConfigSettings)
 from ert.test import ExtendedTestCase, TestAreaContext
 
 
@@ -51,7 +54,7 @@ class ConfigTest(ExtendedTestCase):
 
     def test_item_types(self):
         with TestAreaContext("config/types") as test_area:
-            with open("config" , "w") as f:
+            with Stream("config" , "w") as f:
                 f.write("TYPE_ITEM 10 3.14 TruE  String  file\n")
                 
             conf = ConfigParser()
@@ -127,7 +130,7 @@ class ConfigTest(ExtendedTestCase):
         conf = ConfigParser()
         conf.add("INT", value_type = ContentTypeEnum.CONFIG_INT )
         with TestAreaContext("config/parse2"):
-            with open("config","w") as fileH:
+            with Stream("config","w") as fileH:
                 fileH.write("INT xx\n")
 
             with self.assertRaises(ValueError):
@@ -144,7 +147,7 @@ class ConfigTest(ExtendedTestCase):
         msg = "ITEM INT IS DEPRECATED"
         item.setDeprecated( msg )
         with TestAreaContext("config/parse2"):
-            with open("config","w") as fileH:
+            with Stream("config","w") as fileH:
                 fileH.write("INT 100\n")
 
             content = conf.parse("config"  )
@@ -165,10 +168,10 @@ class ConfigTest(ExtendedTestCase):
             os.makedirs("cwd/jobs")
             os.makedirs("eclipse/bin")
             script_path = os.path.join( os.getcwd() , "eclipse/bin/script.sh")
-            with open(script_path,"w") as f:
+            with Stream(script_path,"w") as f:
                 f.write("This is a test script")
 
-            with open("cwd/jobs/JOB","w") as fileH:
+            with Stream("cwd/jobs/JOB","w") as fileH:
                 fileH.write("EXECUTABLE ../../eclipse/bin/script.sh\n")
 
             os.makedirs("cwd/ert")
@@ -194,7 +197,7 @@ class ConfigTest(ExtendedTestCase):
         
         
         with TestAreaContext("config/parse2"):
-            with open("config","w") as fileH:
+            with Stream("config","w") as fileH:
                 fileH.write("KEY VALUE1 VALUE2 100  True  3.14  path/file.txt\n")
 
             cwd0 = os.getcwd( )
@@ -317,7 +320,7 @@ class ConfigTest(ExtendedTestCase):
 
         
         with TestAreaContext("config/parse3"):
-            with open("config","w") as fileH:
+            with Stream("config","w") as fileH:
                 fileH.write("SETTINGS A 100\n")
                 fileH.write("SETTINGS B 200\n")
                 fileH.write("SETTINGS C 300\n")
@@ -346,7 +349,7 @@ class ConfigTest(ExtendedTestCase):
         cs.initParser( parser )
 
         with TestAreaContext("config/parse4"):
-            with open("config","w") as fileH:
+            with Stream("config","w") as fileH:
                 fileH.write("SETTINGS A 100.1\n")
                 fileH.write("SETTINGS B 200\n")
                 fileH.write("SETTINGS C 300\n")

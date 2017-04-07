@@ -25,7 +25,7 @@ import time
 from ert.ecl import EclDataType, EclKW, EclGrid, EclFile, openEclFile
 from ert.util import DoubleVector, IntVector
 from ert.test import ExtendedTestCase , TestAreaContext
-
+from cwrap import Stream
 
 class GridTest(ExtendedTestCase):
     def egrid_file(self):
@@ -115,7 +115,7 @@ class GridTest(ExtendedTestCase):
     
     
     def create(self, filename, load_actnum=True):
-        fileH = open(filename, "r")
+        fileH = Stream(filename, "r")
         specgrid = EclKW.read_grdecl(fileH, "SPECGRID", ecl_type=EclDataType.ECL_INT, strict=False)
         zcorn = EclKW.read_grdecl(fileH, "ZCORN")
         coord = EclKW.read_grdecl(fileH, "COORD")
@@ -170,7 +170,7 @@ class GridTest(ExtendedTestCase):
             grid = EclGrid.loadFromGrdecl("/file/does/not/exists")
 
         with TestAreaContext("python/grid-test/grdeclLoad"):
-            with open("grid.grdecl","w") as f:
+            with Stream("grid.grdecl","w") as f:
                 f.write("Hei ...")
                 
             with self.assertRaises(ValueError):
@@ -183,7 +183,7 @@ class GridTest(ExtendedTestCase):
             g1.save_EGRID("G.EGRID")
 
             with openEclFile("G.EGRID") as f:
-                with open("grid.grdecl" , "w") as f2:
+                with Stream("grid.grdecl" , "w") as f2:
                     f2.write("SPECGRID\n")
                     f2.write("  10  10  10  \'F\' /\n")
 
@@ -227,7 +227,7 @@ class GridTest(ExtendedTestCase):
             g2 = EclGrid("test.GRID")
             self.assertTrue(g1.equal(g2))
     
-            fileH = open("test.grdecl", "w")
+            fileH = Stream("test.grdecl", "w")
             g1.save_grdecl(fileH)
             fileH.close()
             g2 = self.create("test.grdecl")

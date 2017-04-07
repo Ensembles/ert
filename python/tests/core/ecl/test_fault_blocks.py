@@ -23,6 +23,7 @@ from ert.ecl.faults import FaultBlock, FaultBlockLayer, FaultBlockCell,FaultColl
 from ert.geo import Polyline , CPolylineCollection
 from ert.test import ExtendedTestCase , TestAreaContext
 
+from cwrap import Stream
 
 class FaultBlockTest(ExtendedTestCase):
     def setUp(self):
@@ -59,7 +60,7 @@ class FaultBlockTest(ExtendedTestCase):
 
     def test_get_ijk(self):
         with TestAreaContext("python/fault_block_layer/neighbour") as work_area:
-            with open("kw.grdecl","w") as fileH:
+            with Stream("kw.grdecl","w") as fileH:
                 fileH.write("FAULTBLK \n")
                 fileH.write("1 1 1 0 0\n")
                 fileH.write("1 2 2 0 3\n")
@@ -68,7 +69,7 @@ class FaultBlockTest(ExtendedTestCase):
                 fileH.write("4 4 4 0 5\n")
                 fileH.write("/\n")
 
-            kw = EclKW.read_grdecl(open("kw.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
+            kw = EclKW.read_grdecl(Stream("kw.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
         
         grid = EclGrid.createRectangular( (5,5,1) , (1,1,1) )
         layer = FaultBlockLayer( grid , 0 )
@@ -91,7 +92,7 @@ class FaultBlockTest(ExtendedTestCase):
     def test_neighbours(self):
 
         with TestAreaContext("python/fault_block_layer/neighbour") as work_area:
-            with open("kw.grdecl","w") as fileH:
+            with Stream("kw.grdecl","w") as fileH:
                 fileH.write("FAULTBLK \n")
                 fileH.write("1 1 1 0 0\n")
                 fileH.write("1 2 2 0 3\n")
@@ -100,7 +101,7 @@ class FaultBlockTest(ExtendedTestCase):
                 fileH.write("4 4 4 0 5\n")
                 fileH.write("/\n")
 
-            kw = EclKW.read_grdecl(open("kw.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
+            kw = EclKW.read_grdecl(Stream("kw.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
         
         grid = EclGrid.createRectangular( (5,5,1) , (1,1,1) )
         layer = FaultBlockLayer( grid , 0 )
@@ -148,7 +149,7 @@ class FaultBlockTest(ExtendedTestCase):
         grid = EclGrid.createRectangular( (nx , ny , nz) , (1,1,1) )
         layer = FaultBlockLayer( grid , 0 )
         with TestAreaContext("python/FaultBlocks/neighbours"):
-            with open("faultblock.grdecl","w") as fileH:
+            with Stream("faultblock.grdecl","w") as fileH:
                 fileH.write("FAULTBLK \n")
                 fileH.write("1 1 1 1 2 2 2 2 \n")
                 fileH.write("1 1 1 1 2 2 2 2 \n")
@@ -160,8 +161,8 @@ class FaultBlockTest(ExtendedTestCase):
                 fileH.write("3 3 3 3 2 2 2 2 \n")
                 fileH.write("/\n")
                 
-            kw = EclKW.read_grdecl(open("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
-            with open("faults.grdecl" , "w") as f:
+            kw = EclKW.read_grdecl(Stream("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
+            with Stream("faults.grdecl" , "w") as f:
                 f.write("FAULTS\n")
                 f.write("\'FY\'   1   4   4   4   1   1  'Y'  /\n")
                 f.write("\'FX\'   4   4   1   8   1   1  'X'  /\n")
@@ -214,7 +215,7 @@ class FaultBlockTest(ExtendedTestCase):
         grid = EclGrid.createRectangular( (nx , ny , nz) , (1,1,1) )
         layer = FaultBlockLayer( grid , 0 )
         with TestAreaContext("python/FaultBlocks/neighbours"):
-            with open("faultblock.grdecl","w") as fileH:
+            with Stream("faultblock.grdecl","w") as fileH:
                 fileH.write("FAULTBLK \n")
                 fileH.write("1 1 1 1 2 2 2 2 \n")
                 fileH.write("1 1 1 1 2 2 2 2 \n")
@@ -226,8 +227,8 @@ class FaultBlockTest(ExtendedTestCase):
                 fileH.write("1 1 1 1 1 2 2 2 \n")
                 fileH.write("/\n")
                 
-            kw = EclKW.read_grdecl(open("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
-            with open("faults.grdecl" , "w") as f:
+            kw = EclKW.read_grdecl(Stream("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
+            with Stream("faults.grdecl" , "w") as f:
                 f.write("FAULTS\n")
                 f.write("\'FX\'   4   4   1   4   1   1  'X'  /\n")
                 f.write("\'FX\'   5   5   5   8   1   1  'X'  /\n")
@@ -423,7 +424,7 @@ class FaultBlockTest(ExtendedTestCase):
         grid = EclGrid.createRectangular( (nx , ny , nz) , (1,1,1) )
         layer = FaultBlockLayer( grid , 0 )
         with TestAreaContext("python/FaultBlocks/internal_blocks"):
-            with open("faultblock.grdecl","w") as fileH:
+            with Stream("faultblock.grdecl","w") as fileH:
                 fileH.write("FAULTBLK \n")
                 fileH.write("1 1 1 1 2 2 2 2 \n")
                 fileH.write("1 4 4 1 2 5 5 2 \n")
@@ -436,8 +437,8 @@ class FaultBlockTest(ExtendedTestCase):
                 fileH.write("/\n")
 
 
-            kw = EclKW.read_grdecl(open("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
-            with open("faults.grdecl" , "w") as f:
+            kw = EclKW.read_grdecl(Stream("faultblock.grdecl") , "FAULTBLK" , ecl_type = EclDataType.ECL_INT)
+            with Stream("faults.grdecl" , "w") as f:
                 f.write("FAULTS\n")
                 f.write("\'FX\'   4   4   1   4   1   1  'X'  /\n")
                 f.write("\'FX\'   5   5   4   4   1   1  'Y'  /\n")

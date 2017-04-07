@@ -1,5 +1,6 @@
 import os
 from .polyline import Polyline
+from cwrap import Stream
 
 class XYZIo(object):
 
@@ -14,7 +15,7 @@ class XYZIo(object):
 
         polyline = Polyline(name=name)
 
-        with open(path, "r") as f:
+        with Stream(path, "r") as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -41,7 +42,7 @@ class XYZIo(object):
 
         polyline = Polyline(name=name)
 
-        with open(path, "r") as f:
+        with Stream(path, "r") as f:
             for line in f:
                 x, y= map(float, line.split())
                 polyline.addPoint(x, y)
@@ -54,7 +55,7 @@ class XYZIo(object):
         """
         @type polyline: Polyline or list of tuple of (float, float)
         """
-        with open(filename , "w") as fileH:
+        with Stream(filename , "w") as fileH:
             for p in polyline:
                 fileH.write("%g %g\n" % (p[0] , p[1]))
         
