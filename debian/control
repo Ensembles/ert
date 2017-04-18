@@ -36,6 +36,6 @@ Description: The Ensemble based Reservoir Tool - Python bindings
 Package: python-cwrap
 Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-six
 Description: Package to simplify ctypes based wrapping of C code.
  Package to simplify ctypes based wrapping of C code.
