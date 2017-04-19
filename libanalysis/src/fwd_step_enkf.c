@@ -275,7 +275,7 @@ void fwd_step_enkf_updateA(void * module_data ,
     fwd_step_data->num_threads = 1;
 #endif
 
-    if ( ens_size <= nfolds)
+    if ( ens_size < nfolds)
       util_abort("%s: The number of ensembles must be larger than the CV fold - aborting\n", __func__);
 
 
