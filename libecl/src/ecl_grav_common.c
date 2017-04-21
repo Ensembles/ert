@@ -26,6 +26,7 @@
 #include <ert/ecl/ecl_kw.h>
 #include <ert/ecl/ecl_file.h>
 #include <ert/ecl/ecl_region.h>
+#include <ert/ecl/ecl_grid.h>
 #include <ert/ecl/ecl_grid_cache.h>
 #include <ert/ecl/ecl_kw_magic.h>
 
@@ -54,6 +55,12 @@ bool * ecl_grav_common_alloc_aquifer_cell( const ecl_grid_cache_type * grid_cach
   return aquifer_cell;
 }
 
+bool * ecl_grav_common_alloc_aquifer_cell_nocache(const ecl_grid_type * grid, const ecl_file_type * init_file) {
+  ecl_grid_cache_type * cache = ecl_grid_cache_alloc( grid );
+  bool * aquifer_cell = ecl_grav_common_alloc_aquifer_cell(cache, init_file);
+  ecl_grid_cache_free(cache);
+  return aquifer_cell;
+}
 
 
 double ecl_grav_common_eval_biot_savart( const ecl_grid_cache_type * grid_cache , ecl_region_type * region , const bool * aquifer , const double * weight , double utm_x , double utm_y , double depth) {

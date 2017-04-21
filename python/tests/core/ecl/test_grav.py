@@ -22,4 +22,14 @@ class EclGravTest(ExtendedTestCase):
 
             grav = EclGrav( self.grid , self.init )
 
-
+    def test_aquifer(self):
+        path = '/private/pgdr/opm/opm-data/norne/opm-simulation-reference/NORNE_ATW2013.'
+        grid = EclGrid(path+'EGRID')
+        print(repr(grid))
+        init = EclFile(path+'FINIT')
+        self.assertTrue(init.has_kw('AQUIFERN'))
+        aquifer = EclGrav.aquifer(grid, init)
+        print(len(aquifer))
+        print(repr(aquifer))
+        print(str(aquifer))
+        self.assertEqual(13, sum(aquifer))
