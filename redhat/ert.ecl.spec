@@ -2,7 +2,7 @@
 # spec file for package ert.ecl
 #
 
-%define tag rc1
+%define tag rc2
 
 Name:           ert.ecl
 Version:        2017.04
