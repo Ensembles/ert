@@ -85,7 +85,8 @@ rm -rf %{buildroot}
 %postun -n libert.ecl1 -p /sbin/ldconfig
 
 %files
-%doc README
+%doc README.md
+%{_datadir}/*
 
 %files -n libert.ecl1
 %defattr(-,root,root,-)
