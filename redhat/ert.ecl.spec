@@ -2,7 +2,7 @@
 # spec file for package ert.ecl
 #
 
-%define tag rc2
+%define tag final
 
 Name:           ert.ecl
 Version:        2017.04
@@ -85,7 +85,8 @@ rm -rf %{buildroot}
 %postun -n libert.ecl1 -p /sbin/ldconfig
 
 %files
-%doc README
+%doc README.md
+%{_datadir}/*
 
 %files -n libert.ecl1
 %defattr(-,root,root,-)
