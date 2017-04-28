@@ -31,7 +31,7 @@ extern "C" {
   i.e. 'REAL', 'INTE', ... , come as 4 character strings.
 */
 
-#define ECL_STRING10_LENGTH 10    // Initial guess that the type C010 type is a10 character string.
+#define ECL_STRING10_LENGTH 10    // TODO: Remove
 #define ECL_STRING8_LENGTH   8
 #define ECL_TYPE_LENGTH      4
 
@@ -72,7 +72,8 @@ typedef enum {
   ECL_INT_TYPE    = 3,
   ECL_BOOL_TYPE   = 4,
   ECL_MESS_TYPE   = 5,
-  ECL_C010_TYPE   = 6   // See comment immediately above about the limited support of this type.
+  ECL_C010_TYPE   = 6,   // TODO: Remove
+  ECL_STRING_TYPE = 7
 } ecl_type_enum;
 
 #define ECL_TYPE_ENUM_DEFS {.value = 0 , .name = "ECL_CHAR_TYPE"}, \
@@ -80,9 +81,10 @@ typedef enum {
 {.value = 2 , .name = "ECL_DOUBLE_TYPE"},                          \
 {.value = 3 , .name = "ECL_INT_TYPE"},                             \
 {.value = 4 , .name = "ECL_BOOL_TYPE"},                            \
-{.value = 5 , .name = "ECL_MESS_TYPE"}
+{.value = 5 , .name = "ECL_MESS_TYPE"},                            \
+{.value = 7 , .name = "ECL_STRING_TYPE"}
 
-#define ECL_TYPE_ENUM_SIZE 6
+#define ECL_TYPE_ENUM_SIZE 7
 
 
 
@@ -103,6 +105,9 @@ typedef struct ecl_type_struct ecl_data_type;
 #define ECL_DOUBLE (ecl_data_type) {.type = ECL_DOUBLE_TYPE, .element_size = sizeof(double)}
 #define ECL_BOOL (ecl_data_type) {.type = ECL_BOOL_TYPE, .element_size = sizeof(int)}
 #define ECL_MESS (ecl_data_type) {.type = ECL_MESS_TYPE, .element_size = 0}
+#define ECL_STRING(size) (ecl_data_type) {.type = ECL_STRING_TYPE, .element_size=size}
+
+// TODO: The ECL_C010 macro is to be removed
 #define ECL_C010 (ecl_data_type) {.type = ECL_C010_TYPE, .element_size = 10+1}
 
 
@@ -126,6 +131,7 @@ bool               ecl_type_is_double(const ecl_data_type);
 bool               ecl_type_is_mess(const ecl_data_type);
 bool               ecl_type_is_bool(const ecl_data_type);
 bool               ecl_type_is_C010(const ecl_data_type);
+bool               ecl_type_is_string(const ecl_data_type);
 
 #ifdef __cplusplus
 }
